@@ -58,7 +58,7 @@ if plots==True:
 
             mesh_exit_norm = np.loadtxt('../3_sfgrids/%s_%.2f/dx_%.2f/Door_X_%.6f_Y_%.6f/t_%.6f.csv'%(specified_location[0], specified_location[1], delta_mesh_exit, exits[exit][0], exits[exit][1], time), delimiter=',', skiprows=3)
             aa = ax1.pcolorfast(dim1, dim2, mesh_exit_norm, cmap='coolwarm', vmin=0, vmax=5)
-            ax1.set_title('Exit %s'%exit)
+            ax1.set_title(exit)
             #ax1.text(exits[exit][0]-5, exits[exit][1], 'EXIT %s'%exit, bbox={'facecolor':'w', 'alpha':0.5, 'pad':5})
             ax1.set_aspect('equal')
             ax1.set_xticks(np.arange(dim1_min, dim1_max,5))

@@ -70,15 +70,19 @@ def main(convert, exit):
 
             x_shift, y_shift= 0, 0
 
-            if x0 > x and exits[exit][2]=='y':
-                x_shift=2
-            elif x0 < x and exits[exit][2]=='y':
-                x_shift=-2
-
-            if y0 > y and exits[exit][2]=='x':
-                y_shift=2
-            elif y0 < y and exits[exit][2]=='x':
-                y_shift=-2
+            # if x0 > x and exits[exit][2]=='y':
+            #     x_shift=10
+            # elif x0 < x and exits[exit][2]=='y':
+            #     x_shift=-10
+            #
+            # if y0 > y and exits[exit][2]=='x':
+            #     y_shift=10
+            # elif y0 < y and exits[exit][2]=='x':
+            #     y_shift=-10
+            #
+            # if exit=='C':
+            #     y_shift=-4
+            #
 
             x_exit, y_exit = np.linspace(x0, x+x_shift, math.hypot(x+x_shift - x0, y+y_shift - y0)), np.linspace(y0, y+y_shift, math.hypot(x+x_shift - x0, y+y_shift - y0))
 
@@ -95,6 +99,7 @@ def main(convert, exit):
             #### visibility straight lines not or only moderately obstructed by smoke:
 
             else:
+
                 edge_exit = np.amax(zi_exit)*abs(np.trapz(zi_exit))*delta_dim_1*2
 
 
@@ -104,39 +109,35 @@ def main(convert, exit):
 
             #### storage of the edge factor
             mesh_exit[a,b]=edge_exit
+
             #print x0, y0
 
-            ### This statement yields a representative plot of the line of
-            ### sights if wanted
-            if plots == True:
-                if x0 == 24 and y0 == 4:
-                    return a,b, x0, y0, x, y, zi_exit, edge_exit, x_shift, y_shift, time
+    print 'Exit ', exit, 'maximum D(l)', global_D_max
 
-        print exit, 'maximum D(l)', global_D_max
-
-        for a, line in enumerate(mesh_exit):
-            for b, col in enumerate(line):
-                if mesh_exit[a,b] == 10:
-                    #print exit
-                    continue
-                else:
-                    #print global_D_max
-                    mesh_exit[a,b] = mesh_exit[a,b]/global_D_max
+    for a, line in enumerate(mesh_exit):
+        for b, col in enumerate(line):
+            if mesh_exit[a,b] == 10:
+                #print exit
+                continue
+            else:
+                #print global_D_max
+                mesh_exit[a,b] = mesh_exit[a,b]/global_D_max
 
 
-        header='Room No. 1 , Exit %s, \n dX[m], dY[m] , minX[m] , maxX[m], minY[m], maxY[m] \n   %f  ,  %f    ,  %f  ,  %f  ,  %f ,  %f' \
-        %(exit, delta_mesh_exit, delta_mesh_exit, dim1_min, dim1_max, dim2_min, dim2_max)
-        np.savetxt('../3_sfgrids/%s_%.2f/dx_%.2f/Door_X_%.6f_Y_%.6f/t_%6f.csv'\
-        %(specified_location[0], specified_location[1], delta_mesh_exit, exits[exit][0], exits[exit][1], float(time)), mesh_exit, header=header, delimiter=',', comments='')
-        print 'Write smoke factor grid: ../3_sfgrids/%s_%.2f/dx_%.2f/Door_X_%.6f_Y_%.6f/t_%6f.csv'\
-        %(specified_location[0], specified_location[1], delta_mesh_exit, exits[exit][0], exits[exit][1], float(time))
+    header='Room No. 1 , Exit %s, \n dX[m], dY[m] , minX[m] , maxX[m], minY[m], maxY[m] \n   %f  ,  %f    ,  %f  ,  %f  ,  %f ,  %f' \
+    %(exit, delta_mesh_exit, delta_mesh_exit, dim1_min, dim1_max, dim2_min, dim2_max)
+    np.savetxt('../3_sfgrids/%s_%.2f/dx_%.2f/Door_X_%.6f_Y_%.6f/t_%6f.csv'\
+    %(specified_location[0], specified_location[1], delta_mesh_exit, exits[exit][0], exits[exit][1], float(time)), mesh_exit, header=header, delimiter=',', comments='')
+    print 'Write smoke factor grid: ../3_sfgrids/%s_%.2f/dx_%.2f/Door_X_%.6f_Y_%.6f/t_%6f.csv'\
+    %(specified_location[0], specified_location[1], delta_mesh_exit, exits[exit][0], exits[exit][1], float(time))
 
-        return a,b, x0, y0, x, y, zi_exit, edge_exit, x_shift, y_shift, time
+    return a,b, x0, y0, x, y, zi_exit, edge_exit, x_shift, y_shift, time
+
 
 #==============================================================================
 # This is the resolution of the smoke sensor grids: Adjustments may be
 # appropriate in fligry geometries, Default: delta_mesh_exit = 1 (m)
-delta_mesh_exit = 0.5
+delta_mesh_exit = 1.
 #==============================================================================
 
 print '\n-----------------------------------------------------------------'
@@ -154,6 +155,7 @@ for convert in converted:
     plt.close()
     print '\n-----------------------------------------------------------------'
     print 'Processing files: %s\n' %convert
+
     magnitudes = np.loadtxt(convert, delimiter=',')
 
     time=int(convert[:-4][convert.rfind('_')+1:])
@@ -172,8 +174,9 @@ for convert in converted:
 
         a,b, x0, y0, x, y, zi_exit, edge_exit, x_shift, y_shift, time = main(convert, exit)
 
-        if plots==True:
-
+        ## This statement yields a representative plot of the line of
+        ## sights if wanted
+        if plots == True and x0 == 24 and y0 == 4:
             ax1.set_xlabel('%s (m)'%dimension_1.lower())
             ax1.set_ylabel('%s (m)'%dimension_2.lower())
             ax1.set_xticks(np.arange(dim1_min, dim1_max, 5))
@@ -208,13 +211,11 @@ for convert in converted:
             ax3.set_ylabel('D (1/m)')
             ax3.set_ylim(0,1)
 
-        cbar = fig.colorbar(aa,ax=ax1,cax=ax2,
-            orientation='vertical')
+            cbar = fig.colorbar(aa,ax=ax1,cax=ax2, orientation='vertical')
 
+            plt.legend(fontsize=8, loc='upper left')
 
-        plt.legend(fontsize=8, loc='upper left')
-
-        plt.savefig('../2_consolidated/%s_%.2f/%s_%s.pdf'%(specified_location[0], specified_location[1], quantity+'_arrows', time ))
+            plt.savefig('../2_consolidated/%s_%.2f/%s_%s.pdf'%(specified_location[0], specified_location[1], quantity+'_arrows', time ))
 
 print "\n*** Finished ***"
 
