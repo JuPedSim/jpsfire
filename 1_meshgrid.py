@@ -50,7 +50,7 @@ def read_fds_line():
     return coordinates
 
 f = open('data_slice2ascii.pckl')
-(chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes) = pickle.load(f)
+(chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path) = pickle.load(f)
 
 if not os.path.exists('../1_meshgrid/%s_%.2f'%(specified_location[0], specified_location[1])):
     print 'create directory "1_meshgrid"'
@@ -188,9 +188,6 @@ for slicefile in slicefiles:
     np.savetxt('../1_meshgrid/%s_%.2f/%s.csv'%(specified_location[0], specified_location[1], slicefile[slicefile.rfind('/')+1:-4]), collect, delimiter=',')
     print '\nWrite files: ../1_meshgrid/%s_%.2f/%s.csv'%(specified_location[0], specified_location[1], slicefile[slicefile.rfind('/')+1:-4])
 
-    #plt.imshow(collect)
-#        plt.contourf(dim1, dim2, collect)
-
     # plt.figure(figsize=(cm2inch(15),cm2inch(10)), dpi=300)
     # #plt.figure(figsize=(cm2inch(30),cm2inch(20)), dpi=300)
     # ax=plt.subplot(111)
@@ -214,14 +211,12 @@ print "\n*** Finished ***"
 # Setup of the dict that contains all relevant information about
 # crossings and transitions within the JuPedSim geometry
 
-jps_sim_path = '../../JuPedSim/'
-
 exits_dict={}
 crossings=[]
 transitions=[]
 
 try:
-    geo = glob.glob(jps_sim_path+'*eo*.xml')
+    geo = glob.glob(jps_path+'*eo*.xml')
     tree = ET.parse(geo[0])
     root = tree.getroot()
 
@@ -248,7 +243,7 @@ try:
 
     transitions=[]
 
-    geo = glob.glob(jps_sim_path+'*eo*.xml')
+    geo = glob.glob(jps_path+'*eo*.xml')
     tree = ET.parse(geo[0])
     root = tree.getroot()
 
@@ -275,16 +270,18 @@ try:
 
 except:
     exits_dict = {}
+    print '!!! WARNING No geometry file found - no exits extracted !!!'
     pass
 
-#print exits_dict
+# print exits_dict
 
-#"A":(-0.3,2.0,'y'), "C":(5.0,24.3,'x'), "B":(-0.3,22.0,'y')}#, "D":(-0.3,27.6,'y'), "E":(-4.3,-7.0,'y'), "F":(-2.3,34.3,'x')}
+# format of the exits_dict: exits_dict={"A":(-0.3,2.0,'y')}
+
 exits = collections.OrderedDict(sorted(exits_dict.items()))
 
 #============storage of the most important variables to store.pckl=============
 
 f = open('data_meshgrid.pckl', 'w')
-pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, dim1_min, dim1_max, dim2_min, dim2_max, exits), f)
+pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, dim1_min, dim1_max, dim2_min, dim2_max, exits), f)
 
 f.close()

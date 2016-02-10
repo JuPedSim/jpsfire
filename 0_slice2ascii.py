@@ -19,10 +19,10 @@ import pickle
 
 # location of your local fds2ascii binary
 fds2ascii_path = '/Applications/FDS/FDS6/bin/fds2ascii'
-
 # Path pointing to the fire simulation directory
-path = os.path.join(os.getcwd()+'/../')
-config_file_name = os.path.join("../config_fds2ascii.csv")
+fds_path = os.path.join(os.getcwd()+'/../')
+# Path pointing to the JuPedSim simulation directory
+jps_path = os.path.join('../../JuPedSim/')
 
 ### FDS CHID:
 chid = 'JPSfire'
@@ -50,6 +50,7 @@ t_window=1            # interpolation duration prompted by fds2ascii
 #==============================================================================
 
 
+config_file_name = os.path.join("../config_fds2ascii.csv")
 
 t_low=np.arange(t_start,t_stop+1,t_step)
 t_up=[i+t_window for i in t_low]
@@ -138,7 +139,7 @@ for k, id_slice in enumerate(id_slices):
     data=[]
 
     for a,b in enumerate(t_low):
-        data.extend([path, chid, data_type, extend, domain_size,\
+        data.extend([fds_path, chid, data_type, extend, domain_size,\
         t_low[a], t_up[a], number_slices, id_slice, '0_slice2ascii/%s_%.2f/%s_mesh_%i.txt'%(specified_location[0], specified_location[1], output+str(t_low[a]), id_meshes[k])])
 
     data = np.reshape(data, (len(t_low),-1))
@@ -194,7 +195,7 @@ for k, id_slice in enumerate(id_slices):
         time.sleep(0.5)
 
 f = open('JPSfire/data_slice2ascii.pckl', 'w+')
-pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes), f)
+pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path), f)
 f.close()
 
 print "*** Finished ***"

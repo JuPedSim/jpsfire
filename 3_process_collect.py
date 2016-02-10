@@ -28,14 +28,8 @@ matplotlib.rc('font', **font)
 
 
 f = open('data_meshgrid.pckl')
-(chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, dim1_min, dim1_max, dim2_min, dim2_max, exits) = pickle.load(f)
+(chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, dim1_min, dim1_max, dim2_min, dim2_max, exits) = pickle.load(f)
 
-#### Import of a function for optical density vs. visibility:
-#density_visibility=np.loadtxt('HLKL_1lx.txt', skiprows=1)
-#f_Dl = interp1d(density_visibility[:,0], density_visibility[:,1])
-
-# plt.plot(np.arange(0.00,1.2,0.01),f_Dl(np.arange(0.00,1.2,0.01)))
-# plt.show()
 
 def cm2inch(value):
     return value/2.54
@@ -60,8 +54,6 @@ def main(convert, exit):
 
             x0, y0 = m_to_pix(b*delta_mesh_exit+dim1_min, a*delta_mesh_exit+dim2_min)    # virtual agent position
             #print x0, y0
-            #x0=x0 + 5
-            #y0=y0 + 5
 
             #### stop of iteration and edge factor storage of predecessor cell
             #### if virtual agent position is identical with exit position
@@ -94,39 +86,7 @@ def main(convert, exit):
 
             x_exit, y_exit = np.linspace(x0+aaa, x+x_shift, math.hypot(x+x_shift - x0, y+y_shift - y0)), np.linspace(y0, y+y_shift, math.hypot(x+x_shift - x0, y+y_shift - y0))
 
-
-            # if np.isnan(magnitudes[np.amin(y_exit):np.amax(y_exit) , np.amin(x_exit):np.amax(x_exit)]).any()==True:
-            #     edge_exit = 1
-            #     #print exit, 'NAN!'
-            #     zi_exit = scipy.ndimage.map_coordinates(np.transpose(magnitudes), np.vstack((x_exit,y_exit)))
-            #
-            # else:
-            #     if np.amin(y_exit)==np.amax(y_exit):
-            #         test=magnitudes[np.amin(y_exit) , np.amin(x_exit):np.amax(x_exit)]
-            #         zi_exit=test
-            #         #print zi_exit
-            #
-            #     elif np.amin(x_exit)==np.amax(x_exit):
-            #         test=magnitudes[np.amin(y_exit):np.amax(y_exit) , np.amin(x_exit)]
-            #         zi_exit=test
-            #
-            #     else:
-            #         test=magnitudes[np.amin(y_exit):np.amax(y_exit) , np.amin(x_exit):np.amax(x_exit)]
-            #         zi_exit = scipy.ndimage.map_coordinates(np.transpose(test), np.vstack((x_exit-np.amin(x_exit), y_exit-np.amin(y_exit))))
-
-            #edge_exit = np.amax(zi_exit)*abs(np.trapz(zi_exit))/(len(zi_exit)*delta_dim_1) + 1
-            #     #edge_exit = abs(np.trapz(zi_exit))/len(zi_exit) + 1
-
             zi_exit = scipy.ndimage.map_coordinates(np.transpose(magnitudes), np.vstack((x_exit,y_exit)))
-            #edge_exit = np.amax(zi_exit)*abs(np.trapz(zi_exit))/(len(zi_exit)*delta_dim_1) + 1
-
-            # #### consideration if straight line length is higher than visibility throughout smoke:
-            # first_smoke=np.argmax(zi_exit>0.001)
-            #
-            # if f_Dl(np.mean(zi_exit[first_smoke:])) < (len(zi_exit)-first_smoke)*delta_dim_1 and np.amax(zi_exit)<8:
-            #     print len(zi_exit)
-            #     print 'No visibility!'
-            #     edge_exit = 10 + np.amax(zi_exit)*abs(np.trapz(zi_exit))/(len(zi_exit)*delta_dim_1)
 
             #### consideration of visibility straight lines blocked by an &OBST:
 
@@ -140,25 +100,12 @@ def main(convert, exit):
 
             else:
 
-                # print 'min', np.amin(zi_exit)
-                # print 'max', np.amax(zi_exit)
-                #
-                # zi_exit=zi_exit*np.arange(0,len(zi_exit))/len(zi_exit)
-                #
-                # print 'min_norm', np.amin(zi_exit)
-                # print 'max_norm', np.amax(zi_exit)
-
-                #edge_exit = np.amax(zi_exit)*abs(np.trapz(zi_exit))*delta_dim_1 # /(len(zi_exit)*delta_dim_1) # np.amax(zi_exit) * #/(len(zi_exit)*delta_dim_1)# + 1
-                #edge_exit = abs(np.trapz(zi_exit))*delta_dim_1 # /(len(zi_exit)*delta_dim_1) # np.amax(zi_exit) * #/(len(zi_exit)*delta_dim_1)# + 1
-
                 edge_exit = np.amax(zi_exit)*abs(np.trapz(zi_exit))*delta_dim_1*2
 
 
                 if np.amax(zi_exit) > global_D_max:
                     global_D_max=np.amax(zi_exit)
 
-                #if np.amax(zi_exit)>1:
-                    #return a,b, x0, y0, x, y, zi_exit, edge_exit, x_shift, y_shift
 
             #### storage of the edge factor
             mesh_exit[a,b]=edge_exit
@@ -294,6 +241,6 @@ print "\n*** Finished ***"
 #============storage of the most important variables to store.pckl=============
 
 f = open('data_sfgrids.pckl', 'w')
-pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, dim1_min, dim1_max, dim2_min, dim2_max, exits, delta_mesh_exit), f)
+pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, dim1_min, dim1_max, dim2_min, dim2_max, exits, delta_mesh_exit), f)
 
 f.close()
