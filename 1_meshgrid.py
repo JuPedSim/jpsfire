@@ -50,7 +50,7 @@ def read_fds_line():
     return coordinates
 
 f = open('data_slice2ascii.pckl')
-(chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path) = pickle.load(f)
+(chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots) = pickle.load(f)
 
 if not os.path.exists('../1_meshgrid/%s_%.2f'%(specified_location[0], specified_location[1])):
     print 'create directory "1_meshgrid"'
@@ -61,9 +61,10 @@ try:
 except OSError:
     pass
 
-# if not os.path.exists('../slicefiles/%s_%.2f'%(specified_location[0], specified_location[1])):
-#     print 'create directory "slicefiles"'
-#     os.makedirs('../slicefiles/%s_%.2f'%(specified_location[0], specified_location[1]))
+if plots==True:
+    if not os.path.exists('../slicefiles/%s_%.2f'%(specified_location[0], specified_location[1])):
+        print 'create directory "slicefiles"'
+        os.makedirs('../slicefiles/%s_%.2f'%(specified_location[0], specified_location[1]))
 
 
 fds=glob.glob('../%s.fds'%chid)
@@ -188,23 +189,21 @@ for slicefile in slicefiles:
     np.savetxt('../1_meshgrid/%s_%.2f/%s.csv'%(specified_location[0], specified_location[1], slicefile[slicefile.rfind('/')+1:-4]), collect, delimiter=',')
     print '\nWrite files: ../1_meshgrid/%s_%.2f/%s.csv'%(specified_location[0], specified_location[1], slicefile[slicefile.rfind('/')+1:-4])
 
-    # plt.figure(figsize=(cm2inch(15),cm2inch(10)), dpi=300)
-    # #plt.figure(figsize=(cm2inch(30),cm2inch(20)), dpi=300)
-    # ax=plt.subplot(111)
-    # aa = ax.pcolorfast(dim1, dim2, collect)
-    # plt.colorbar(aa)
-    #
-    # plt.xlabel('%s (m)'%dimension_1.lower())
-    # plt.ylabel('%s (m)'%dimension_2.lower())
-    #
-    # plt.xticks([-5,0,5,10])
-    #
-    # plt.axes().set_aspect('equal')
-    # plt.minorticks_on()
-    # plt.grid(which='major')
-    #
-    # plt.savefig('../slicefiles/%s_%.2f/%s.pdf'%(specified_location[0],specified_location[1], slicefile[slicefile.rfind('/')+1:-4]))
-    #plt.show()
+    if plots==True:
+        plt.figure(figsize=(cm2inch(15),cm2inch(10)), dpi=300)
+        ax=plt.subplot(111)
+        aa = ax.pcolorfast(dim1, dim2, collect, vmin=0, vmax=2)
+        plt.colorbar(aa, label=quantity)
+
+        plt.xlabel('%s (m)'%dimension_1.lower())
+        plt.ylabel('%s (m)'%dimension_2.lower())
+
+        plt.axes().set_aspect('equal')
+        plt.minorticks_on()
+        plt.grid(which='major')
+
+        plt.savefig('../slicefiles/%s_%.2f/%s.pdf'%(specified_location[0],specified_location[1], slicefile[slicefile.rfind('/')+1:-4]))
+
 
 print "\n*** Finished ***"
 
@@ -282,6 +281,6 @@ exits = collections.OrderedDict(sorted(exits_dict.items()))
 #============storage of the most important variables to store.pckl=============
 
 f = open('data_meshgrid.pckl', 'w')
-pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, dim1_min, dim1_max, dim2_min, dim2_max, exits), f)
+pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, dim1_min, dim1_max, dim2_min, dim2_max, exits), f)
 
 f.close()

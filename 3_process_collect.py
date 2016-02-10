@@ -28,15 +28,17 @@ matplotlib.rc('font', **font)
 
 
 f = open('data_meshgrid.pckl')
-(chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, dim1_min, dim1_max, dim2_min, dim2_max, exits) = pickle.load(f)
+(chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, dim1_min, dim1_max, dim2_min, dim2_max, exits) = pickle.load(f)
 
-
+# Comversion cm to inches
 def cm2inch(value):
     return value/2.54
 
+# Comversion m to pixel coordinates
 def m_to_pix(x_i, y_i):
     return ((abs(dim1_max-dim1_min) - dim1_max + x_i)/delta_dim_1, (abs(dim2_max-dim2_min) - dim2_max + y_i) / delta_dim_2 )
 
+# main function
 def main(convert, exit):
 
     if not os.path.exists('../3_sfgrids/%s_%.2f/dx_%.2f/Door_X_%.6f_Y_%.6f'%(specified_location[0], specified_location[1], delta_mesh_exit, exits[exit][0], exits[exit][1])):
@@ -64,27 +66,25 @@ def main(convert, exit):
 
             #### shifting the x and y position of the exit according to the virtual agent position
             #### as well as the orientation of the exit to avoid to excessive &OBST slicing (Pixels)
+            #### Uncomment if needed, else: x_shift, y_shift= 0, 0
 
             x_shift, y_shift= 0, 0
 
-            if x0 > x and exits[exit][2]=='y':
-                x_shift=10
-            elif x0 < x and exits[exit][2]=='y':
-                x_shift=-10
+            # if x0 > x and exits[exit][2]=='y':
+            #     x_shift=10
+            # elif x0 < x and exits[exit][2]=='y':
+            #     x_shift=-10
+            #
+            # if y0 > y and exits[exit][2]=='x':
+            #     y_shift=10
+            # elif y0 < y and exits[exit][2]=='x':
+            #     y_shift=-10
+            #
+            # if exit=='C':
+            #     y_shift=-4
+            #
 
-            if y0 > y and exits[exit][2]=='x':
-                y_shift=10
-            elif y0 < y and exits[exit][2]=='x':
-                y_shift=-10
-
-            if exit=='C':
-                y_shift=-4
-
-            aaa=0
-            if exit=='D' or exit=='E' or exit=='F':
-                aaa=-10
-
-            x_exit, y_exit = np.linspace(x0+aaa, x+x_shift, math.hypot(x+x_shift - x0, y+y_shift - y0)), np.linspace(y0, y+y_shift, math.hypot(x+x_shift - x0, y+y_shift - y0))
+            x_exit, y_exit = np.linspace(x0, x+x_shift, math.hypot(x+x_shift - x0, y+y_shift - y0)), np.linspace(y0, y+y_shift, math.hypot(x+x_shift - x0, y+y_shift - y0))
 
             zi_exit = scipy.ndimage.map_coordinates(np.transpose(magnitudes), np.vstack((x_exit,y_exit)))
 
@@ -110,8 +110,13 @@ def main(convert, exit):
             #### storage of the edge factor
             mesh_exit[a,b]=edge_exit
 
-            # if x0 == 110 and y0==230:
-            #    return a,b, x0, y0, x, y, zi_exit, edge_exit, x_shift, y_shift
+            #print x0, y0
+
+            ### This statement yields a representative plot of the line of
+            ### sights if wanted
+            if plots == True:
+                if x0 == 24 and y0 == 4:
+                    return a,b, x0, y0, x, y, zi_exit, edge_exit, x_shift, y_shift, time
 
     print 'Exit ', exit, 'maximum D(l)', global_D_max
 
@@ -125,9 +130,6 @@ def main(convert, exit):
                 mesh_exit[a,b] = mesh_exit[a,b]/global_D_max
 
 
-    time=int(convert[:-4][convert.rfind('_')+1:])
-
-
     header='Room No. 1 , Exit %s, \n dX[m], dY[m] , minX[m] , maxX[m], minY[m], maxY[m] \n   %f  ,  %f    ,  %f  ,  %f  ,  %f ,  %f' \
     %(exit, delta_mesh_exit, delta_mesh_exit, dim1_min, dim1_max, dim2_min, dim2_max)
     np.savetxt('../3_sfgrids/%s_%.2f/dx_%.2f/Door_X_%.6f_Y_%.6f/t_%6f.csv'\
@@ -139,9 +141,9 @@ def main(convert, exit):
 
 
 #==============================================================================
-
-delta_mesh_exit = 1.0
-
+# This is the resolution of the smoke sensor grids: Adjustments may be
+# appropriate in fligry geometries, Default: delta_mesh_exit = 1 (m)
+delta_mesh_exit = 1.
 #==============================================================================
 
 print '\n-----------------------------------------------------------------'
@@ -161,13 +163,14 @@ for convert in converted:
     print 'Processing files: %s\n' %convert
     magnitudes = np.loadtxt(convert, delimiter=',')
 
+    time=int(convert[:-4][convert.rfind('_')+1:])
+
     fig = plt.figure(figsize=(cm2inch(15),cm2inch(9)), dpi=300)
 
     gs = gridspec.GridSpec(1, 15)
 
     #plt.suptitle('Time%s'%convert[:-4][convert.find('_'):], fontsize=14)
 
-    colors = ['0.1','0.3','0.5','0.7','0.85','1.0']
     ax1 = fig.add_subplot(gs[0,0:7])
     ax2 = fig.add_subplot(gs[0,6:8])
     ax3 = fig.add_subplot(gs[0,8:15])
@@ -176,71 +179,55 @@ for convert in converted:
 
         a,b, x0, y0, x, y, zi_exit, edge_exit, x_shift, y_shift, time = main(convert, exit)
 
-        ax1.set_xlabel('%s (m)'%dimension_1.lower())
-        ax1.set_ylabel('%s (m)'%dimension_2.lower())
-        ax1.set_xticks(np.arange(dim1_min, dim1_max, 5))
-        ax1.set_yticks(np.arange(dim2_min+1, dim2_max, 5))
+        if plots==True:
+
+            ax1.set_xlabel('%s (m)'%dimension_1.lower())
+            ax1.set_ylabel('%s (m)'%dimension_2.lower())
+            ax1.set_xticks(np.arange(dim1_min, dim1_max, 5))
+            ax1.set_yticks(np.arange(dim2_min+1, dim2_max, 5))
+
+            # Plot the line of sights towards each exit
+            line_of_sight = [
+            [x0*delta_dim_1,
+            exits[exit][0]]
+            ,
+            [y0*delta_dim_2,
+            exits[exit][1]],
+            ]
+
+            line, = ax1.plot(line_of_sight[0], line_of_sight[1])
+
+            aa = ax1.pcolorfast(dim1, dim2, magnitudes, vmin=0, vmax=2)
+            ax1.minorticks_on()
+            ax1.axis('image')
+
+            ax1.grid(which='major',linestyle='-', alpha=0.4)
+            ax1.grid(which='minor',linestyle='-', alpha=0.4)
+
+            ax3.plot(zi_exit,  lw=2, label='%s: $f_{smoke}$ = %.3f'%(exit, edge_exit))
+            first_smoke=np.argmax(zi_exit>0.001)
+
+            ax3.set_xlabel('l (m)')
+            labels = ax3.get_xticks()
+            labels = (labels*delta_dim_1).astype(int)
+            ax3.set_xticklabels(labels)
+
+            ax3.set_ylabel('D (1/m)')
+            ax3.set_ylim(0,1)
+
+        cbar = fig.colorbar(aa,ax=ax1,cax=ax2,
+            orientation='vertical')
 
 
-        ax1.add_patch(
-        patches.FancyArrow(
+        plt.legend(fontsize=8, loc='upper left')
 
-        b*delta_mesh_exit+dim1_min+delta_mesh_exit/2.0, \
-        a*delta_mesh_exit+dim2_min+delta_mesh_exit/2.0, \
-        #-1.0*((b)*delta_mesh_exit+dim1_min-exits[exit][0])+x_shift*delta_dim_1, \
-
-        #-1.0*((a)*delta_mesh_exit+dim2_min-exits[exit][1])+y_shift*delta_dim_1,
-
-        exits[exit][0]-(b*delta_mesh_exit+dim1_min+delta_mesh_exit/2.0)+x_shift/10, \
-
-        exits[exit][1]-(a*delta_mesh_exit+dim2_min+delta_mesh_exit/2.0)+y_shift/10,
-
-        alpha=None, color=colors[id],
-        width=0.25,        # Default
-        linewidth=0.1,
-        head_width=0.75,    # Default: 3 * width
-        head_length=0.75,
-        ))    # Default: 1.5 * head_width
-
-
-        aa = ax1.pcolorfast(dim1, dim2, magnitudes, cmap='gray_r', vmin=0, vmax=1)
-        ax1.minorticks_on()
-        ax1.axis('image')
-        #ax1.grid(which='major',linestyle='-', alpha=0.4)
-        #ax1.grid(which='minor',linestyle='-', alpha=0.4)
-
-        ax3.plot(zi_exit,  lw=2, color=colors[id], label='Exit %s: $f_{smoke}$ = %.3f'%(exit, edge_exit))
-        first_smoke=np.argmax(zi_exit>0.001)
-        #ax3.axhline(np.mean(zi_exit[first_smoke:]),color=colors[id])
-
-        ax1.text(13,30, 'Room 3', bbox={'facecolor':'w', 'pad':4})
-        ax1.text(13,20, 'Room 1', bbox={'facecolor':'w', 'pad':4})
-
-        ax1.text(13,10, 'Agent \n $P_A :=(x_1|y_1)$', bbox={'facecolor':'w', 'pad':4})
-        ax1.text(13,0, 'Exit \n $P_E :=(x_2|y_2)$', bbox={'facecolor':'w', 'pad':4})
-
-        ax3.set_xlabel('l (m)')
-        labels = ax3.get_xticks()
-        labels = (labels*delta_dim_1).astype(int)
-        ax3.set_xticklabels(labels)
-
-        ax3.set_ylabel('D (1/m)')
-        ax3.set_ylim(0,1)
-
-    cbar = fig.colorbar(aa,ax=ax1,cax=ax2,
-        orientation='vertical')
-
-
-    #plt.legend(fontsize=9, loc='upper left')
-
-    #plt.savefig('../2_consilidated/%s_%.2f/smoke_%s.pdf'%(specified_location[0], specified_location[1], time ))
+        plt.savefig('../2_consolidated/%s_%.2f/%s_%s.pdf'%(specified_location[0], specified_location[1], quantity+'_arrows', time ))
 
 print "\n*** Finished ***"
-#plt.show()
 
 #============storage of the most important variables to store.pckl=============
 
 f = open('data_sfgrids.pckl', 'w')
-pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, dim1_min, dim1_max, dim2_min, dim2_max, exits, delta_mesh_exit), f)
+pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, dim1_min, dim1_max, dim2_min, dim2_max, exits, delta_mesh_exit), f)
 
 f.close()

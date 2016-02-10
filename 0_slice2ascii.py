@@ -16,7 +16,6 @@ import sys
 import pickle
 
 #===================CHANGE PARAMETERS AS NECEASSARY=============================
-
 # location of your local fds2ascii binary
 fds2ascii_path = '/Applications/FDS/FDS6/bin/fds2ascii'
 # Path pointing to the fire simulation directory
@@ -47,9 +46,16 @@ t_start=0
 t_stop=120
 t_step=20
 t_window=1            # interpolation duration prompted by fds2ascii
-#==============================================================================
 
+# Do you want to have plots produced? May be computaionally intensive depending
+# on your FDS simulation extend!
+plots = True
 
+#===============================================================================
+
+# BEGINNING OF THE AUTOMATIC PART - NO CHANGES NEEDED
+
+#===============================================================================
 config_file_name = os.path.join("../config_fds2ascii.csv")
 
 t_low=np.arange(t_start,t_stop+1,t_step)
@@ -195,7 +201,7 @@ for k, id_slice in enumerate(id_slices):
         time.sleep(0.5)
 
 f = open('JPSfire/data_slice2ascii.pckl', 'w+')
-pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path), f)
+pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots), f)
 f.close()
 
 print "*** Finished ***"
