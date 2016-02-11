@@ -86,16 +86,15 @@ def main(convert, exit):
 
             x_exit, y_exit = np.linspace(x0, x+x_shift, math.hypot(x+x_shift - x0, y+y_shift - y0)), np.linspace(y0, y+y_shift, math.hypot(x+x_shift - x0, y+y_shift - y0))
 
-            line_of_sight = scipy.ndimage.map_coordinates(np.transpose(magnitudes), np.vstack((x_exit,y_exit)))
-
+            magnitude_along_line_of_sight = scipy.ndimage.map_coordinates(np.transpose(magnitudes), np.vstack((x_exit,y_exit)))
 
             #### consideration of visibility straight lines whose lengt is lt 1:
-            if len(line_of_sight)<1:
+            if len(magnitude_along_line_of_sight)<1:
                 continue
 
             else:
                 #### Computation of the edge factor towards the exit:
-                smoke_factor = np.amax(line_of_sight)*abs(np.trapz(line_of_sight, dx=delta_dim_1))
+                smoke_factor = np.amax(magnitude_along_line_of_sight)*abs(np.trapz(magnitude_along_line_of_sight, dx=delta_dim_1))
 
             #### storage of the edge factor
             smoke_factor_grid[a,b]=smoke_factor
@@ -118,31 +117,32 @@ def main(convert, exit):
                     exits[exit][1]],
                     ]
 
-                    line, = ax1.plot(line_of_sight[0], line_of_sight[1])
+                    line, = ax1.plot(line_of_sight[0], line_of_sight[1], lw=2)
 
-                    aa = ax1.pcolorfast(dim1, dim2, magnitudes, vmin=0, vmax=2)
+                    aa = ax1.pcolorfast(dim1, dim2, magnitudes, cmap='Greys', vmin=0, vmax=1)
                     ax1.minorticks_on()
                     ax1.axis('image')
 
                     ax1.grid(which='major',linestyle='-', alpha=0.4)
                     ax1.grid(which='minor',linestyle='-', alpha=0.4)
 
-                    ax3.plot(line_of_sight,  lw=2, label='%s: $f_{smoke}$ = %.3f'%(exit, smoke_factor))
-                    first_smoke=np.argmax(line_of_sight>0.001)
+
+                    ax3.plot(magnitude_along_line_of_sight,  lw=2, label='%s: $f_{smoke}$ = %.3f'%(exit, smoke_factor))
 
                     ax3.set_xlabel('l (m)')
                     labels = ax3.get_xticks()
                     labels = (labels*delta_dim_1).astype(int)
                     ax3.set_xticklabels(labels)
 
-                    ax3.set_ylabel('D (1/m)')
+                    ax3.set_ylabel(quantity)
                     ax3.set_ylim(0,1)
 
                     cbar = fig.colorbar(aa,ax=ax1,cax=ax2, orientation='vertical')
 
-                    plt.legend(fontsize=8, loc='upper left')
+                    plt.legend(loc='upper left')
+                    plt.grid()
 
-                    plt.savefig('../2_consolidated/%s_%.2f/%s_%s.pdf'%(specified_location[0], specified_location[1], quantity+'_arrows', time ))
+                    plt.savefig('../2_consolidated/%s_%.2f/%s_%s.pdf'%(specified_location[0], specified_location[1], quantity+'_debug', time ))
 
     #if np.amax(smoke_factor_grid)>max_Smoke_Factor:
     max_Smoke_Factor = np.amax(smoke_factor_grid)
@@ -161,7 +161,7 @@ def main(convert, exit):
     print 'Write smoke factor grid: ../3_sfgrids/%s_%.2f/dx_%.2f/Door_X_%.6f_Y_%.6f/t_%6f.csv'\
     %(specified_location[0], specified_location[1], delta_smoke_factor_grid, exits[exit][0], exits[exit][1], float(time))
 
-    return a,b, x0, y0, x, y, line_of_sight, smoke_factor, x_shift, y_shift, time
+    return a,b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, x_shift, y_shift, time
 
 
 #==============================================================================
@@ -189,19 +189,19 @@ for convert in converted:
 
     time=int(convert[:-4][convert.rfind('_')+1:])
 
-    fig = plt.figure(figsize=(cm2inch(15),cm2inch(9)), dpi=300)
+    fig = plt.figure(figsize=(cm2inch(21),cm2inch(10)), dpi=300)
 
-    gs = gridspec.GridSpec(1, 15)
+    gs = gridspec.GridSpec(1, 40)
 
     #plt.suptitle('Time %i s'%time, fontsize=12)
 
-    ax1 = fig.add_subplot(gs[0,0:7])
-    ax2 = fig.add_subplot(gs[0,6:8])
-    ax3 = fig.add_subplot(gs[0,8:15])
+    ax1 = fig.add_subplot(gs[0,0:20])
+    ax2 = fig.add_subplot(gs[0,19:22])
+    ax3 = fig.add_subplot(gs[0,24:40])
 
     for id, exit in enumerate(exits):
 
-        a,b, x0, y0, x, y, line_of_sight, smoke_factor, x_shift, y_shift, time = main(convert, exit)
+        a,b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, x_shift, y_shift, time = main(convert, exit)
 
 print "\n*** Finished ***"
 

@@ -28,7 +28,10 @@ chid = 'smoke_sensor'
 
 ### SLICE QUANTITY:
 quantity = 'SOOT OPTICAL DENSITY'
+
+### tuple containing the dimension and the location of the slicefile 
 specified_location = ('z'.upper(), 2.25)
+
 # Grid resolution in x, y and z
 dx=0.25
 dy=0.25
