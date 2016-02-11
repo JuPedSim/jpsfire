@@ -28,7 +28,8 @@ matplotlib.rc('font', **font)
 
 
 f = open('data_meshgrid.pckl')
-(chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, dim1_min, dim1_max, dim2_min, dim2_max, exits) = pickle.load(f)
+(chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max, exits) = pickle.load(f)
+
 
 # Comversion cm to inches
 def cm2inch(value):
@@ -48,7 +49,10 @@ def main(convert, exit):
 
     x, y = m_to_pix(x_i=exits[exit][0], y_i=exits[exit][1])
 
-    global_D_max = 0
+    ### calculation of the global max of the extracted field_qunatity
+    ### (without geometry)
+    global_D_max = np.amax(magnitudes-geometry[ :-1 , :-1])
+    #print global_D_max
 
     for a, line in enumerate(mesh_exit):
 
@@ -84,29 +88,66 @@ def main(convert, exit):
 
             zi_exit = scipy.ndimage.map_coordinates(np.transpose(magnitudes), np.vstack((x_exit,y_exit)))
 
-            #### consideration of visibility straight lines blocked by an &OBST:
-
+            #### consideration of visibility straight lines whose lengt is lt 1:
             if len(zi_exit)<1:
                 continue
 
-            if np.amax(zi_exit)>8:
+            #### consideration of visibility straight lines blocked by an &OBST:
+            if np.amax(zi_exit)>global_D_max:
                 edge_exit = 10
 
             #### visibility straight lines not or only moderately obstructed by smoke:
 
             else:
-
                 edge_exit = np.amax(zi_exit)*abs(np.trapz(zi_exit))*delta_dim_1*2
-
-
-                if np.amax(zi_exit) > global_D_max:
-                    global_D_max=np.amax(zi_exit)
-
 
             #### storage of the edge factor
             mesh_exit[a,b]=edge_exit
 
-            #print x0, y0
+            ## This statement yields a representative plot of the line of
+            ## sights if wanted. x0 and y0 can be adjusted e.g. for debugging
+            if plots == True:
+                if x0 == 24 and y0 == 4:
+                    ax1.set_xlabel('%s (m)'%dimension_1.lower())
+                    ax1.set_ylabel('%s (m)'%dimension_2.lower())
+                    ax1.set_xticks(np.arange(dim1_min, dim1_max, 5))
+                    ax1.set_yticks(np.arange(dim2_min+1, dim2_max, 5))
+
+                    # Plot the line of sights towards each exit
+                    line_of_sight = [
+                    [x0*delta_dim_1,
+                    exits[exit][0]]
+                    ,
+                    [y0*delta_dim_2,
+                    exits[exit][1]],
+                    ]
+
+                    line, = ax1.plot(line_of_sight[0], line_of_sight[1])
+
+                    aa = ax1.pcolorfast(dim1, dim2, magnitudes, vmin=0, vmax=2)
+                    ax1.minorticks_on()
+                    ax1.axis('image')
+
+                    ax1.grid(which='major',linestyle='-', alpha=0.4)
+                    ax1.grid(which='minor',linestyle='-', alpha=0.4)
+
+                    ax3.plot(zi_exit,  lw=2, label='%s: $f_{smoke}$ = %.3f'%(exit, edge_exit))
+                    first_smoke=np.argmax(zi_exit>0.001)
+
+                    ax3.set_xlabel('l (m)')
+                    labels = ax3.get_xticks()
+                    labels = (labels*delta_dim_1).astype(int)
+                    ax3.set_xticklabels(labels)
+
+                    ax3.set_ylabel('D (1/m)')
+                    ax3.set_ylim(0,1)
+
+                    cbar = fig.colorbar(aa,ax=ax1,cax=ax2, orientation='vertical')
+
+                    plt.legend(fontsize=8, loc='upper left')
+
+                    plt.savefig('../2_consolidated/%s_%.2f/%s_%s.pdf'%(specified_location[0], specified_location[1], quantity+'_arrows', time ))
+
 
     print 'Exit ', exit, 'maximum D(l)', global_D_max
 
@@ -139,7 +180,6 @@ delta_mesh_exit = 1.
 print '\n-----------------------------------------------------------------'
 print 'Analysing Slice File at %s=%.2f\n'%(specified_location[0], specified_location[1])
 
-
 #plt.close()
 converted = glob.glob('../2_consolidated/%s_%.2f/%s_*.csv'%(specified_location[0], specified_location[1], quantity))
 
@@ -170,54 +210,11 @@ for convert in converted:
 
         a,b, x0, y0, x, y, zi_exit, edge_exit, x_shift, y_shift, time = main(convert, exit)
 
-        ## This statement yields a representative plot of the line of
-        ## sights if wanted
-        if plots == True and x0 == 24 and y0 == 4:
-            ax1.set_xlabel('%s (m)'%dimension_1.lower())
-            ax1.set_ylabel('%s (m)'%dimension_2.lower())
-            ax1.set_xticks(np.arange(dim1_min, dim1_max, 5))
-            ax1.set_yticks(np.arange(dim2_min+1, dim2_max, 5))
-
-            # Plot the line of sights towards each exit
-            line_of_sight = [
-            [x0*delta_dim_1,
-            exits[exit][0]]
-            ,
-            [y0*delta_dim_2,
-            exits[exit][1]],
-            ]
-
-            line, = ax1.plot(line_of_sight[0], line_of_sight[1])
-
-            aa = ax1.pcolorfast(dim1, dim2, magnitudes, vmin=0, vmax=2)
-            ax1.minorticks_on()
-            ax1.axis('image')
-
-            ax1.grid(which='major',linestyle='-', alpha=0.4)
-            ax1.grid(which='minor',linestyle='-', alpha=0.4)
-
-            ax3.plot(zi_exit,  lw=2, label='%s: $f_{smoke}$ = %.3f'%(exit, edge_exit))
-            first_smoke=np.argmax(zi_exit>0.001)
-
-            ax3.set_xlabel('l (m)')
-            labels = ax3.get_xticks()
-            labels = (labels*delta_dim_1).astype(int)
-            ax3.set_xticklabels(labels)
-
-            ax3.set_ylabel('D (1/m)')
-            ax3.set_ylim(0,1)
-
-            cbar = fig.colorbar(aa,ax=ax1,cax=ax2, orientation='vertical')
-
-            plt.legend(fontsize=8, loc='upper left')
-
-            plt.savefig('../2_consolidated/%s_%.2f/%s_%s.pdf'%(specified_location[0], specified_location[1], quantity+'_arrows', time ))
-
 print "\n*** Finished ***"
 
 #============storage of the most important variables to store.pckl=============
 
 f = open('data_sfgrids.pckl', 'w')
-pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, dim1_min, dim1_max, dim2_min, dim2_max, exits, delta_mesh_exit), f)
+pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max, exits, delta_mesh_exit), f)
 
 f.close()

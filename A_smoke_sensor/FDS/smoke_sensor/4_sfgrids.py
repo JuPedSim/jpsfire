@@ -26,7 +26,7 @@ def cm2inch(value):
     return value/2.54
 
 f = open('data_sfgrids.pckl')
-(chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, dim1_min, dim1_max, dim2_min, dim2_max, exits, delta_mesh_exit) = pickle.load(f)
+(chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max, exits, delta_mesh_exit) = pickle.load(f)
 
 if plots==True:
 
@@ -57,7 +57,7 @@ if plots==True:
 
 
             mesh_exit_norm = np.loadtxt('../3_sfgrids/%s_%.2f/dx_%.2f/Door_X_%.6f_Y_%.6f/t_%.6f.csv'%(specified_location[0], specified_location[1], delta_mesh_exit, exits[exit][0], exits[exit][1], time), delimiter=',', skiprows=3)
-            aa = ax1.pcolorfast(dim1, dim2, mesh_exit_norm, cmap='coolwarm', vmin=0, vmax=5)
+            aa = ax1.pcolorfast(dim1, dim2, mesh_exit_norm, cmap='coolwarm', vmin=0, vmax=1)
             ax1.set_title(exit)
             #ax1.text(exits[exit][0]-5, exits[exit][1], 'EXIT %s'%exit, bbox={'facecolor':'w', 'alpha':0.5, 'pad':5})
             ax1.set_aspect('equal')

@@ -184,6 +184,7 @@ for slicefile in slicefiles:
         fd.close()
 
     collect = magnitudes + geometry
+
     #collect = collect[:-1,:-1]
 
     np.savetxt('../1_meshgrid/%s_%.2f/%s.csv'%(specified_location[0], specified_location[1], slicefile[slicefile.rfind('/')+1:-4]), collect, delimiter=',')
@@ -281,6 +282,6 @@ exits = collections.OrderedDict(sorted(exits_dict.items()))
 #============storage of the most important variables to store.pckl=============
 
 f = open('data_meshgrid.pckl', 'w')
-pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, dim1_min, dim1_max, dim2_min, dim2_max, exits), f)
+pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max, exits), f)
 
 f.close()
