@@ -37,8 +37,8 @@ if plots==True:
         test=[]
         plt.close()
 
-        fig  = plt.figure(figsize=(cm2inch(15),cm2inch(12)), dpi=300)
-        gs = gridspec.GridSpec(30, 4,bottom=0.18,left=0.18,right=0.88)
+        fig  = plt.figure(figsize=(cm2inch(21),cm2inch(10)), dpi=300)
+        gs = gridspec.GridSpec(15, 4,bottom=0.18,left=0.18,right=0.88)
         #fig, axes = plt.subplots(figsize=(10, 6), ncols=3)
         #plt.subplots_adjust(wspace = 0.6)
         #plt.suptitle('Edge Factor Grids per Exit', fontsize=14)
@@ -52,7 +52,7 @@ if plots==True:
             if ax==1:
                 plt.ylabel('y (m)')
 
-            ax1 = fig.add_subplot(gs[:24,ax])
+            ax1 = fig.add_subplot(gs[:12,ax])
             plt.xlabel('x (m)')
 
 
@@ -67,12 +67,12 @@ if plots==True:
             ax1.grid(which='major',linestyle='-', lw=1, alpha=0.4)
             ax1.grid(which='minor',linestyle='-', lw=1, alpha=0.4)
 
-        ax2 = fig.add_subplot(gs[29:30,0:6])
+        ax2 = fig.add_subplot(gs[14:15,0:len(exits)])
         fig.colorbar(aa,ax=ax1,cax=ax2, label=r'$f_{smoke}$', orientation='horizontal')
 
-        plt.savefig('../3_sfgrids/%s_%.2f/dx_%.2f/%i.pdf'%(specified_location[0], specified_location[1], delta_smoke_factor_grid, time))
+        plt.savefig('../3_sfgrids/%s_%.2f/dx_%.2f/sfgrid_%i.pdf'%(specified_location[0], specified_location[1], delta_smoke_factor_grid, time))
 
-        print '\nSave smoke sensor grid: ../sfgrids/%s_%.2f/dx_%.2f/%i.pdf'%(specified_location[0], specified_location[1], delta_smoke_factor_grid, time)
+        print '\nSave smoke factor grid: ../sfgrids/%s_%.2f/dx_%.2f/sfgrid_%i.pdf'%(specified_location[0], specified_location[1], delta_smoke_factor_grid, time)
 
         #plt.show()
 
