@@ -24,11 +24,11 @@ fds_path = os.path.join(os.getcwd()+'/../')
 jps_path = os.path.join('../../JuPedSim/')
 
 ### FDS CHID:
-chid = 'JPSfire'
+chid = 'smoke_sensor'
 
 ### SLICE QUANTITY:
 quantity = 'SOOT OPTICAL DENSITY'
-specified_location = ('z'.upper(), 1.75)
+specified_location = ('z'.upper(), 2.25)
 # Grid resolution in x, y and z
 dx=0.25
 dy=0.25

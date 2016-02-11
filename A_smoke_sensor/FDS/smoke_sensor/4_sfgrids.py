@@ -26,7 +26,7 @@ def cm2inch(value):
     return value/2.54
 
 f = open('data_sfgrids.pckl')
-(chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max, exits, delta_mesh_exit) = pickle.load(f)
+(chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max, exits, delta_smoke_factor_grid) = pickle.load(f)
 
 if plots==True:
 
@@ -56,8 +56,8 @@ if plots==True:
             plt.xlabel('x (m)')
 
 
-            mesh_exit_norm = np.loadtxt('../3_sfgrids/%s_%.2f/dx_%.2f/Door_X_%.6f_Y_%.6f/t_%.6f.csv'%(specified_location[0], specified_location[1], delta_mesh_exit, exits[exit][0], exits[exit][1], time), delimiter=',', skiprows=3)
-            aa = ax1.pcolorfast(dim1, dim2, mesh_exit_norm, cmap='coolwarm', vmin=0, vmax=1)
+            smoke_factor_grid_norm = np.loadtxt('../3_sfgrids/%s_%.2f/dx_%.2f/Door_X_%.6f_Y_%.6f/t_%.6f.csv'%(specified_location[0], specified_location[1], delta_smoke_factor_grid, exits[exit][0], exits[exit][1], time), delimiter=',', skiprows=3)
+            aa = ax1.pcolorfast(dim1, dim2, smoke_factor_grid_norm, cmap='coolwarm')#, vmin=0, vmax=10)
             ax1.set_title(exit)
             #ax1.text(exits[exit][0]-5, exits[exit][1], 'EXIT %s'%exit, bbox={'facecolor':'w', 'alpha':0.5, 'pad':5})
             ax1.set_aspect('equal')
@@ -70,9 +70,9 @@ if plots==True:
         ax2 = fig.add_subplot(gs[29:30,0:6])
         fig.colorbar(aa,ax=ax1,cax=ax2, label=r'$f_{smoke}$', orientation='horizontal')
 
-        plt.savefig('../3_sfgrids/%s_%.2f/dx_%.2f/%i.pdf'%(specified_location[0], specified_location[1], delta_mesh_exit, time))
+        plt.savefig('../3_sfgrids/%s_%.2f/dx_%.2f/%i.pdf'%(specified_location[0], specified_location[1], delta_smoke_factor_grid, time))
 
-        print '\nSave smoke sensor grid: ../sfgrids/%s_%.2f/dx_%.2f/%i.pdf'%(specified_location[0], specified_location[1], delta_mesh_exit, time)
+        print '\nSave smoke sensor grid: ../sfgrids/%s_%.2f/dx_%.2f/%i.pdf'%(specified_location[0], specified_location[1], delta_smoke_factor_grid, time)
 
         #plt.show()
 
