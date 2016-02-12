@@ -38,12 +38,27 @@ def dimensions(a):
     else:
         return 4,5
 
+def isfloat(value):
+  try:
+    float(value)
+    return True
+  except ValueError:
+    return False
+
 def read_fds_line():
 
     coordinates=[x.strip() for x in lines.split('XB')][1:]
     coordinates=''.join(coordinates)
     coordinates=re.split(', |,| |=|/',coordinates)
-    coordinates=[ x for x in coordinates if '.' in x][0:6]
+    for j, cord in enumerate(coordinates):
+        if isfloat(cord) == True:
+            coordinates[j] = float(cord)
+        if cord.isdigit() == True:
+            coordinates[j] = float(cord)
+        else:
+            continue
+
+    coordinates=[ x for x in coordinates if type(x)<>str]
     coordinates=map(float, coordinates)
     #increasiing sorting of coordinate pairs:
     coordinates=sorted(coordinates[0:2])+sorted(coordinates[2:4])+sorted(coordinates[4:6])
