@@ -4,25 +4,22 @@
 
 <!-- header: seed, geometry, output format -->
 <numCPU>4</numCPU>
-<seed>3011</seed>
+<seed>1707</seed>
 <max_sim_time>600</max_sim_time>
 <!--maxCPU>1</maxCPU-->
 
 
-<geometry>geometry.xml</geometry>
+<geometry>smoke_sensor_geometry.xml</geometry>
 
 <!-- traectories file and format -->
 <trajectories format="xml-plain" fps="24">
-<file location="traj.xml" />
+<file location="smoke_sensor_traj.xml" />
 </trajectories>
 
 <!-- agents -->
-
-<agents operational_model_id="3">
+<agents operational_model_id="2">
 	<agents_distribution>
-		<group group_id="1" agent_parameter_id="1" room_id="0" subroom_id="0" number="30" router_id="7" pre_movement_mean="100" pre_movement_sigma="0" y_max="4" risk_tolerance_mean="0." risk_tolerance_sigma="0."/>
-		<!--group group_id="2" agent_parameter_id="1" room_id="0" subroom_id="1" number="10" router_id="7" pre_movement_mean="30" pre_movement_sigma="30"/>/
-		<group group_id="3" agent_parameter_id="1" room_id="0" subroom_id="2" number="10" router_id="7" pre_movement_mean="30" pre_movement_sigma="30"/-->
+		<group group_id="1" agent_parameter_id="1" room_id="0" subroom_id="0" number="30" router_id="7" pre_movement_mean="40" pre_movement_sigma="0" y_max="4" risk_tolerance_mean="0." risk_tolerance_sigma="0."/>
 	</agents_distribution>
 </agents>
 
@@ -92,31 +89,10 @@
 </operational_models>
 
 <!-- route choice models -->
-
   <route_choice_models>
-
-		<router router_id="1" description="quickest">
-			<parameters>
-			</parameters>
-		</router>
-
-    <router router_id="2" description="global_shortest">
-  <parameters>
-    <navigation_mesh method="triangulation" minimum_distance_between_edges="0.5" minimum_angle_in_triangles="0" use_for_local_planning="false" />
-           <!-- <navigation_lines file="routing.xml" /> -->
-  </parameters>
-</router>
-
-<router router_id="3" description="local_shortest">
-  <parameters>
-    <navigation_mesh method="triangulation" minimum_distance_between_edges="0.5" minimum_angle_in_triangles="0" use_for_local_planning="true" />
-           <!-- <navigation_lines file="routing.xml" /> -->
-  </parameters>
-</router>
 
     <router router_id="7" description="cognitive_map">
       <sensors>
-	      <sensor sensor_id="1" description="Room2Corridor" status="activated"/>
 	      <sensor sensor_id="2" description="Smoke" smoke_factor_grids="../FDS/3_sfgrids/Z_2.25/dx_1.00/" update_time="20" final_time="120" status="activated"/>
 	      <sensor sensor_id="3" description="LastDestination" status="activated"/>
       </sensors>
