@@ -3,10 +3,13 @@ Framework for the coupling of fire simulation results with [FDS](https://github.
 
 Available components:
 --------------------
+
 Smoke Sensor
 
 
 Upcoming components:
 -------------------
+
 Walking speed reduction in smoke
+
 Toxicity analyses
