@@ -8,6 +8,4 @@ python 1_meshgrid.py
 wait
 python 2_consolidate_meshes.py
 wait
-python 3_process_collect.py
-wait
-python 4_sfgrids.py
+python 3_smoke_factor_grids.py
