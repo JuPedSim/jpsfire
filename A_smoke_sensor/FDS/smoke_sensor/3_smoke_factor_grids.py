@@ -42,8 +42,8 @@ def m_to_pix(x_i, y_i):
 # main function
 def main(convert, exit):
 
-    if not os.path.exists('../3_sfgrids/%s_%.2f/dx_%.2f/Door_X_%.6f_Y_%.6f'%(specified_location[0], specified_location[1], delta_smoke_factor_grid, exits[exit][0], exits[exit][1])):
-        os.makedirs('../3_sfgrids/%s_%.2f/dx_%.2f/Door_X_%.6f_Y_%.6f'%(specified_location[0], specified_location[1], delta_smoke_factor_grid, exits[exit][0], exits[exit][1]))
+    if not os.path.exists('../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.6f_Y_%.6f'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1])):
+        os.makedirs('../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.6f_Y_%.6f'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1]))
 
     smoke_factor_grid = np.ones([int(abs(dim2_max-dim2_min)/delta_smoke_factor_grid) ,int(abs(dim1_max-dim1_min)/delta_smoke_factor_grid)])
 
@@ -156,10 +156,10 @@ def main(convert, exit):
 
     header='Room No. 1 , Exit %s, \n dX[m], dY[m] , minX[m] , maxX[m], minY[m], maxY[m] \n   %f  ,  %f    ,  %f  ,  %f  ,  %f ,  %f' \
     %(exit, delta_smoke_factor_grid, delta_smoke_factor_grid, dim1_min, dim1_max, dim2_min, dim2_max)
-    np.savetxt('../3_sfgrids/%s_%.2f/dx_%.2f/Door_X_%.6f_Y_%.6f/t_%6f.csv'\
-    %(specified_location[0], specified_location[1], delta_smoke_factor_grid, exits[exit][0], exits[exit][1], float(time)), smoke_factor_grid_norm, header=header, delimiter=',', comments='')
-    print 'Write smoke factor grid: ../3_sfgrids/%s_%.2f/dx_%.2f/Door_X_%.6f_Y_%.6f/t_%6f.csv'\
-    %(specified_location[0], specified_location[1], delta_smoke_factor_grid, exits[exit][0], exits[exit][1], float(time))
+    np.savetxt('../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.6f_Y_%.6f/t_%6f.csv'\
+    %(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], float(time)), smoke_factor_grid_norm, header=header, delimiter=',', comments='')
+    print 'Write smoke factor grid: ../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.6f_Y_%.6f/t_%6f.csv'\
+    %(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], float(time))
 
     return a,b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, x_shift, y_shift, time
 
@@ -233,7 +233,7 @@ if plots==True:
             plt.xlabel('x (m)')
 
 
-            smoke_factor_grid_norm = np.loadtxt('../3_sfgrids/%s_%.2f/dx_%.2f/Door_X_%.6f_Y_%.6f/t_%.6f.csv'%(specified_location[0], specified_location[1], delta_smoke_factor_grid, exits[exit][0], exits[exit][1], time), delimiter=',', skiprows=3)
+            smoke_factor_grid_norm = np.loadtxt('../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.6f_Y_%.6f/t_%.6f.csv'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], time), delimiter=',', skiprows=3)
             aa = ax1.pcolorfast(dim1, dim2, smoke_factor_grid_norm, cmap='coolwarm')#, vmin=0, vmax=10)
             ax1.set_title(exit)
             #ax1.text(exits[exit][0]-5, exits[exit][1], 'EXIT %s'%exit, bbox={'facecolor':'w', 'alpha':0.5, 'pad':5})
@@ -247,9 +247,9 @@ if plots==True:
         ax2 = fig.add_subplot(gs[14:15,0:len(exits)])
         fig.colorbar(aa,ax=ax1,cax=ax2, label=r'$f_{smoke}$', orientation='horizontal')
 
-        plt.savefig('../3_sfgrids/%s_%.2f/dx_%.2f/sfgrid_%i.pdf'%(specified_location[0], specified_location[1], delta_smoke_factor_grid, time))
+        plt.savefig('../3_sfgrids/dx_%.2f/%s_%.2f/sfgrid_%i.pdf'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  time))
 
-        print '\nPlot smoke factor grid: ../sfgrids/%s_%.2f/dx_%.2f/sfgrid_%i.pdf'%(specified_location[0], specified_location[1], delta_smoke_factor_grid, time)
+        print '\nPlot smoke factor grid: ../sfgrids/dx_%.2f/%s_%.2f/sfgrid_%i.pdf'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  time)
 
         #plt.show()
 
