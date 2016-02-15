@@ -59,7 +59,6 @@ def main(convert, exit):
         for b, col in enumerate(line):
 
             x0, y0 = m_to_pix(b*delta_smoke_factor_grid+dim1_min, a*delta_smoke_factor_grid+dim2_min)    # virtual agent position
-            #print x0, y0
 
             #### stop of iteration and edge factor storage of predecessor cell
             #### if virtual agent position is identical with exit position
@@ -68,23 +67,7 @@ def main(convert, exit):
                 smoke_factor_grid[a,b]=smoke_factor
                 continue
 
-            #### shifting the x and y position of the exit according to the virtual agent position
-            #### as well as the orientation of the exit to avoid to excessive &OBST slicing (Pixels)
-            #### Uncomment if needed, else: x_shift, y_shift= 0, 0
-
-            x_shift, y_shift= 0, 0
-
-            # if x0 > x and exits[exit][2]=='y':
-            #     x_shift=1/delta_dim_1
-            # elif x0 < x and exits[exit][2]=='y':
-            #     x_shift=-1/delta_dim_1
-            #
-            # if y0 > y and exits[exit][2]=='x':
-            #     y_shift=1/delta_dim_2
-            # elif y0 < y and exits[exit][2]=='x':
-            #     y_shift=-1/delta_dim_2
-
-            x_exit, y_exit = np.linspace(x0, x+x_shift, math.hypot(x+x_shift - x0, y+y_shift - y0)), np.linspace(y0, y+y_shift, math.hypot(x+x_shift - x0, y+y_shift - y0))
+            x_exit, y_exit = np.linspace(x0, x, math.hypot(x - x0, y - y0)), np.linspace(y0, y, math.hypot(x - x0, y - y0))
 
             magnitude_along_line_of_sight = scipy.ndimage.map_coordinates(np.transpose(magnitudes), np.vstack((x_exit,y_exit)))
 
@@ -161,7 +144,7 @@ def main(convert, exit):
     print 'Write smoke factor grid: ../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.6f_Y_%.6f/t_%6f.csv'\
     %(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], float(time))
 
-    return a,b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, x_shift, y_shift, time
+    return a,b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, time
 
 
 #==============================================================================
@@ -193,15 +176,13 @@ for convert in converted:
 
     gs = gridspec.GridSpec(1, 40)
 
-    #plt.suptitle('Time %i s'%time, fontsize=12)
-
     ax1 = fig.add_subplot(gs[0,0:20])
     ax2 = fig.add_subplot(gs[0,19:22])
     ax3 = fig.add_subplot(gs[0,24:40])
 
     for id, exit in enumerate(exits):
 
-        a,b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, x_shift, y_shift, time = main(convert, exit)
+        a,b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, time = main(convert, exit)
 
 ### Plot Smoke factor grids - if specified
 
@@ -216,15 +197,8 @@ if plots==True:
 
         fig  = plt.figure(figsize=(cm2inch(21),cm2inch(10)), dpi=300)
         gs = gridspec.GridSpec(15, 4,bottom=0.18,left=0.18,right=0.88)
-        #fig, axes = plt.subplots(figsize=(10, 6), ncols=3)
-        #plt.subplots_adjust(wspace = 0.6)
-        #plt.suptitle('Edge Factor Grids per Exit', fontsize=14)
-
 
         for ax, exit in enumerate(exits):
-
-            # if ax>2:
-            #     break
 
             if ax==1:
                 plt.ylabel('y (m)')
@@ -234,9 +208,8 @@ if plots==True:
 
 
             smoke_factor_grid_norm = np.loadtxt('../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.6f_Y_%.6f/t_%.6f.csv'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], time), delimiter=',', skiprows=3)
-            aa = ax1.pcolorfast(dim1, dim2, smoke_factor_grid_norm, cmap='coolwarm')#, vmin=0, vmax=10)
+            aa = ax1.pcolorfast(dim1, dim2, smoke_factor_grid_norm, cmap='coolwarm', vmin=0, vmax=10)
             ax1.set_title(exit)
-            #ax1.text(exits[exit][0]-5, exits[exit][1], 'EXIT %s'%exit, bbox={'facecolor':'w', 'alpha':0.5, 'pad':5})
             ax1.set_aspect('equal')
             ax1.set_xticks(np.arange(dim1_min, dim1_max,5))
             ax1.set_yticks(np.arange(dim2_min+1, dim2_max,5))
@@ -250,8 +223,6 @@ if plots==True:
         plt.savefig('../3_sfgrids/dx_%.2f/%s_%.2f/sfgrid_%i.pdf'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  time))
 
         print '\nPlot smoke factor grid: ../sfgrids/dx_%.2f/%s_%.2f/sfgrid_%i.pdf'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  time)
-
-        #plt.show()
 
 
 print "\n*** Finished ***"
