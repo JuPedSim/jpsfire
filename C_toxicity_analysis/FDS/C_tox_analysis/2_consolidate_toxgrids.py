@@ -53,7 +53,7 @@ def mesh_attributes(time, mesh_id):
 
 
 f = open('data_meshgrid.pckl')
-(chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max) = pickle.load(f)
+(chid, quantity, tox_ppm_dict, specified_location, t_start, t_stop, t_step, id_meshes, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max) = pickle.load(f)
 
 times = np.arange(t_start,t_stop+1,t_step)[:]
 
@@ -139,10 +139,10 @@ for time in times:
     header='dX[m], dY[m] , minX[m] , maxX[m], minY[m], maxY[m] \n  %f  , %f ,  %f  ,  %f  ,  %f ,  %f' \
     %(delta_dim_1, delta_dim_2, dim1_min, dim1_max, dim2_min, dim2_max)
 
-    np.savetxt('../2_toxgrids/%s_%.2f/%s/t_%.6f.csv'%(specified_location[0], specified_location[1], quantity, time), consolidated, header=header, delimiter=',')
+    np.savetxt('../2_toxgrids/%s_%.2f/%s/t_%.6f.csv'%(specified_location[0], specified_location[1], quantity, time), consolidated*10E6, header=header, delimiter=',')
 
     if plots == True:
-        aa = ax.pcolorfast(new_dim1, new_dim2, consolidated, vmin=0, vmax=0.00001)
+        aa = ax.pcolorfast(new_dim1, new_dim2, consolidated*10E6, vmin=0, vmax=tox_ppm_dict[quantity])
 
         plt.colorbar(aa)
         plt.axes().set_aspect('equal')

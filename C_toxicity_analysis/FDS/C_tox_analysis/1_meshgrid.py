@@ -25,6 +25,12 @@ font = {'family' : 'serif',
 
 matplotlib.rc('font', **font)
 
+tox_ppm_dict={
+'CARBON DIOXIDE VOLUME FRACTION': 10000,
+'CARBON MONOXIDE VOLUME FRACTION': 100,
+'HYDROGEN CYANIDE VOLUME FRACTION': 8,
+'HYDROGEN CHLORIDE VOLUME FRACTION': 16
+}
 
 def cm2inch(value):
     return value/2.54
@@ -77,9 +83,9 @@ except OSError:
     pass
 
 if plots==True:
-    if not os.path.exists('../slicefiles/%s_%.2f'%(specified_location[0], specified_location[1])):
+    if not os.path.exists('../slicefiles/%s_%.2f/%s'%(specified_location[0], specified_location[1], quantity)):
         print 'create directory "slicefiles"'
-        os.makedirs('../slicefiles/%s_%.2f'%(specified_location[0], specified_location[1]))
+        os.makedirs('../slicefiles/%s_%.2f/%s'%(specified_location[0], specified_location[1], quantity))
 
 
 fds=glob.glob('../%s.fds'%chid)
@@ -172,7 +178,7 @@ for slicefile in slicefiles:
                 if obst[dim3_1] < specified_location[1] < obst[dim3_2]:
                     obst=[(1/delta_dim_1)*i for i in obst]
                     geometry[obst[dim2_1]-dim2_max/delta_dim_2-1 : obst[dim2_2]-dim2_max/delta_dim_2-1, \
-                    obst[dim1_1]-dim1_max/delta_dim_1-1 : obst[dim1_2]-dim1_max/delta_dim_1-1] [:]=10
+                    obst[dim1_1]-dim1_max/delta_dim_1-1 : obst[dim1_2]-dim1_max/delta_dim_1-1] [:]=np.nan
 
                     if slicefile == slicefiles[0]:
                         obsts=np.append(obsts,obst)
@@ -208,8 +214,8 @@ for slicefile in slicefiles:
     if plots==True:
         plt.figure(figsize=(cm2inch(15),cm2inch(10)), dpi=300)
         ax=plt.subplot(111)
-        aa = ax.pcolorfast(dim1, dim2, collect, vmin=0, vmax=0.00001)
-        plt.colorbar(aa, label=quantity)
+        aa = ax.pcolorfast(dim1, dim2, collect*10E6, vmin=0, vmax=tox_ppm_dict[quantity])
+        plt.colorbar(aa, label=quantity+' in ppm')
 
         plt.xlabel('%s (m)'%dimension_1.lower())
         plt.ylabel('%s (m)'%dimension_2.lower())
@@ -218,7 +224,7 @@ for slicefile in slicefiles:
         plt.minorticks_on()
         plt.grid(which='major')
 
-        plt.savefig('../slicefiles/%s_%.2f/%s.pdf'%(specified_location[0],specified_location[1], slicefile[slicefile.rfind('/')+1:-4]))
+        plt.savefig('../slicefiles/%s_%.2f/%s/%s.pdf'%(specified_location[0],specified_location[1], quantity, slicefile[slicefile.rfind('/')+1:-4]))
 
 
 print "\n*** Finished ***"
@@ -227,6 +233,6 @@ print "\n*** Finished ***"
 #============storage of the most important variables to store.pckl=============
 
 f = open('data_meshgrid.pckl', 'w')
-pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max), f)
+pickle.dump((chid, quantity, tox_ppm_dict, specified_location, t_start, t_stop, t_step, id_meshes, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max), f)
 
 f.close()

@@ -14,6 +14,12 @@ import re
 import time
 import sys
 import pickle
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("slice_quantity", type=str, help="quantity of the slicefile")
+parser.add_argument("slice_dim", type=str, help="axis of the slicefile")
+parser.add_argument("slice_coord", type=float, help="coordinate on the axis" )
 
 #===================CHANGE PARAMETERS AS NECEASSARY=============================
 # location of your local fds2ascii binary
@@ -26,11 +32,23 @@ jps_path = os.path.join('../../JuPedSim/')
 ### FDS CHID:
 chid = 'smoke_sensor'
 
-### SLICE QUANTITY:
-quantity = 'SOOT OPTICAL DENSITY'
+### SLICE QUANTITY and location:
+### check if multiple quantities have been submitted from tox_analysis.sh
+### check if multiple locations have been submitted from tox_analysis.sh
+try:
+    cmdl_args = parser.parse_args()
+    quantity = cmdl_args.slice_quantity
+    location = (cmdl_args.slice_dim, cmdl_args.slice_coord)
 
-### tuple containing the dimension and the location of the slicefile 
-specified_location = ('z'.upper(), 2.25)
+    print '\nProcessing FDS slice quantities and locations defined in smoke_sensor.sh\n'
+except:
+    ### if not use single quantity defined explicitly in 0_slice2ascii.py
+    ### if not use single loation defined explicitly in 0_slice2ascii.py
+    print '\nProcessing single FDS slice quantity and location defined in 0_slice2ascii.py\n'
+    ### change quantity here - if necessary
+    quantity = 'SOOT OPTICAL DENSITY'
+    ### change dimension and location of the slicefile here - if necessary
+    location = ('Z', 2.25)
 
 # Grid resolution in x, y and z
 dx=0.25
@@ -59,7 +77,9 @@ plots = True
 # BEGINNING OF THE AUTOMATIC PART - NO CHANGES NEEDED
 
 #===============================================================================
-config_file_name = os.path.join("../config_fds2ascii.csv")
+config_file_name = os.path.join("config_fds2ascii.csv")
+
+specified_location = (location[0].upper(), location[1])
 
 t_low=np.arange(t_start,t_stop+1,t_step)
 t_up=[i+t_window for i in t_low]
@@ -203,7 +223,7 @@ for k, id_slice in enumerate(id_slices):
         extract_ascii_data(data_row)
         time.sleep(0.5)
 
-f = open('smoke_sensor/data_slice2ascii.pckl', 'w+')
+f = open('A_smoke_sensor/data_slice2ascii.pckl', 'w+')
 pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots), f)
 f.close()
 

@@ -344,16 +344,16 @@ SLCF     1 &     0    48     0    36     8     8
  C
 SLCF     1 &     0    48     0    36     8     8
  toxicity_analysis_02.sf
- HYDROGEN CYANIDE MASS FRACTION
- Y_HCN
- kg/kg
+ HYDROGEN CYANIDE VOLUME FRACTION
+ X_HCN
+ mol/mol
 SLCF     1 &     0    48     0    36     8     8
  toxicity_analysis_03.sf
- CARBON MONOXIDE MASS FRACTION
- Y_CO
- kg/kg
+ CARBON MONOXIDE VOLUME FRACTION
+ X_CO
+ mol/mol
 SLCF     1 &     0    48     0    36     8     8
  toxicity_analysis_04.sf
- CARBON DIOXIDE MASS FRACTION
- Y_CO2
- kg/kg
+ CARBON DIOXIDE VOLUME FRACTION
+ X_CO2
+ mol/mol

@@ -739,129 +739,6 @@
  slice time=   100.44
  slice time=   100.61
  slice time=   100.78
- slice time=   100.96
- slice time=   101.10
- slice time=   101.24
- slice time=   101.38
- slice time=   101.52
- slice time=   101.66
- slice time=   101.80
- slice time=   101.95
- slice time=   102.12
- slice time=   102.29
- slice time=   102.46
- slice time=   102.63
- slice time=   102.80
- slice time=   102.95
- slice time=   103.10
- slice time=   103.25
- slice time=   103.40
- slice time=   103.56
- slice time=   103.72
- slice time=   103.89
- slice time=   104.03
- slice time=   104.16
- slice time=   104.30
- slice time=   104.44
- slice time=   104.58
- slice time=   104.74
- slice time=   104.89
- slice time=   105.04
- slice time=   105.20
- slice time=   105.35
- slice time=   105.50
- slice time=   105.66
- slice time=   105.79
- slice time=   105.93
- slice time=   106.07
- slice time=   106.21
- slice time=   106.34
- slice time=   106.48
- slice time=   106.63
- slice time=   106.78
- slice time=   106.94
- slice time=   107.09
- slice time=   107.24
- slice time=   107.39
- slice time=   107.54
- slice time=   107.71
- slice time=   107.86
- slice time=   108.00
- slice time=   108.15
- slice time=   108.30
- slice time=   108.45
- slice time=   108.60
- slice time=   108.75
- slice time=   108.90
- slice time=   109.05
- slice time=   109.20
- slice time=   109.35
- slice time=   109.50
- slice time=   109.65
- slice time=   109.80
- slice time=   109.95
- slice time=   110.11
- slice time=   110.28
- slice time=   110.44
- slice time=   110.60
- slice time=   110.77
- slice time=   110.93
- slice time=   111.10
- slice time=   111.26
- slice time=   111.43
- slice time=   111.59
- slice time=   111.75
- slice time=   111.92
- slice time=   112.08
- slice time=   112.25
- slice time=   112.41
- slice time=   112.58
- slice time=   112.74
- slice time=   112.90
- slice time=   113.07
- slice time=   113.23
- slice time=   113.40
- slice time=   113.56
- slice time=   113.73
- slice time=   113.89
- slice time=   114.06
- slice time=   114.22
- slice time=   114.38
- slice time=   114.55
- slice time=   114.69
- slice time=   114.84
- slice time=   114.98
- slice time=   115.13
- slice time=   115.28
- slice time=   115.42
- slice time=   115.57
- slice time=   115.71
- slice time=   115.86
- slice time=   116.00
- slice time=   116.16
- slice time=   116.34
- slice time=   116.52
- slice time=   116.71
- slice time=   116.90
- slice time=   117.10
- slice time=   117.29
- slice time=   117.46
- slice time=   117.63
- slice time=   117.80
- slice time=   117.97
- slice time=   118.14
- slice time=   118.31
- slice time=   118.48
- slice time=   118.65
- slice time=   118.82
- slice time=   118.99
- slice time=   119.15
- slice time=   119.32
- slice time=   119.49
- slice time=   119.66
- slice time=   119.83
- slice time=   119.98
- slice time=   120.13
 
 Smokeview 6.3.3 - Jan  5 2016
 
@@ -917,9 +794,9 @@ processing config file: /Applications/FDS/FDS6/bin/smokeview.ini
 processing config file: toxicity_analysis.ini
 clipping blockages + data
 
-Loading slice data: toxicity_analysis_02.sf
+Loading slice data: toxicity_analysis_04.sf
  global min (slice file): 0.000000 node=(0,0,8)
- global max (slice file): 0.000013 node=(44,26,8)
+ global max (slice file): 0.001603 node=(44,26,8)
 computing slice color levels 
- 6.3 MB loaded in 0.10 s - rate: 478.7 Mb/s (overhead: 0.12 s)
+ 5.4 MB loaded in 0.14 s - rate: 314.2 Mb/s (overhead: 0.16 s)
 
