@@ -144,7 +144,7 @@ for time in times:
     if plots == True:
         aa = ax.pcolorfast(new_dim1, new_dim2, consolidated*10E6, vmin=0, vmax=tox_ppm_dict[quantity])
 
-        plt.colorbar(aa)
+        plt.colorbar(aa, label=quantity)
         plt.axes().set_aspect('equal')
 
         plt.xlabel('%s (m)'%dimension_1.lower())

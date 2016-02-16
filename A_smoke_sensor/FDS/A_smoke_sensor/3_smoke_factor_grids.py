@@ -26,10 +26,8 @@ font = {'family' : 'serif',
 
 matplotlib.rc('font', **font)
 
-
 f = open('data_meshgrid.pckl')
 (chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max, exits) = pickle.load(f)
-
 
 # Comversion cm to inches
 def cm2inch(value):
