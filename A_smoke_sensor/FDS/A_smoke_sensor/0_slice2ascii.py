@@ -15,6 +15,7 @@ import time
 import sys
 import pickle
 import argparse
+import multiprocessing as mp
 
 parser = argparse.ArgumentParser()
 parser.add_argument("slice_quantity", type=str, help="quantity of the slicefile")

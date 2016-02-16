@@ -77,7 +77,7 @@ def main(convert, exit):
 
             else:
                 #### Computation of the smoke factor towards the exit:
-                smoke_factor = np.amax(magnitude_along_line_of_sight)*abs(np.trapz(magnitude_along_line_of_sight, dx=delta_dim_1))
+                smoke_factor = np.nanmax(magnitude_along_line_of_sight)*abs(np.trapz(magnitude_along_line_of_sight, dx=delta_dim_1))
 
             #### storage of the edge factor
             smoke_factor_grid[a,b]=smoke_factor
@@ -168,7 +168,7 @@ for convert in converted:
     print '\n-----------------------------------------------------------------'
     print 'Processing files: %s\n' %convert
 
-    magnitudes = np.loadtxt(convert, delimiter=',')-geometry[:-1,:-1]
+    magnitudes = np.loadtxt(convert, delimiter=',')
 
     time=int(convert[:-4][convert.rfind('_')+1:])
 

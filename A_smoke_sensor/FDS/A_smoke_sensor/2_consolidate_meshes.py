@@ -138,7 +138,7 @@ for time in times:
 
     np.savetxt('../2_consolidated/%s_%.2f/%s_%i.csv'%(specified_location[0], specified_location[1], quantity, time), consolidated, delimiter=',')
 
-    aa = ax.pcolorfast(new_dim1, new_dim2, consolidated, vmin=0, vmax=5)
+    aa = ax.pcolorfast(new_dim1, new_dim2, consolidated+geometry[:-1,:-1], vmin=0, vmax=5)
 
     plt.colorbar(aa)
     plt.axes().set_aspect('equal')

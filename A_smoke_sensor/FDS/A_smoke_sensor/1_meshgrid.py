@@ -172,7 +172,7 @@ for slicefile in slicefiles:
                 if obst[dim3_1] < specified_location[1] < obst[dim3_2]:
                     obst=[(1/delta_dim_1)*i for i in obst]
                     geometry[obst[dim2_1]-dim2_max/delta_dim_2-1 : obst[dim2_2]-dim2_max/delta_dim_2-1, \
-                    obst[dim1_1]-dim1_max/delta_dim_1-1 : obst[dim1_2]-dim1_max/delta_dim_1-1] [:]=10
+                    obst[dim1_1]-dim1_max/delta_dim_1-1 : obst[dim1_2]-dim1_max/delta_dim_1-1] [:]=np.nan
 
                     if slicefile == slicefiles[0]:
                         obsts=np.append(obsts,obst)
@@ -202,7 +202,7 @@ for slicefile in slicefiles:
 
     #collect = collect[:-1,:-1]
 
-    np.savetxt('../1_meshgrid/%s_%.2f/%s.csv'%(specified_location[0], specified_location[1], slicefile[slicefile.rfind('/')+1:-4]), collect, delimiter=',')
+    np.savetxt('../1_meshgrid/%s_%.2f/%s.csv'%(specified_location[0], specified_location[1], slicefile[slicefile.rfind('/')+1:-4]), magnitudes, delimiter=',')
     print '\nWrite files: ../1_meshgrid/%s_%.2f/%s.csv'%(specified_location[0], specified_location[1], slicefile[slicefile.rfind('/')+1:-4])
 
     if plots==True:

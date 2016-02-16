@@ -2,14 +2,19 @@
 
 # Execution of the python scripts to supply the Smoke Sensor
 
+
+#===================CHANGE PARAMETERS AS NECEASSARY=============================
 quantities=(
 'SOOT OPTICAL DENSITY'
 )
 
-# Please specify the coordinate as float!
 locations=(
 'Z',2.25
 )
+#===============================================================================
+
+
+#### AUTOMATIC PART - NO CHANGES NECEASSARY ####
 
 for location in "${locations[@]}"
 do
