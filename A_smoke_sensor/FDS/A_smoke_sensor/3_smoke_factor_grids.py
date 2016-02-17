@@ -184,7 +184,6 @@ for convert in converted:
         a,b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, time = main(convert, exit)
 
 ### Plot Smoke factor grids - if specified
-plots = True
 
 if plots==True:
 
