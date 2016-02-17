@@ -162,26 +162,26 @@ print '\n-----------------------------------------------------------------'
 print 'Generation of potential fields... mesh resolution: %s m\n' %delta_smoke_factor_grid
 
 
-for convert in converted:
-    plt.close()
-    print '\n-----------------------------------------------------------------'
-    print 'Processing files: %s\n' %convert
-
-    magnitudes = np.loadtxt(convert, delimiter=',')
-
-    time=int(convert[:-4][convert.rfind('_')+1:])
-
-    fig = plt.figure(figsize=(cm2inch(21),cm2inch(10)), dpi=300)
-
-    gs = gridspec.GridSpec(1, 40)
-
-    ax1 = fig.add_subplot(gs[0,0:20])
-    ax2 = fig.add_subplot(gs[0,19:22])
-    ax3 = fig.add_subplot(gs[0,24:40])
-
-    for id, exit in enumerate(exits):
-
-        a,b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, time = main(convert, exit)
+# for convert in converted:
+#     plt.close()
+#     print '\n-----------------------------------------------------------------'
+#     print 'Processing files: %s\n' %convert
+#
+#     magnitudes = np.loadtxt(convert, delimiter=',')
+#
+#     time=int(convert[:-4][convert.rfind('_')+1:])
+#
+#     fig = plt.figure()
+#
+#     gs = gridspec.GridSpec(1, 40)
+#
+#     ax1 = fig.add_subplot(gs[0,0:20])
+#     ax2 = fig.add_subplot(gs[0,19:22])
+#     ax3 = fig.add_subplot(gs[0,24:40])
+#
+#     for id, exit in enumerate(exits):
+#
+#         a,b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, time = main(convert, exit)
 
 ### Plot Smoke factor grids - if specified
 
@@ -193,8 +193,9 @@ if plots==True:
 
         plt.close()
 
-        nrows = int(math.ceil(len(exits) / 2.))
-        ncols = int(math.ceil(len(exits) / 2.))
+        fig = plt.figure()
+        nrows = int(math.ceil( len(exits)**0.5 ))
+        ncols = int(math.ceil( len(exits)**0.5 ))
         fig, axes = plt.subplots(nrows+1, ncols)
 
         gs = gridspec.GridSpec(nrows+1, ncols)
@@ -209,23 +210,22 @@ if plots==True:
             exit = exits.items()[i][0]
             ax = plt.subplot(g)
 
-            plt.xlabel('x (m)')
-            plt.ylabel('y (m)')
-
+        #    plt.xlabel('x (m)')
+        #    plt.ylabel('y (m)')
+            plt.tight_layout()
             smoke_factor_grid_norm = np.loadtxt('../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.6f_Y_%.6f/t_%.6f.csv'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], time), delimiter=',', skiprows=3)
             aa = ax.pcolorfast(dim1, dim2, smoke_factor_grid_norm, cmap='coolwarm', vmin=0, vmax=10)
             ax.set_title(exit)
             ax.set_aspect('equal')
             ax.set_xticks(np.arange(dim1_min, dim1_max,5))
             ax.set_yticks(np.arange(dim2_min+1, dim2_max,5))
-            ax.minorticks_on()
-            ax.grid(which='major',linestyle='-', lw=1, alpha=0.4)
-            ax.grid(which='minor',linestyle='-', lw=1, alpha=0.4)
+        #    ax.minorticks_on()
+        #    ax.grid(which='major',linestyle='-', lw=1, alpha=0.4)
+        #    ax.grid(which='minor',linestyle='-', lw=1, alpha=0.4)
 
         plt.savefig('../3_sfgrids/dx_%.2f/%s_%.2f/sfgrid_%i.pdf'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  time))
 
         print '\nPlot smoke factor grid: ../sfgrids/dx_%.2f/%s_%.2f/sfgrid_%i.pdf'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  time)
-
 
 print "\n*** Finished ***"
 
