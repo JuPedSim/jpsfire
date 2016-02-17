@@ -29,6 +29,7 @@ matplotlib.rc('font', **font)
 f = open('data_meshgrid.pckl')
 (chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max, exits) = pickle.load(f)
 
+
 # Comversion cm to inches
 def cm2inch(value):
     return value/2.54
@@ -160,8 +161,8 @@ converted = glob.glob('../2_consolidated/%s_%.2f/%s_*.csv'%(specified_location[0
 print '\n-----------------------------------------------------------------'
 print 'Generation of potential fields... mesh resolution: %s m\n' %delta_smoke_factor_grid
 
-for convert in converted:
 
+for convert in converted:
     plt.close()
     print '\n-----------------------------------------------------------------'
     print 'Processing files: %s\n' %convert
@@ -183,6 +184,7 @@ for convert in converted:
         a,b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, time = main(convert, exit)
 
 ### Plot Smoke factor grids - if specified
+plots = True
 
 if plots==True:
 
@@ -190,33 +192,36 @@ if plots==True:
 
     for time in times:
 
-        test=[]
         plt.close()
 
-        fig  = plt.figure(figsize=(cm2inch(21),cm2inch(10)), dpi=300)
-        gs = gridspec.GridSpec(15, 4,bottom=0.18,left=0.18,right=0.88)
+        nrows = int(math.ceil(len(exits) / 2.))
+        ncols = int(math.ceil(len(exits) / 2.))
+        fig, axes = plt.subplots(nrows+1, ncols)
 
-        for ax, exit in enumerate(exits):
+        gs = gridspec.GridSpec(nrows+1, ncols)
 
-            if ax==1:
-                plt.ylabel('y (m)')
+        for i, g in enumerate(gs):
 
-            ax1 = fig.add_subplot(gs[:12,ax])
+            if i == len(exits):
+                cbar_ax = plt.subplot(gs[-1, :])
+                fig.colorbar(aa, cax=cbar_ax, label=r'$f_{smoke}$', orientation='horizontal')
+                break
+
+            exit = exits.items()[i][0]
+            ax = plt.subplot(g)
+
             plt.xlabel('x (m)')
-
+            plt.ylabel('y (m)')
 
             smoke_factor_grid_norm = np.loadtxt('../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.6f_Y_%.6f/t_%.6f.csv'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], time), delimiter=',', skiprows=3)
-            aa = ax1.pcolorfast(dim1, dim2, smoke_factor_grid_norm, cmap='coolwarm', vmin=0, vmax=10)
-            ax1.set_title(exit)
-            ax1.set_aspect('equal')
-            ax1.set_xticks(np.arange(dim1_min, dim1_max,5))
-            ax1.set_yticks(np.arange(dim2_min+1, dim2_max,5))
-            ax1.minorticks_on()
-            ax1.grid(which='major',linestyle='-', lw=1, alpha=0.4)
-            ax1.grid(which='minor',linestyle='-', lw=1, alpha=0.4)
-
-        ax2 = fig.add_subplot(gs[14:15,0:len(exits)])
-        fig.colorbar(aa,ax=ax1,cax=ax2, label=r'$f_{smoke}$', orientation='horizontal')
+            aa = ax.pcolorfast(dim1, dim2, smoke_factor_grid_norm, cmap='coolwarm', vmin=0, vmax=10)
+            ax.set_title(exit)
+            ax.set_aspect('equal')
+            ax.set_xticks(np.arange(dim1_min, dim1_max,5))
+            ax.set_yticks(np.arange(dim2_min+1, dim2_max,5))
+            ax.minorticks_on()
+            ax.grid(which='major',linestyle='-', lw=1, alpha=0.4)
+            ax.grid(which='minor',linestyle='-', lw=1, alpha=0.4)
 
         plt.savefig('../3_sfgrids/dx_%.2f/%s_%.2f/sfgrid_%i.pdf'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  time))
 
