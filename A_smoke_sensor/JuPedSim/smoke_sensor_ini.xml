@@ -5,7 +5,7 @@
 <!-- header: seed, geometry, output format -->
 <numCPU>4</numCPU>
 <seed>1707</seed>
-<max_sim_time>600</max_sim_time>
+<max_sim_time>120</max_sim_time>
 <!--maxCPU>1</maxCPU-->
 
 
@@ -19,7 +19,10 @@
 <!-- agents -->
 <agents operational_model_id="2">
 	<agents_distribution>
-		<group group_id="1" agent_parameter_id="1" room_id="0" subroom_id="0" number="30" router_id="7" pre_movement_mean="40" pre_movement_sigma="0" y_max="4" risk_tolerance_mean="0." risk_tolerance_sigma="0."/>
+		<!--group group_id="1" agent_parameter_id="1" room_id="0" subroom_id="0" number="100" router_id="7" pre_movement_mean="40" pre_movement_sigma="0" y_max="4" risk_tolerance_mean="0.6" risk_tolerance_sigma="0.1"/-->
+		
+		<group group_id="1" agent_parameter_id="1" room_id="0" subroom_id="0" number="100" router_id="7" pre_movement_mean="40" pre_movement_sigma="0" y_max="4" risk_tolerance_alpha="1.5" risk_tolerance_beta="0.5"/>
+		
 	</agents_distribution>
 </agents>
 

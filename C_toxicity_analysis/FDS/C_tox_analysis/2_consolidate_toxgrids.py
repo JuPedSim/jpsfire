@@ -16,6 +16,10 @@ import os
 import collections
 import matplotlib
 from matplotlib import rcParams
+import multiprocessing as mp
+
+CPUs = mp.cpu_count()
+print CPUs
 
 rcParams.update({'figure.autolayout': True})
 

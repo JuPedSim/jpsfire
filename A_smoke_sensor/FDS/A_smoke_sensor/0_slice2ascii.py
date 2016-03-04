@@ -87,7 +87,7 @@ t_up=[i+t_window for i in t_low]
 
 number_slices=1
 
-output=quantity+'_'
+output=quantity.replace(' ', '_') + '_'
 
 smv_slcfs = []
 id_slices = []
@@ -145,6 +145,8 @@ if len(id_slices)==0:
     sys.exit('Mismatch between specified SLICE locations and/or quantities! -> EXIT')
 
 #==============================================================================
+
+quantity = quantity.replace(' ', '_')
 
 if os.path.exists(os.path.join('../0_slice2ascii')):
     shutil.rmtree(os.path.join('../0_slice2ascii'))
