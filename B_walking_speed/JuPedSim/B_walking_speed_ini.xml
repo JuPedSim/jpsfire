@@ -27,8 +27,8 @@ xsi:noNamespaceSchemaLocation="../../xsd/jps_ini_core.xsd">
 
   <!-- configuration of fire simulation input -->
   <JPSfire>
-  	<A_somoke_sensor/>
-   	<B_walking_speed extinction_grids="../FDS/2_extinction_grids/EXTINCTION_COEFFICIENT/" update_time="10.0" final_time="120.0" study="Jin1974"/>
+  	<A_smoke_sensor/>
+   	<B_walking_speed extinction_grids="../FDS/2_extinction_grids/EXTINCTION_COEFFICIENT/" update_time="10.0" final_time="120.0" study="Jin1978" irritant="false"/>
    	<C_toxicity_analysis/>
   </JPSfire>
 
@@ -36,7 +36,7 @@ xsi:noNamespaceSchemaLocation="../../xsd/jps_ini_core.xsd">
   <agents operational_model_id="1">
     <agents_distribution>
 
-      <group group_id="0" agent_parameter_id="1" room_id="1" subroom_id="0" number="1" goal_id="-1" router_id="1" pre_movement_mean="10" pre_movement_sigma="0" />
+      <group group_id="0" agent_parameter_id="1" room_id="1" subroom_id="0" number="1" goal_id="-1" router_id="1" pre_movement_mean="60" pre_movement_sigma="0" x_min="5" y_min="1"/>
 
     </agents_distribution>
   </agents>
@@ -55,7 +55,7 @@ xsi:noNamespaceSchemaLocation="../../xsd/jps_ini_core.xsd">
         <force_wall nu="0.2" dist_max="3" disteff_max="2" interpolation_width="0.1" />
       </model_parameters>
       <agent_parameters agent_parameter_id="1">
-        <v0 mu="1.4" sigma="0.0" />
+        <v0 mu="1.1" sigma="0.0" />
         <bmax mu="0.25" sigma="0.001" />
         <bmin mu="0.20" sigma="0.001" />
         <amin mu="0.18" sigma="0.001" />
