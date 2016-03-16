@@ -81,51 +81,6 @@ def main(convert, exit):
             #### storage of the edge factor
             smoke_factor_grid[a,b]=smoke_factor
 
-            ## This statement yields a representative plot of the line of
-            ## sights if wanted. x0 and y0 can be adjusted e.g. for debugging
-            if plots == True:
-                if x0 == 24 and y0 == 4:
-                    ax1.set_xlabel('%s (m)'%dimension_1.lower())
-                    ax1.set_ylabel('%s (m)'%dimension_2.lower())
-                    ax1.set_xticks(np.arange(dim1_min, dim1_max, 5))
-                    ax1.set_yticks(np.arange(dim2_min+1, dim2_max, 5))
-
-                    # Plot the line of sights towards each exit
-                    line_of_sight = [
-                    [x0*delta_dim_1,
-                    exits[exit][0]]
-                    ,
-                    [y0*delta_dim_2,
-                    exits[exit][1]],
-                    ]
-
-                    line, = ax1.plot(line_of_sight[0], line_of_sight[1], lw=2)
-
-                    aa = ax1.pcolorfast(dim1, dim2, magnitudes, cmap='Greys', vmin=0, vmax=1)
-                    ax1.minorticks_on()
-                    ax1.axis('image')
-
-                    ax1.grid(which='major',linestyle='-', alpha=0.4)
-                    ax1.grid(which='minor',linestyle='-', alpha=0.4)
-
-
-                    ax3.plot(magnitude_along_line_of_sight,  lw=2, label='%s: $f_{smoke}$ = %.3f'%(exit, smoke_factor))
-
-                    ax3.set_xlabel('l (m)')
-                    labels = ax3.get_xticks()
-                    labels = (labels*delta_dim_1).astype(int)
-                    ax3.set_xticklabels(labels)
-
-                    ax3.set_ylabel(quantity)
-                    ax3.set_ylim(0,1)
-
-                    cbar = fig.colorbar(aa,ax=ax1,cax=ax2, orientation='vertical')
-
-                    plt.legend(loc='upper left')
-                    plt.grid()
-
-                    plt.savefig('../2_consolidated/%s_%.2f/%s_%s.pdf'%(specified_location[0], specified_location[1], quantity+'_debug', time ))
-
     #if np.amax(smoke_factor_grid)>max_Smoke_Factor:
     max_Smoke_Factor = np.amax(smoke_factor_grid)
 
@@ -159,34 +114,95 @@ print 'Analysing Slice File at %s=%.2f\n'%(specified_location[0], specified_loca
 converted = glob.glob('../2_consolidated/%s_%.2f/%s_*.csv'%(specified_location[0], specified_location[1], quantity))
 
 print '\n-----------------------------------------------------------------'
-print 'Generation of potential fields... mesh resolution: %s m\n' %delta_smoke_factor_grid
+print 'Generation of smoke factor grids... mesh resolution: %s m\n' %delta_smoke_factor_grid
 
 
 for convert in converted:
     plt.close()
     print '\n-----------------------------------------------------------------'
     print 'Processing files: %s\n' %convert
-    
+
     magnitudes = np.loadtxt(convert, delimiter=',')
-    
+
     time=int(convert[:-4][convert.rfind('_')+1:])
-    
-    fig = plt.figure()
-    
-    gs = gridspec.GridSpec(1, 40)
-    
-    ax1 = fig.add_subplot(gs[0,0:20])
-    ax2 = fig.add_subplot(gs[0,19:22])
-    ax3 = fig.add_subplot(gs[0,24:40])
-    
+
     for id, exit in enumerate(exits):
 
         a,b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, time = main(convert, exit)
 
-### Plot Smoke factor grids - if specified
 
 if plots==True:
 
+    ## This statement yields a representative plot of the line of
+    ## sights if wanted. x0 and y0 can be adjusted e.g. for debugging
+
+    x0 = 3
+    y0 = 3
+    slicefile = '../2_consolidated/Z_2.25/SOOT_OPTICAL_DENSITY_120.csv'
+    sfgrid = '../3_sfgrids/dx_1.00/Z_2.25/Door_X_2.000000_Y_5.500000/t_120.000000.csv'
+    exit = 'cross_0'
+    time = 120
+
+    x, y = m_to_pix(x_i=exits[exit][0], y_i=exits[exit][1])
+    x_exit, y_exit = np.linspace(x0, x, math.hypot(x - x0, y - y0)), np.linspace(y0, y, math.hypot(x - x0, y - y0))
+
+    magnitude_along_line_of_sight = scipy.ndimage.map_coordinates(np.transpose(magnitudes), np.vstack((x_exit,y_exit)))
+
+
+    fig = plt.figure()
+
+    gs = gridspec.GridSpec(1, 40)
+
+    ax1 = fig.add_subplot(gs[0,0:20])
+    ax2 = fig.add_subplot(gs[0,19:22])
+    ax3 = fig.add_subplot(gs[0,24:40])
+    ax1.set_xlabel('%s (m)'%dimension_1.lower())
+    ax1.set_ylabel('%s (m)'%dimension_2.lower())
+    ax1.set_xticks(np.arange(dim1_min, dim1_max, 5))
+    ax1.set_yticks(np.arange(dim2_min+1, dim2_max, 5))
+
+    # Plot the line of sights towards each exit
+    line_of_sight = [
+    [x0*delta_dim_1,
+    exits[exit][0]]
+    ,
+    [y0*delta_dim_2,
+    exits[exit][1]],
+    ]
+
+    line, = ax1.plot(line_of_sight[0], line_of_sight[1], lw=2)
+
+    slicefile = np.loadtxt(slicefile, delimiter=',')
+    aa = ax1.pcolorfast(dim1, dim2, slicefile, cmap='Greys', vmin=0, vmax=1)
+    ax1.minorticks_on()
+    ax1.axis('image')
+
+    ax1.grid(which='major',linestyle='-', alpha=0.4)
+    ax1.grid(which='minor',linestyle='-', alpha=0.4)
+
+    sfgrid = np.loadtxt(sfgrid, skiprows=3, delimiter=',')
+    smoke_factor = sfgrid[ x0/delta_smoke_factor_grid, -y0/delta_smoke_factor_grid ]
+    #print smoke_factor
+
+    ax3.plot(magnitude_along_line_of_sight,  lw=2, label='%s: $f_{smoke}$ = %.3f'%(exit, smoke_factor))
+
+    ax3.set_xlabel('l (m)')
+    labels = ax3.get_xticks()
+    labels = (labels*delta_dim_1).astype(int)
+    ax3.set_xticklabels(labels)
+
+    ax3.set_ylabel(quantity)
+    ax3.set_ylim(0,1)
+
+    cbar = fig.colorbar(aa,ax=ax1,cax=ax2, orientation='vertical')
+
+    plt.legend(loc='upper left')
+    plt.grid()
+
+    plt.savefig('../2_consolidated/%s_%.2f/%s_%s.pdf'%(specified_location[0], specified_location[1], quantity+'_debug', time ))
+
+
+    ## Plot Smoke factor grids - if specified
     times=np.arange(t_start,t_stop+1,t_step)
 
     for time in times:
