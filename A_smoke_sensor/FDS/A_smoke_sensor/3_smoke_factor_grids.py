@@ -136,13 +136,13 @@ if plots==True:
     ## This statement yields a representative plot of the line of
     ## sights if wanted. x0 and y0 can be adjusted e.g. for debugging
 
-    x0 = 12.5
-    y0 = 5.5
+    x0 = 3
+    y0 = 3
 
-    slicefile = '../2_consolidated/Z_2.25/SOOT_OPTICAL_DENSITY_60.csv'
-    sfgrid = '../3_sfgrids/dx_1.00/Z_2.25/Door_X_25.000000_Y_6.000000/t_60.000000.csv'
-    exit = 'trans_0'
-    time = 60
+    slicefile = '../2_consolidated/Z_2.25/SOOT_OPTICAL_DENSITY_120.csv'
+    sfgrid = '../3_sfgrids/dx_1.00/Z_2.25/Door_X_25.000000_Y_6.000000/t_120.000000.csv'
+    exit = 'cross_0'
+    time = 120
 
     fds_delta = 0.25
 
@@ -239,7 +239,7 @@ if plots==True:
 
             exit = exits.items()[i][0]
             ax = plt.subplot(g)
-    
+
             plt.xlabel('x (m)')
             plt.ylabel('y (m)')
             plt.tight_layout()
