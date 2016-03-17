@@ -138,10 +138,18 @@ if plots==True:
 
     x0 = 3
     y0 = 3
+
     slicefile = '../2_consolidated/Z_2.25/SOOT_OPTICAL_DENSITY_120.csv'
     sfgrid = '../3_sfgrids/dx_1.00/Z_2.25/Door_X_2.000000_Y_5.500000/t_120.000000.csv'
     exit = 'cross_0'
     time = 120
+
+    fds_delta = 0.25
+
+    ### ==== automatic part ======
+
+    x0 = x0 / fds_delta
+    y0 = y0 / fds_delta
 
     x, y = m_to_pix(x_i=exits[exit][0], y_i=exits[exit][1])
     x_exit, y_exit = np.linspace(x0, x, math.hypot(x - x0, y - y0)), np.linspace(y0, y, math.hypot(x - x0, y - y0))
@@ -181,6 +189,12 @@ if plots==True:
     ax1.grid(which='minor',linestyle='-', alpha=0.4)
 
     sfgrid = np.loadtxt(sfgrid, skiprows=3, delimiter=',')
+    #print np.shape(sfgrid)
+
+    for i in range(int(1/fds_delta)/2):
+        sfgrid = np.kron(sfgrid, [[1,1], [1,1]])
+    #print np.shape(sfgrid)
+
     smoke_factor = sfgrid[ x0/delta_smoke_factor_grid, -y0/delta_smoke_factor_grid ]
     #print smoke_factor
 
