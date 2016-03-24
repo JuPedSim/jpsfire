@@ -140,7 +140,7 @@ if plots==True:
     y0 = 3
 
     slicefile = '../2_consolidated/Z_2.25/SOOT_OPTICAL_DENSITY_120.csv'
-    sfgrid = '../3_sfgrids/dx_1.00/Z_2.25/Door_X_2.000000_Y_5.500000/t_120.000000.csv'
+    sfgrid = '../3_sfgrids/dx_1.00/Z_2.25/Door_X_25.000000_Y_6.000000/t_120.000000.csv'
     exit = 'cross_0'
     time = 120
 
@@ -154,8 +154,9 @@ if plots==True:
     x, y = m_to_pix(x_i=exits[exit][0], y_i=exits[exit][1])
     x_exit, y_exit = np.linspace(x0, x, math.hypot(x - x0, y - y0)), np.linspace(y0, y, math.hypot(x - x0, y - y0))
 
-    magnitude_along_line_of_sight = scipy.ndimage.map_coordinates(np.transpose(magnitudes), np.vstack((x_exit,y_exit)))
+    slicefile = np.loadtxt(slicefile, delimiter=',')
 
+    magnitude_along_line_of_sight = scipy.ndimage.map_coordinates(np.transpose(slicefile), np.vstack((x_exit,y_exit)))
 
     fig = plt.figure()
 
@@ -180,7 +181,6 @@ if plots==True:
 
     line, = ax1.plot(line_of_sight[0], line_of_sight[1], lw=2)
 
-    slicefile = np.loadtxt(slicefile, delimiter=',')
     aa = ax1.pcolorfast(dim1, dim2, slicefile, cmap='Greys', vmin=0, vmax=1)
     ax1.minorticks_on()
     ax1.axis('image')
@@ -195,7 +195,7 @@ if plots==True:
         sfgrid = np.kron(sfgrid, [[1,1], [1,1]])
     #print np.shape(sfgrid)
 
-    smoke_factor = sfgrid[ x0/delta_smoke_factor_grid, -y0/delta_smoke_factor_grid ]
+    smoke_factor = sfgrid[ y0/delta_smoke_factor_grid, -x0/delta_smoke_factor_grid ]
     #print smoke_factor
 
     ax3.plot(magnitude_along_line_of_sight,  lw=2, label='%s: $f_{smoke}$ = %.3f'%(exit, smoke_factor))
