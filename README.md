@@ -8,8 +8,11 @@ Have a look at the [Wiki](https://cst.version.fz-juelich.de/jupedsim/JPSfire/wik
 Available components:
 --------------------
 Smoke sensor
+
 Walking speed reduction in smoke
+
 Fire hazard analyses
+
 
 Upcoming components:
 -------------------
