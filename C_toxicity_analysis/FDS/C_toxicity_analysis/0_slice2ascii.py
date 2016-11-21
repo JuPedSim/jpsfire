@@ -68,7 +68,7 @@ t_window=1            # interpolation duration prompted by fds2ascii
 
 # Do you want to have plots produced? May be computaionally intensive depending
 # on your FDS simulation extend!
-plots = True
+plots = False
 
 #===============================================================================
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<JuPedSim project="JPS-Project" version="0.5"
+<JuPedSim project="JPS-Project" version="0.8"
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:noNamespaceSchemaLocation="../../xsd/jps_ini_core.xsd">
 
@@ -15,7 +15,7 @@ xsi:noNamespaceSchemaLocation="../../xsd/jps_ini_core.xsd">
     <!--<socket hostname="127.0.0.1" port="8989"/> -->
   </trajectories>
   <!-- where to store the logs -->
-  <!--<logfile>log.txt</logfile> -->
+  <logfile>log.dat</logfile>
 
 
   <!-- traffic information: e.g closed doors -->
@@ -28,16 +28,17 @@ xsi:noNamespaceSchemaLocation="../../xsd/jps_ini_core.xsd">
   <!-- configuration of fire simulation input -->
   <JPSfire>
   	<A_smoke_sensor />
-   	<B_walking_speed />
-   	<C_toxicity_analysis toxicity_grids="../FDS/2_toxicity_grids/" final_time="120" update_time="20" />
+   	<!--B_walking_speed extinction_grids="/Users/Benjamin/Desktop/FZJ/JPSFire/B_walking_speed/FDS/2_extinction_grids/" final_time="120" update_time="20" study="Jin1978" irritant="true" /-->
+   	<C_toxicity_analysis toxicity_grids="/Users/Benjamin/Desktop/FZJ/JPSFire/C_toxicity_analysis/FDS/2_toxicity_grids/" final_time="120" update_time="20" />
   </JPSfire>
 
   <!--persons information and distribution -->
   <agents operational_model_id="1">
     <agents_distribution>
 
-      <group group_id="0" agent_parameter_id="1" room_id="1" subroom_id="0" number="1" goal_id="-1" router_id="1" pre_movement_mean="60" pre_movement_sigma="0" x_min="5" y_min="1"/>
-
+      <group group_id="0" agent_parameter_id="1" room_id="1" subroom_id="0" number="1" goal_id="-1" router_id="1" pre_movement_mean="60" pre_movement_sigma="10" />
+      <!--group group_id="1" agent_parameter_id="1" room_id="1" subroom_id="0" number="10" goal_id="-1" router_id="1" pre_movement_mean="30" pre_movement_sigma="0" /-->
+      
     </agents_distribution>
   </agents>
 
