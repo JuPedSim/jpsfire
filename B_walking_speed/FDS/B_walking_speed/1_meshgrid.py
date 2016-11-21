@@ -64,11 +64,11 @@ def read_fds_line():
     return coordinates
 
 f = open('data_slice2ascii.pckl')
-(chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, plots) = pickle.load(f)
+(chid, quantity, specified_location, t_low, id_meshes, plots) = pickle.load(f)
 
-if not os.path.exists('../1_meshgrid/%s_%.6f'%(specified_location[0], specified_location[1])):
+if not os.path.exists('1_meshgrid/%s_%.6f'%(specified_location[0], specified_location[1])):
     print 'create directory "1_meshgrid"'
-    os.makedirs('../1_meshgrid/%s_%.6f'%(specified_location[0], specified_location[1]))
+    os.makedirs('1_meshgrid/%s_%.6f'%(specified_location[0], specified_location[1]))
 
 try:
     os.remove('data_meshgrid.pckl')
@@ -76,15 +76,15 @@ except OSError:
     pass
 
 if plots==True:
-    if not os.path.exists('../slicefiles/%s/%s_%.6f'%(quantity, specified_location[0], specified_location[1])):
+    if not os.path.exists('slicefiles/%s/%s_%.6f'%(quantity, specified_location[0], specified_location[1])):
         print 'create directory "slicefiles"'
-        os.makedirs('../slicefiles/%s/%s_%.6f'%(quantity, specified_location[0], specified_location[1]))
+        os.makedirs('slicefiles/%s/%s_%.6f'%(quantity, specified_location[0], specified_location[1]))
 
 
 fds=glob.glob('../%s.fds'%chid)
 #===== if necessary, adjust path and/or name of the converted asci slices======
 
-slicefiles=glob.glob('../0_slice2ascii/%s_%.6f/*'%(specified_location[0], specified_location[1]))
+slicefiles=glob.glob('0_slice2ascii/%s_%.6f/*'%(specified_location[0], specified_location[1]))
 
 if len(slicefiles)==0:
     sys.exit('CAUTION: directory comprises no converted slicefiles!')
@@ -178,7 +178,7 @@ for slicefile in slicefiles:
 
         if slicefile == slicefiles[0]:
             obsts=np.reshape(obsts,(-1,6))
-            np.savetxt('../1_meshgrid/obst.csv', obsts, delimiter=',')
+            np.savetxt('1_meshgrid/obst.csv', obsts, delimiter=',')
 
         for lines in content:
             if lines[0:5]=='&HOLE':
@@ -193,16 +193,16 @@ for slicefile in slicefiles:
 
         if slicefile == slicefiles[0]:
             holes=np.reshape(holes,(-1,6))
-            np.savetxt('../1_meshgrid/hole.csv', holes, delimiter=',')
+            np.savetxt('1_meshgrid/hole.csv', holes, delimiter=',')
 
         fd.close()
 
-    collect = magnitudes + geometry
+    collect = magnitudes #+ geometry
 
     #collect = collect[:-1,:-1]
 
-    np.savetxt('../1_meshgrid/%s_%.6f/%s.csv'%(specified_location[0], specified_location[1], slicefile[slicefile.rfind('/')+1:-4]), collect, delimiter=',')
-    print '\nWrite files: ../1_meshgrid/%s_%.6f/%s.csv'%(specified_location[0], specified_location[1], slicefile[slicefile.rfind('/')+1:-4])
+    np.savetxt('1_meshgrid/%s_%.6f/%s.csv'%(specified_location[0], specified_location[1], slicefile[slicefile.rfind('/')+1:-4]), collect, delimiter=',')
+    print '\nWrite files: 1_meshgrid/%s_%.6f/%s.csv'%(specified_location[0], specified_location[1], slicefile[slicefile.rfind('/')+1:-4])
 
     if plots==True:
         plt.figure(figsize=(cm2inch(15),cm2inch(10)), dpi=300)
@@ -217,7 +217,7 @@ for slicefile in slicefiles:
         plt.minorticks_on()
         plt.grid(which='major')
 
-        plt.savefig('../slicefiles/%s/%s_%.6f/%s.pdf'%(quantity, specified_location[0],specified_location[1], slicefile[slicefile.rfind('/')+1:-4]))
+        plt.savefig('slicefiles/%s/%s_%.6f/%s.pdf'%(quantity, specified_location[0],specified_location[1], slicefile[slicefile.rfind('/')+1:-4]))
 
 
 print "\n*** Finished ***"
@@ -226,6 +226,6 @@ print "\n*** Finished ***"
 #============storage of the most important variables to store.pckl=============
 
 f = open('data_meshgrid.pckl', 'w')
-pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max), f)
+pickle.dump((chid, quantity, specified_location, t_low, id_meshes, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max), f)
 
 f.close()

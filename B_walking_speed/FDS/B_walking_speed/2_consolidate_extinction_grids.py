@@ -36,7 +36,7 @@ def cm2inch(value):
 
 def mesh_attributes(time, mesh_id):
 
-    sf=np.loadtxt('../0_slice2ascii/%s_%.6f/%s_%i_mesh_%i.txt'%(specified_location[0], specified_location[1], quantity, time, mesh_id), skiprows=2, delimiter=',')
+    sf=np.loadtxt('0_slice2ascii/%s_%.6f/%s_%i_mesh_%i.txt'%(specified_location[0], specified_location[1], quantity, time, mesh_id), skiprows=2, delimiter=',')
 
     delta_dim_1 = abs(np.max(np.diff(sf[:,0])))
     delta_dim_2 = abs(np.max(np.diff(sf[:,1])))
@@ -59,23 +59,20 @@ def mesh_attributes(time, mesh_id):
 f = open('data_meshgrid.pckl')
 (chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max) = pickle.load(f)
 
-times = np.arange(t_start,t_stop+1,t_step)[:]
-
-
-if not os.path.exists('../2_extinction_grids/%s/%s_%.6f'%(quantity, specified_location[0], specified_location[1])):
+if not os.path.exists('2_extinction_grids/%s/%s_%.6f'%(quantity, specified_location[0], specified_location[1])):
     print 'create directory "2_extinction_grids"'
-    os.makedirs('../2_extinction_grids/%s/%s_%.6f'%(quantity, specified_location[0], specified_location[1]))
+    os.makedirs('2_extinction_grids/%s/%s_%.6f'%(quantity, specified_location[0], specified_location[1]))
 
-for time in times:
+for time in t_low:
 
-    consolidated = np.zeros((3000,3000))
+    consolidated = np.zeros((5000,5000))
     consolidated[:] = np.NAN
 
     dim1_cons = []
     dim2_cons = []
 
-    global_offset_dim1 = 500
-    global_offset_dim2 = 500
+    global_offset_dim1 = 1500
+    global_offset_dim2 = 1500
 
     offset_dim1 = [0]
     offset_dim2 = [0]
@@ -86,9 +83,9 @@ for time in times:
     ax=plt.subplot(111)
 
     for mesh_id in id_meshes:
-        print '../%s_%.6f/%s_%i_mesh_%i.csv'%(specified_location[0], specified_location[1], quantity, time, mesh_id)
+        print '%s_%.6f/%s_%i_mesh_%i.csv'%(specified_location[0], specified_location[1], quantity, time, mesh_id)
 
-        collect = np.loadtxt('../1_meshgrid/%s_%.6f/%s_%i_mesh_%i.csv'%(specified_location[0], specified_location[1], quantity, time, mesh_id), delimiter=',')
+        collect = np.loadtxt('1_meshgrid/%s_%.6f/%s_%i_mesh_%i.csv'%(specified_location[0], specified_location[1], quantity, time, mesh_id), delimiter=',')
 
         dim1 = offset_dim1, mesh_attributes(time, mesh_id)[0]
         dim2 = offset_dim2, mesh_attributes(time, mesh_id)[1]
@@ -143,7 +140,7 @@ for time in times:
     header='Room \n dX[m], dY[m] , minX[m] , maxX[m], minY[m], maxY[m] \n  %f  , %f ,  %f  ,  %f  ,  %f ,  %f' \
     %(delta_dim_1, delta_dim_2, dim1_min, dim1_max, dim2_min, dim2_max)
 
-    np.savetxt('../2_extinction_grids/%s/%s_%.6f/t_%.6f.csv'%(quantity, specified_location[0], specified_location[1], time), consolidated, header=header, delimiter=',', comments='')
+    np.savetxt('2_extinction_grids/%s/%s_%.6f/t_%.6f.csv'%(quantity, specified_location[0], specified_location[1], time), consolidated, header=header, delimiter=',', comments='')
 
     if plots == True:
         aa = ax.pcolorfast(new_dim1, new_dim2, consolidated, vmin=0, vmax=5)
@@ -157,7 +154,7 @@ for time in times:
         #plt.minorticks_on()
         #plt.grid(which='major')
 
-        plt.savefig('../2_extinction_grids/%s/%s_%.6f/t_%.6f.pdf'%(quantity, specified_location[0], specified_location[1], time))
+        plt.savefig('2_extinction_grids/%s/%s_%.6f/t_%.6f.pdf'%(quantity, specified_location[0], specified_location[1], time))
 
         plt.close()
 

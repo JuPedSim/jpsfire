@@ -44,13 +44,13 @@ except:
     ### if not use single loation defined explicitly in 0_slice2ascii.py
     print '\nProcessing single FDS slice quantity and location defined in 0_slice2ascii.py\n'
     ### change quantity here - if necessary
-    quantity = 'EXTINCTION COEFFICIENT'
+    quantity = 'SOOT EXTINCTION COEFFICIENT'
     ### change dimension and location of the slicefile here - if necessary
-    location = ('Z', 4.8)
+    location = ('Z', 1.8)
 
 # Grid resolution in x, y and z
-dx=0.2
-dy=0.2
+dx=0.4
+dy=0.4
 dz=0.2
 
 # Parameters to be tunneled to fds2ascii:
@@ -63,12 +63,13 @@ domain_size="n"
 # Interpolation times sequences; adjust arange values and/or window
 t_start=0
 t_stop=120
-t_step=10
+t_step=20
 t_window=1            # interpolation duration prompted by fds2ascii
+t_shift=0           # time shift between fire and pedestrian simulation
 
 # Do you want to have plots produced? May be computaionally intensive depending
 # on your FDS simulation extend!
-plots = False
+plots = True
 
 #===============================================================================
 
@@ -81,7 +82,7 @@ specified_location = (location[0].upper(), location[1])
 
 #print specified_location
 
-t_low=np.arange(t_start,t_stop+1,t_step)
+t_low = np.arange(t_start+t_shift, t_stop+t_shift+1, t_step)
 t_up=[i+t_window for i in t_low]
 
 number_slices=1
@@ -153,15 +154,15 @@ if len(id_slices)==0:
 
 quantity = quantity.replace(' ', '_')
 
-if os.path.exists(os.path.join('../0_slice2ascii')):
-    shutil.rmtree(os.path.join('../0_slice2ascii'))
+if os.path.exists(os.path.join('0_slice2ascii')):
+    shutil.rmtree(os.path.join('0_slice2ascii'))
 
-if not os.path.exists('../0_slice2ascii'):
+if not os.path.exists('0_slice2ascii'):
     print 'create directory "0_slice2ascii"'
-    os.makedirs('../0_slice2ascii')
+    os.makedirs('0_slice2ascii')
 
-if not os.path.exists(os.path.join('../0_slice2ascii/%s_%.6f'%(specified_location[0], specified_location[1]))):
-    os.makedirs(os.path.join('../0_slice2ascii/%s_%.6f'%(specified_location[0], specified_location[1])))
+if not os.path.exists(os.path.join('0_slice2ascii/%s_%.6f'%(specified_location[0], specified_location[1]))):
+    os.makedirs(os.path.join('0_slice2ascii/%s_%.6f'%(specified_location[0], specified_location[1])))
 
 try:
     os.remove('data_slice2ascii.pckl')
@@ -176,7 +177,7 @@ for k, id_slice in enumerate(id_slices):
 
     for a,b in enumerate(t_low):
         data.extend([fds_path, chid, data_type, extend, domain_size,\
-        t_low[a], t_up[a], number_slices, id_slice, '0_slice2ascii/%s_%.6f/%s_mesh_%i.txt'%(specified_location[0], specified_location[1], output+str(t_low[a]), id_meshes[k])])
+        t_low[a], t_up[a], number_slices, id_slice, 'B_walking_speed/0_slice2ascii/%s_%.6f/%s_mesh_%i.txt'%(specified_location[0], specified_location[1], output+str(t_low[a]+t_shift), id_meshes[k])])
 
     data = np.reshape(data, (len(t_low),-1))
 
@@ -231,7 +232,7 @@ for k, id_slice in enumerate(id_slices):
         time.sleep(0.5)
 
 f = open('B_walking_speed/data_slice2ascii.pckl', 'w+')
-pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, plots), f)
+pickle.dump((chid, quantity, specified_location, t_low, id_meshes, plots), f)
 f.close()
 
 print "*** Finished ***"

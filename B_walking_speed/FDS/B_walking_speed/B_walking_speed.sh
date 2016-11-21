@@ -3,7 +3,7 @@
 # Execution of the python scripts to supply the Smoke Sensor
 
 quantities=(
-'EXTINCTION COEFFICIENT'
+'SOOT EXTINCTION COEFFICIENT'
 )
 
 # Please specify the coordinate as float!
