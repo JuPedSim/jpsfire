@@ -32,7 +32,7 @@ def cm2inch(value):
 
 def mesh_attributes(time, mesh_id):
 
-    sf=np.loadtxt('../0_slice2ascii/%s_%.2f/%s_%i_mesh_%i.txt'%(specified_location[0], specified_location[1], quantity, time, mesh_id), skiprows=2, delimiter=',')
+    sf=np.loadtxt('../0_slice2ascii/%s_%.6f/%s_%i_mesh_%i.txt'%(specified_location[0], specified_location[1], quantity, time, mesh_id), skiprows=2, delimiter=',')
 
     delta_dim_1 = abs(np.max(np.diff(sf[:,0])))
     delta_dim_2 = abs(np.max(np.diff(sf[:,1])))
@@ -58,9 +58,9 @@ f = open('data_meshgrid.pckl')
 times = np.arange(t_start,t_stop+1,t_step)[:]
 
 
-if not os.path.exists('../2_consolidated/%s_%.2f'%(specified_location[0], specified_location[1])):
+if not os.path.exists('../2_consolidated/%s_%.6f'%(specified_location[0], specified_location[1])):
     print 'create directory "2_consolidated"'
-    os.makedirs('../2_consolidated/%s_%.2f'%(specified_location[0], specified_location[1]))
+    os.makedirs('../2_consolidated/%s_%.6f'%(specified_location[0], specified_location[1]))
 
 for time in times:
 
@@ -82,9 +82,9 @@ for time in times:
     ax=plt.subplot(111)
 
     for mesh_id in id_meshes:
-        print '../%s_%.2f/%s_%i_mesh_%i.csv'%(specified_location[0], specified_location[1], quantity, time, mesh_id)
+        print '../%s_%.6f/%s_%i_mesh_%i.csv'%(specified_location[0], specified_location[1], quantity, time, mesh_id)
 
-        collect = np.loadtxt('../1_meshgrid/%s_%.2f/%s_%i_mesh_%i.csv'%(specified_location[0], specified_location[1], quantity, time, mesh_id), delimiter=',')
+        collect = np.loadtxt('../1_meshgrid/%s_%.6f/%s_%i_mesh_%i.csv'%(specified_location[0], specified_location[1], quantity, time, mesh_id), delimiter=',')
 
         dim1 = offset_dim1, mesh_attributes(time, mesh_id)[0]
         dim2 = offset_dim2, mesh_attributes(time, mesh_id)[1]
@@ -96,15 +96,15 @@ for time in times:
         consolidated[
 
         #rows
-        global_offset_dim2 + np.amin(dim2[1])/delta_dim_2
+        int(global_offset_dim2 + np.amin(dim2[1])/delta_dim_2)
         :
-        global_offset_dim2 + np.amin(dim2[1])/delta_dim_2 + np.shape(collect)[0]
+        int(global_offset_dim2 + np.amin(dim2[1])/delta_dim_2 + np.shape(collect)[0])
         ,
 
         #cols
-        global_offset_dim1 + np.amin(dim1[1])*(1/delta_dim_1)
+        int(global_offset_dim1 + np.amin(dim1[1])*(1/delta_dim_1))
         :
-        global_offset_dim1 + np.amin(dim1[1])*(1/delta_dim_1) + np.shape(collect)[1]
+        int(global_offset_dim1 + np.amin(dim1[1])*(1/delta_dim_1) + np.shape(collect)[1])
 
         ] = collect
 
@@ -119,6 +119,9 @@ for time in times:
     for i, col in enumerate(consolidated.T):
         if np.isnan(np.nanmean(col)) == False:
             dim1_resize = np.append(dim1_resize, i)
+            
+    dim1_resize = dim1_resize.astype(int)
+    dim2_resize = dim2_resize.astype(int)   
 
 
     consolidated = consolidated[
@@ -136,7 +139,7 @@ for time in times:
     new_dim1 = np.arange(dim1_global_min, dim1_global_max, delta_dim_1)
     new_dim2 = np.arange(dim2_global_min, dim2_global_max, delta_dim_2)
 
-    np.savetxt('../2_consolidated/%s_%.2f/%s_%i.csv'%(specified_location[0], specified_location[1], quantity, time), consolidated, delimiter=',')
+    np.savetxt('../2_consolidated/%s_%.6f/%s_%i.csv'%(specified_location[0], specified_location[1], quantity, time), consolidated, delimiter=',')
 
     aa = ax.pcolorfast(new_dim1, new_dim2, consolidated+geometry[:-1,:-1], vmin=0, vmax=5)
 
@@ -149,7 +152,7 @@ for time in times:
     #plt.minorticks_on()
     #plt.grid(which='major')
 
-    plt.savefig('../2_consolidated/%s_%.2f/%s_%i.pdf'%(specified_location[0], specified_location[1], quantity, time))
+    plt.savefig('../2_consolidated/%s_%.6f/%s_%i.pdf'%(specified_location[0], specified_location[1], quantity, time))
 
     plt.close()
 

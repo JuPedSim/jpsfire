@@ -154,15 +154,12 @@ if len(id_slices)==0:
 
 quantity = quantity.replace(' ', '_')
 
-if os.path.exists(os.path.join('0_slice2ascii')):
-    shutil.rmtree(os.path.join('0_slice2ascii'))
-
-if not os.path.exists('0_slice2ascii'):
+if not os.path.exists('../0_slice2ascii'):
     print 'create directory "0_slice2ascii"'
-    os.makedirs('0_slice2ascii')
+    os.makedirs('../0_slice2ascii')
 
-if not os.path.exists(os.path.join('0_slice2ascii/%s_%.6f'%(specified_location[0], specified_location[1]))):
-    os.makedirs(os.path.join('0_slice2ascii/%s_%.6f'%(specified_location[0], specified_location[1])))
+if not os.path.exists(os.path.join('../0_slice2ascii/%s_%.6f'%(specified_location[0], specified_location[1]))):
+    os.makedirs(os.path.join('../0_slice2ascii/%s_%.6f'%(specified_location[0], specified_location[1])))
 
 try:
     os.remove('data_slice2ascii.pckl')
@@ -177,7 +174,7 @@ for k, id_slice in enumerate(id_slices):
 
     for a,b in enumerate(t_low):
         data.extend([fds_path, chid, data_type, extend, domain_size,\
-        t_low[a], t_up[a], number_slices, id_slice, 'B_walking_speed/0_slice2ascii/%s_%.6f/%s_mesh_%i.txt'%(specified_location[0], specified_location[1], output+str(t_low[a]+t_shift), id_meshes[k])])
+        t_low[a], t_up[a], number_slices, id_slice, '0_slice2ascii/%s_%.6f/%s_mesh_%i.txt'%(specified_location[0], specified_location[1], output+str(t_low[a]+t_shift), id_meshes[k])])
 
     data = np.reshape(data, (len(t_low),-1))
 

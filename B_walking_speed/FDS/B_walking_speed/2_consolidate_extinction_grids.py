@@ -36,7 +36,7 @@ def cm2inch(value):
 
 def mesh_attributes(time, mesh_id):
 
-    sf=np.loadtxt('0_slice2ascii/%s_%.6f/%s_%i_mesh_%i.txt'%(specified_location[0], specified_location[1], quantity, time, mesh_id), skiprows=2, delimiter=',')
+    sf=np.loadtxt('../0_slice2ascii/%s_%.6f/%s_%i_mesh_%i.txt'%(specified_location[0], specified_location[1], quantity, time, mesh_id), skiprows=2, delimiter=',')
 
     delta_dim_1 = abs(np.max(np.diff(sf[:,0])))
     delta_dim_2 = abs(np.max(np.diff(sf[:,1])))
@@ -57,11 +57,11 @@ def mesh_attributes(time, mesh_id):
 
 
 f = open('data_meshgrid.pckl')
-(chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max) = pickle.load(f)
+(chid, quantity, specified_location, t_low, id_meshes, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max) = pickle.load(f)
 
-if not os.path.exists('2_extinction_grids/%s/%s_%.6f'%(quantity, specified_location[0], specified_location[1])):
+if not os.path.exists('../2_extinction_grids/%s/%s_%.6f'%(quantity, specified_location[0], specified_location[1])):
     print 'create directory "2_extinction_grids"'
-    os.makedirs('2_extinction_grids/%s/%s_%.6f'%(quantity, specified_location[0], specified_location[1]))
+    os.makedirs('../2_extinction_grids/%s/%s_%.6f'%(quantity, specified_location[0], specified_location[1]))
 
 for time in t_low:
 
@@ -85,7 +85,7 @@ for time in t_low:
     for mesh_id in id_meshes:
         print '%s_%.6f/%s_%i_mesh_%i.csv'%(specified_location[0], specified_location[1], quantity, time, mesh_id)
 
-        collect = np.loadtxt('1_meshgrid/%s_%.6f/%s_%i_mesh_%i.csv'%(specified_location[0], specified_location[1], quantity, time, mesh_id), delimiter=',')
+        collect = np.loadtxt('../1_meshgrid/%s_%.6f/%s_%i_mesh_%i.csv'%(specified_location[0], specified_location[1], quantity, time, mesh_id), delimiter=',')
 
         dim1 = offset_dim1, mesh_attributes(time, mesh_id)[0]
         dim2 = offset_dim2, mesh_attributes(time, mesh_id)[1]
@@ -97,15 +97,15 @@ for time in t_low:
         consolidated[
 
         #rows
-        global_offset_dim2 + np.amin(dim2[1])/delta_dim_2
+        int(global_offset_dim2 + np.amin(dim2[1])/delta_dim_2)
         :
-        global_offset_dim2 + np.amin(dim2[1])/delta_dim_2 + np.shape(collect)[0]
+        int(global_offset_dim2 + np.amin(dim2[1])/delta_dim_2 + np.shape(collect)[0])
         ,
 
         #cols
-        global_offset_dim1 + np.amin(dim1[1])*(1/delta_dim_1)
+        int(global_offset_dim1 + np.amin(dim1[1])*(1/delta_dim_1))
         :
-        global_offset_dim1 + np.amin(dim1[1])*(1/delta_dim_1) + np.shape(collect)[1]
+        int(global_offset_dim1 + np.amin(dim1[1])*(1/delta_dim_1) + np.shape(collect)[1])
 
         ] = collect
 
@@ -120,7 +120,9 @@ for time in t_low:
     for i, col in enumerate(consolidated.T):
         if np.isnan(np.nanmean(col)) == False:
             dim1_resize = np.append(dim1_resize, i)
-
+            
+    dim1_resize = dim1_resize.astype(int)
+    dim2_resize = dim2_resize.astype(int)   
 
     consolidated = consolidated[
     dim2_resize[0] : dim2_resize[-1]
@@ -140,7 +142,7 @@ for time in t_low:
     header='Room \n dX[m], dY[m] , minX[m] , maxX[m], minY[m], maxY[m] \n  %f  , %f ,  %f  ,  %f  ,  %f ,  %f' \
     %(delta_dim_1, delta_dim_2, dim1_min, dim1_max, dim2_min, dim2_max)
 
-    np.savetxt('2_extinction_grids/%s/%s_%.6f/t_%.6f.csv'%(quantity, specified_location[0], specified_location[1], time), consolidated, header=header, delimiter=',', comments='')
+    np.savetxt('../2_extinction_grids/%s/%s_%.6f/t_%.6f.csv'%(quantity, specified_location[0], specified_location[1], time), consolidated, header=header, delimiter=',', comments='')
 
     if plots == True:
         aa = ax.pcolorfast(new_dim1, new_dim2, consolidated, vmin=0, vmax=5)
@@ -154,7 +156,7 @@ for time in t_low:
         #plt.minorticks_on()
         #plt.grid(which='major')
 
-        plt.savefig('2_extinction_grids/%s/%s_%.6f/t_%.6f.pdf'%(quantity, specified_location[0], specified_location[1], time))
+        plt.savefig('../2_extinction_grids/%s/%s_%.6f/t_%.6f.pdf'%(quantity, specified_location[0], specified_location[1], time))
 
         plt.close()
 

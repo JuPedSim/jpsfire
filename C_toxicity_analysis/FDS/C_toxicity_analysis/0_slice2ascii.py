@@ -48,7 +48,7 @@ except:
     ### change dimension and location of the slicefile here - if necessary
     location = ('Z', 1.8)
 
-# Grid resolution in x, y and z
+# Grid resolution in x, y and z - has to be compliant with FDS specifications
 dx=0.40
 dy=0.40
 dz=0.2
@@ -68,7 +68,7 @@ t_window=1            # interpolation duration prompted by fds2ascii
 
 # Do you want to have plots produced? May be computaionally intensive depending
 # on your FDS simulation extend!
-plots = False
+plots = True
 
 #===============================================================================
 
@@ -142,9 +142,6 @@ if len(id_slices)==0:
     sys.exit('Mismatch between specified SLICE locations and/or quantities! -> EXIT')
 
 #==============================================================================
-
-if os.path.exists(os.path.join('../0_slice2ascii')):
-    shutil.rmtree(os.path.join('../0_slice2ascii'))
 
 if not os.path.exists('../0_slice2ascii'):
     print 'create directory "0_slice2ascii"'

@@ -100,15 +100,15 @@ for time in times:
         consolidated[
 
         #rows
-        global_offset_dim2 + np.amin(dim2[1])/delta_dim_2
+        int(global_offset_dim2 + np.amin(dim2[1])/delta_dim_2)
         :
-        global_offset_dim2 + np.amin(dim2[1])/delta_dim_2 + np.shape(collect)[0]
+        int(global_offset_dim2 + np.amin(dim2[1])/delta_dim_2 + np.shape(collect)[0])
         ,
 
         #cols
-        global_offset_dim1 + np.amin(dim1[1])*(1/delta_dim_1)
+        int(global_offset_dim1 + np.amin(dim1[1])*(1/delta_dim_1))
         :
-        global_offset_dim1 + np.amin(dim1[1])*(1/delta_dim_1) + np.shape(collect)[1]
+        int(global_offset_dim1 + np.amin(dim1[1])*(1/delta_dim_1) + np.shape(collect)[1])
 
         ] = collect
 
@@ -123,8 +123,10 @@ for time in times:
     for i, col in enumerate(consolidated.T):
         if np.isnan(np.nanmean(col)) == False:
             dim1_resize = np.append(dim1_resize, i)
-
-
+            
+    dim1_resize = dim1_resize.astype(int)
+    dim2_resize = dim2_resize.astype(int)   
+    
     consolidated = consolidated[
     dim2_resize[0] : dim2_resize[-1]
     ,
