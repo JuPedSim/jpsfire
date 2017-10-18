@@ -1,10 +1,19 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
+
 """
 Created on Wed Jan 28 10:34:18 2015
-
 @author: Benjamin Schroeder
+# Script based on 06.19.08 by bryan.klein@nist.gov
 """
+__author__ = 'Benjamin Schroeder'
+__email__ = 'dev@jupedsim.org'
+__copyright__ = '<2009-2017> Forschungszentrum Jülich GmbH. All rights reserved.'
+__license__ = 'GNU Lesser General Public License'
+__version__ = '0.1'
+__status__ = 'Production'
+
+
 import subprocess
 import csv
 import os
@@ -15,41 +24,82 @@ import time
 import sys
 import pickle
 import argparse
-import multiprocessing as mp
+import logging
+import glob
 
-parser = argparse.ArgumentParser()
-parser.add_argument("slice_quantity", type=str, help="quantity of the slicefile")
-parser.add_argument("slice_dim", type=str, help="axis of the slicefile")
-parser.add_argument("slice_coord", type=float, help="coordinate on the axis" )
+basename = os.path.basename(__file__)
+logfile =  os.path.join(os.path.dirname(__file__), "log_%s.txt" % basename.split(".")[0])
 
-#===================CHANGE PARAMETERS AS NECEASSARY=============================
-# location of your local fds2ascii binary
-fds2ascii_path = '/Applications/FDS/FDS6/bin/fds2ascii'
+open(logfile, 'w').close()
+logging.basicConfig(filename=logfile, level=logging.DEBUG,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+
+print("Running <%s>. (Logfile: <%s>)" % (__file__, logfile))
+
+def get_tstop(fds_path):
+
+    fds_file = glob.glob("%s/*.fds" %fds_path)
+    if len(fds_file) == 0:
+        logging.critical("No fds-file found in <%s>" % fds_path)
+        exit("ERROR: no fds-file")
+
+    if len(fds_file) > 1:
+        logging.warning("more than one fds-file was found. Calculate t_stop from the first file.")
+
+    with open(fds_file[0]) as f:
+        lines = f.readlines()
+        for l in lines:
+            if l.startswith("&TIME"):
+                time_line = l.strip("/ \n").split("=")
+            else:
+                continue
+
+            if len(time_line) > 1:
+                t_stop = float(time_line[1])
+            else:
+                logging.critical("could not read t_stop from file <%s>" % fds_file[0])
+                exit("ERROR: can not read time from fds-file")
+    return t_stop
+
+def getParserArgs():
+    parser = argparse.ArgumentParser(description="Automation of NIST's fds2ascii. Conversion of FDS-data (slicefiles) to ascii format")
+    parser.add_argument("-q", "--slice_quantity", type=str, default = "SOOT OPTICAL DENSITY", help="quantity of the slicefile (default: SOOT OPTICAL DENSITY)", required=False)
+    parser.add_argument("-d", "--slice_dim", type=str, default='Z', help="axis of the slicefile (default: Z)", required=False)
+    parser.add_argument("-c", "--slice_coord", type=float, default=2.25, help="coordinate on the axis (default: 2.25)", required=False)
+    parser.add_argument("-p", "--plot", dest="plot", action='store_true')
+    parser.add_argument("-f", "--fds", type=str, default='/Applications/FDS/FDS6/bin/fds2ascii', help="Absolute path to fds2ascii", required=False)
+    parser.add_argument("-j", "--jps", type=str, default='../../JuPedSim/', help="Path pointing to the JuPedSim simulation directory", required=False)
+    
+    args = parser.parse_args()
+    return args
+
+
 # Path pointing to the fire simulation directory
-fds_path = os.path.join(os.getcwd()+'/../')
-# Path pointing to the JuPedSim simulation directory
-jps_path = os.path.join('../../JuPedSim/')
+script_dir = os.path.dirname(os.path.realpath(__file__))
+fds_path = os.path.join(script_dir, "..")
+logging.info('Processing FDS slice quantities and locations defined in smoke_sensor.sh\n')
+logging.info("script path: <%s>" % script_dir)
+logging.info("fds path: <%s>" % fds_path)
 
 ### FDS CHID:
 chid = 'smoke_sensor'
 
-### SLICE QUANTITY and location:
-### check if multiple quantities have been submitted from tox_analysis.sh
-### check if multiple locations have been submitted from tox_analysis.sh
-try:
-    cmdl_args = parser.parse_args()
-    quantity = cmdl_args.slice_quantity
-    location = (cmdl_args.slice_dim, cmdl_args.slice_coord)
+# Parse parameter
+cmdl_args = getParserArgs()
+quantity = cmdl_args.slice_quantity
+location = (cmdl_args.slice_dim, cmdl_args.slice_coord)
+# location of your local fds2ascii binary
+fds2ascii_path = cmdl_args.fds
+jps_path = cmdl_args.jps
+plots = cmdl_args.plot
 
-    print '\nProcessing FDS slice quantities and locations defined in smoke_sensor.sh\n'
-except:
-    ### if not use single quantity defined explicitly in 0_slice2ascii.py
-    ### if not use single loation defined explicitly in 0_slice2ascii.py
-    print '\nProcessing single FDS slice quantity and location defined in 0_slice2ascii.py\n'
-    ### change quantity here - if necessary
-    quantity = 'SOOT OPTICAL DENSITY'
-    ### change dimension and location of the slicefile here - if necessary
-    location = ('Z', 2.25)
+logging.info("Quantity: " + quantity)
+logging.info("location: " +  ", ".join(map(str, location)))
+logging.info("Plot: On" if plots else "Plot: Off")
+logging.info("fds2ascii_path: %s" % fds2ascii_path)
+logging.info("jps_path: %s" % jps_path)
+
+## HERE  EXIT
 
 # Grid resolution in x, y and z
 dx=0.25
@@ -65,20 +115,22 @@ extend=1
 domain_size="n"
 # Interpolation times sequences; adjust arange values and/or window
 t_start=0
-t_stop=120
+t_stop=120 # todo: read from fds file. Set as default. argument parsen
 t_step=20
 t_window=1            # interpolation duration prompted by fds2ascii
 
-# Do you want to have plots produced? May be computaionally intensive depending
-# on your FDS simulation extend!
-plots = True
-
+t_stop = get_tstop(fds_path)
 #===============================================================================
 
+logging.info("t_stop: %.2f", t_stop)
 # BEGINNING OF THE AUTOMATIC PART - NO CHANGES NEEDED
+if not os.path.exists(fds2ascii_path):
+    logging.critical("<%s> does not exist. exits." %fds2ascii_path)
+    exit("<%s> does not exist. exits." %fds2ascii_path)
 
 #===============================================================================
-config_file_name = os.path.join("config_fds2ascii.csv")
+# config_file_name = os.path.join("config_fds2ascii.csv")
+config_file_name = os.path.join(script_dir, "config_fds2ascii.csv")
 
 specified_location = (location[0].upper(), location[1])
 
@@ -152,7 +204,7 @@ if os.path.exists(os.path.join('../0_slice2ascii')):
     shutil.rmtree(os.path.join('../0_slice2ascii'))
 
 if not os.path.exists('../0_slice2ascii'):
-    print 'create directory "0_slice2ascii"'
+    logging.info('create directory \"0_slice2ascii\"')
     os.makedirs('../0_slice2ascii')
 
 if not os.path.exists(os.path.join('../0_slice2ascii/%s_%.2f'%(specified_location[0], specified_location[1]))):
@@ -189,23 +241,22 @@ for k, id_slice in enumerate(id_slices):
     try:
         fh=open(config_file_name, 'U')
     except:
-        print"!!! The Config File "+config_file_name+\
-        " does not exist or the path defined in the script is incorrect. !!!"
+        logging.info("!!! The Config File %s does not exist or the path defined in the script is incorrect."% config_file_name)
         #exit()
 
     #Read file with csv module.
     data_array = csv.reader(fh)
     #Convert into List object
     config_lists = [list(sublist) for sublist in data_array]
-    print str(len(config_lists))+" lines read in from "+config_file_name+"\n"
+    logging.info("%d lines read in from %s"% (len(config_lists), config_file_name))
 
     def extract_ascii_data(input_data):
         # change to working directory, the first string in each row of the config file.
-        #print input_data[0]
         os.chdir(input_data[0])
 
-        print "Working Directory:",os.getcwd()
+        logging.info("Working Directory: %s"% os.getcwd())
         # Open fds2ascii and create a seperate output and input stream.
+            
         proc = subprocess.Popen(os.path.join(fds2ascii_path),
                                shell=True,
                                stdin=subprocess.PIPE,
@@ -215,7 +266,7 @@ for k, id_slice in enumerate(id_slices):
         #from the fds2ascii_Config_File.csv file.
         for field in input_data[1:]:
             if field != '':
-                print "Input:",field
+                logging.info("Input: %s"% field)
                 proc.stdin.write('%s\n' % field)
             else:
                 pass
@@ -230,5 +281,5 @@ f = open('A_smoke_sensor/data_slice2ascii.pckl', 'w+')
 pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots), f)
 f.close()
 
-print "*** Finished ***"
-# Script based on 06.19.08 by bryan.klein@nist.gov
+logging.info("*** Finished ***")
+
