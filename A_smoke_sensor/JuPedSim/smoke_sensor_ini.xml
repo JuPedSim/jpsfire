@@ -16,8 +16,15 @@
 <file location="smoke_sensor_traj.xml" />
 </trajectories>
 
+<JPSfire>
+	<A_smoke_sensor smoke_factor_grids="../FDS/3_sfgrids/" update_time="20" final_time="120" />
+ 	<B_walking_speed/>
+ 	<C_toxicity_analysis/>
+</JPSfire>
+
+
 <!-- agents -->
-<agents operational_model_id="2">
+<agents operational_model_id="3">
 	<agents_distribution>
 		<!--group group_id="1" agent_parameter_id="1" room_id="0" subroom_id="0" number="100" router_id="7" pre_movement_mean="40" pre_movement_sigma="0" y_max="4" risk_tolerance_mean="0.6" risk_tolerance_sigma="0.1"/-->
 		
@@ -94,7 +101,7 @@
 <!-- route choice models -->
   <route_choice_models>
 
-    <router router_id="7" description="cognitive_map">
+    <router router_id="7" description="AI">
       <sensors>
 	      <sensor sensor_id="2" description="Smoke" smoke_factor_grids="../FDS/3_sfgrids/dx_1.00/Z_2.25/" update_time="20" final_time="120" status="activated"/>
 	      <sensor sensor_id="3" description="LastDestination" status="activated"/>
