@@ -81,14 +81,14 @@ cmdl_args = getParserArgs()
 quantity = cmdl_args.slice_quantity
 location = (cmdl_args.slice_dim, cmdl_args.slice_coord)
 # location of your local fds2ascii binary
-fds2ascii_path = cmdl_args.fds
+fds2ascii_exec = cmdl_args.fds
 jps_path = cmdl_args.jps
 plots = cmdl_args.plot
 
 logging.info("Quantity: " + quantity)
 logging.info("location: " +  ", ".join(map(str, location)))
 logging.info("Plot: On" if plots else "Plot: Off")
-logging.info("fds2ascii_path: %s" % fds2ascii_path)
+logging.info("fds2ascii_exec: %s" % fds2ascii_exec)
 logging.info("jps_path: %s" % jps_path)
 
 ## HERE  EXIT
@@ -116,9 +116,9 @@ t_stop = get_tstop(fds_path, chid)
 
 logging.info("t_stop: %.2f", t_stop)
 # BEGINNING OF THE AUTOMATIC PART - NO CHANGES NEEDED
-if not os.path.exists(fds2ascii_path):
-    logging.critical("<%s> does not exist. exits." %fds2ascii_path)
-    sys.exit("<%s> does not exist. exits." %fds2ascii_path)
+if not os.path.exists(fds2ascii_exec):
+    logging.critical("<%s> does not exist. exits." %fds2ascii_exec)
+    sys.exit("<%s> does not exist. exits." %fds2ascii_exec)
 
 #===============================================================================
 # config_file_name = os.path.join("config_fds2ascii.csv")
@@ -248,7 +248,7 @@ for k, id_slice in enumerate(id_slices):
 
         logging.info("Working Directory: %s"% os.getcwd())
         # Open fds2ascii and create a seperate output and input stream.
-        proc = subprocess.Popen(fds2ascii_path,
+        proc = subprocess.Popen(fds2ascii_exec,
                                 shell=True,
                                 stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE,
