@@ -198,16 +198,15 @@ if os.path.exists(os.path.join('../0_slice2ascii')):
     shutil.rmtree(os.path.join('../0_slice2ascii'))
 
 
-logging.info('create directory \"0_slice2ascii\"')
+logging.info('create directory <0_slice2ascii>')
 os.makedirs('../0_slice2ascii')
+Z_directory = os.path.join('../0_slice2ascii', '%s_%.2f'%(specified_location[0], specified_location[1]))
+if not os.path.exists(Z_directory):
+    os.makedirs(Z_directory)
+    logging.info("create directory <%s>" % Z_directory)
 
-if not os.path.exists(os.path.join('../0_slice2ascii/%s_%.2f'%(specified_location[0], specified_location[1]))):
-    os.makedirs(os.path.join('../0_slice2ascii/%s_%.2f'%(specified_location[0], specified_location[1])))
-
-try:
+if os.path.exists('data_slice2ascii.pckl'):
     os.remove('data_slice2ascii.pckl')
-except OSError:
-    pass
 
 #==============================================================================
 
@@ -243,7 +242,6 @@ for k, id_slice in enumerate(id_slices):
     #Convert into List object
     config_lists = [list(sublist) for sublist in data_array]
     logging.info("%d lines read in from %s"% (len(config_lists), config_file_name))
-
     def extract_ascii_data(input_data):
         # change to working directory, the first string in each row of the config file.
         os.chdir(input_data[0])
@@ -260,13 +258,18 @@ for k, id_slice in enumerate(id_slices):
         #from the fds2ascii_Config_File.csv file.
         logging.info("Input: %s"% " ".join(map(str, input_data[1:])))
         for field in input_data[1:]:
-            if field != '':
-                proc.stdin.write(field)
+            field_d = field.strip()
+            if field_d:
+                # logging.debug("field: <%s> " %field)
+                proc.stdin.write('%s\n' % field)
             else:
+                # logging.debug("not field: <%s> " %field)
                 pass
-        out =proc.communicate()[0]
-        print (out)
-    # Pa
+
+        out =proc.communicate("\n")[0]
+        print(out)
+
+
     for data_row in config_lists:
         extract_ascii_data(data_row)
         time.sleep(0.5)
