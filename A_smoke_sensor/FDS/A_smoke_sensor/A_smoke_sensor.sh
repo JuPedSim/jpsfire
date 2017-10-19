@@ -27,7 +27,7 @@ do
      echo Slicefile dimension: "$1"
      echo Slicefile coordinate: $2
 
-     python 0_slice2ascii.py "$quantity" "$1" $2
+     python 0_slice2ascii.py -q "$quantity" -d "$1" -c $2
      wait
      python 1_meshgrid.py
      wait
