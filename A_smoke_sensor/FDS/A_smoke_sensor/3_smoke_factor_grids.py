@@ -17,6 +17,7 @@ import matplotlib
 from matplotlib import rcParams, gridspec
 import matplotlib.patches as patches
 from scipy.interpolate import interp1d
+import logging
 
 rcParams.update({'figure.autolayout': True})
 
@@ -26,7 +27,16 @@ font = {'family' : 'serif',
 
 matplotlib.rc('font', **font)
 
-f = open('data_meshgrid.pckl')
+basename = os.path.basename(__file__)
+
+logfile =  os.path.join(os.path.dirname(__file__), "log_%s.txt" % basename.split(".")[0])
+
+open(logfile, 'w').close()
+logging.basicConfig(filename=logfile, level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
+print("Running <%s>. (Logfile: <%s>)" % (__file__, logfile))
+
+f = open('data_meshgrid.pckl', 'rb')
 (chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max, exits) = pickle.load(f)
 
 
@@ -95,8 +105,8 @@ def main(convert, exit):
     %(exit, delta_smoke_factor_grid, delta_smoke_factor_grid, dim1_min, dim1_max, dim2_min, dim2_max)
     np.savetxt('../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.6f_Y_%.6f/t_%6f.csv'\
     %(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], float(time)), smoke_factor_grid_norm, header=header, delimiter=',', comments='')
-    print 'Write smoke factor grid: ../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.6f_Y_%.6f/t_%6f.csv'\
-    %(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], float(time))
+    logging.info('Write smoke factor grid: ../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.6f_Y_%.6f/t_%6f.csv'\
+    %(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], float(time)))
 
     return a,b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, time
 
@@ -107,20 +117,18 @@ def main(convert, exit):
 delta_smoke_factor_grid = 1.
 #==============================================================================
 
-print '\n-----------------------------------------------------------------'
-print 'Analysing Slice File at %s=%.2f\n'%(specified_location[0], specified_location[1])
+logging.info('Analyzing Slice File at %s = %.2f'%(specified_location[0], specified_location[1]))
 
 #plt.close()
 converted = glob.glob('../2_consolidated/%s_%.2f/%s_*.csv'%(specified_location[0], specified_location[1], quantity))
 
-print '\n-----------------------------------------------------------------'
-print 'Generation of smoke factor grids... mesh resolution: %s m\n' %delta_smoke_factor_grid
+logging.info('Generation of smoke factor grids... mesh resolution: %s m' %delta_smoke_factor_grid)
 
 
 for convert in converted:
     plt.close()
-    print '\n-----------------------------------------------------------------'
-    print 'Processing files: %s\n' %convert
+    logging.info('-----------------------------------------------------------------')
+    logging.info('Processing files: %s' %convert)
 
     magnitudes = np.loadtxt(convert, delimiter=',')
 
@@ -136,12 +144,12 @@ if plots==True:
     ## This statement yields a representative plot of the line of
     ## sights if wanted. x0 and y0 can be adjusted e.g. for debugging
 
-    x0 = 3
-    y0 = 3
+    x0 = 4
+    y0 = 1
 
     slicefile = '../2_consolidated/Z_2.25/SOOT_OPTICAL_DENSITY_120.csv'
-    sfgrid = '../3_sfgrids/dx_1.00/Z_2.25/Door_X_25.000000_Y_6.000000/t_120.000000.csv'
-    exit = 'cross_0'
+    sfgrid = '../3_sfgrids/dx_1.00/Z_2.25/Door_X_10.000000_Y_6.500000/t_120.000000.csv'
+    exit = 'trans_1'
     time = 120
 
     fds_delta = 0.25
@@ -191,11 +199,11 @@ if plots==True:
     sfgrid = np.loadtxt(sfgrid, skiprows=3, delimiter=',')
     #print np.shape(sfgrid)
 
-    for i in range(int(1/fds_delta)/2):
+    for i in range(int((1/fds_delta)/2)):
         sfgrid = np.kron(sfgrid, [[1,1], [1,1]])
     #print np.shape(sfgrid)
 
-    smoke_factor = sfgrid[ y0/delta_smoke_factor_grid, -x0/delta_smoke_factor_grid ]
+    smoke_factor = sfgrid[int(y0/delta_smoke_factor_grid), int(-x0/delta_smoke_factor_grid)]
     #print smoke_factor
 
     ax3.plot(magnitude_along_line_of_sight,  lw=2, label='%s: $f_{smoke}$ = %.3f'%(exit, smoke_factor))
@@ -237,7 +245,7 @@ if plots==True:
                 fig.colorbar(aa, cax=cbar_ax, label=r'$f_{smoke}$', orientation='horizontal')
                 break
 
-            exit = exits.items()[i][0]
+            exit = list(exits.items())[i][0]
             ax = plt.subplot(g)
 
             plt.xlabel('x (m)')
@@ -255,13 +263,13 @@ if plots==True:
 
         plt.savefig('../3_sfgrids/dx_%.2f/%s_%.2f/sfgrid_%i.pdf'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  time))
 
-        print '\nPlot smoke factor grid: ../sfgrids/dx_%.2f/%s_%.2f/sfgrid_%i.pdf'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  time)
+        logging.info('Plot smoke factor grid: ../sfgrids/dx_%.2f/%s_%.2f/sfgrid_%i.pdf'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  time))
 
-print "\n*** Finished ***"
+logging.info("*** Finished ***")
 
 #============storage of the most important variables to store.pckl=============
 
-f = open('data_sfgrids.pckl', 'w')
+f = open('data_sfgrids.pckl', 'wb')
 pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max, exits, delta_smoke_factor_grid), f)
 
 f.close()
