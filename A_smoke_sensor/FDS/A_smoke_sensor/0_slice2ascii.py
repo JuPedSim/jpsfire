@@ -69,7 +69,7 @@ def getParserArgs():
 # Path pointing to the fire simulation directory
 script_dir = os.path.dirname(os.path.realpath(__file__))
 fds_path = os.path.join(script_dir, "..")
-logging.info('Processing FDS slice quantities and locations defined in smoke_sensor.sh\n')
+logging.info('Processing FDS slice quantities and locations defined in smoke_sensor.sh')
 logging.info("script path: <%s>" % script_dir)
 logging.info("fds path: <%s>" % fds_path)
 

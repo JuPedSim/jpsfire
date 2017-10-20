@@ -20,6 +20,7 @@ def main():
     import matplotlib
     from matplotlib import rcParams
     import xml.etree.ElementTree as ET
+    import logging
 
     rcParams.update({'figure.autolayout': True})
 
@@ -29,6 +30,13 @@ def main():
 
     matplotlib.rc('font', **font)
 
+    basename = os.path.basename(__file__)
+    logfile =  os.path.join(os.path.dirname(__file__), "log_%s.txt" % basename.split(".")[0])
+
+    open(logfile, 'w').close()
+    logging.basicConfig(filename=logfile, level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
+    print("Running <%s>. (Logfile: <%s>)" % (__file__, logfile))
 
     def cm2inch(value):
         return value/2.54
@@ -62,17 +70,17 @@ def main():
             else:
                 continue
 
-        coordinates=[ x for x in coordinates if type(x)<>str]
-        coordinates=map(float, coordinates)
-        #increasiing sorting of coordinate pairs:
+        coordinates=[ x for x in coordinates if type(x)!=str]
+        coordinates=list(map(float, coordinates))
+        #increasing sorting of coordinate pairs:
         coordinates=sorted(coordinates[0:2])+sorted(coordinates[2:4])+sorted(coordinates[4:6])
         return coordinates
 
-    f = open('data_slice2ascii.pckl')
+    f = open('data_slice2ascii.pckl', 'rb')
     (chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots) = pickle.load(f)
 
     if not os.path.exists('../1_meshgrid/%s_%.2f'%(specified_location[0], specified_location[1])):
-        print 'create directory "1_meshgrid"'
+        logging.info('create directory "1_meshgrid"')
         os.makedirs('../1_meshgrid/%s_%.2f'%(specified_location[0], specified_location[1]))
 
     try:
@@ -82,7 +90,7 @@ def main():
 
     if plots==True:
         if not os.path.exists('../slicefiles/%s_%.2f'%(specified_location[0], specified_location[1])):
-            print 'create directory "slicefiles"'
+            logging.info('create directory "slicefiles"')
             os.makedirs('../slicefiles/%s_%.2f'%(specified_location[0], specified_location[1]))
 
 
@@ -108,20 +116,19 @@ def main():
 
     dimension_1=c[1]
 
-    print '\nInitialisation...'
-    print '\nFDS-File: ',fds[0]
-    print '\nDimension 1:', dimension_1
+    logging.info('Initialisation...')
+    logging.info('FDS-File: %s' %fds[0])
+    logging.info('Dimension 1: %s' %dimension_1)
     dimension_2=c[3]
-    print 'Dimension 2:', dimension_2
+    logging.info('Dimension 2: %s' %dimension_2)
 
     if dimension_1 in dims: dims.remove(dimension_1)
     if dimension_2 in dims: dims.remove(dimension_2)
 
     dimension_3=dims[0]
-    print 'Dimension 3:', dimension_3
-    print ''
+    logging.info('Dimension 3: %s' %dimension_3)
 
-    print 'projection level geometry', dimension_3, '=', specified_location[1]
+    logging.info('projection level geometry: %s = %s' %(dimension_3, specified_location[1]))
 
     dim1_1, dim1_2 = dimensions(dimension_1)
     dim2_1, dim2_2 = dimensions(dimension_2)
@@ -135,19 +142,19 @@ def main():
 
         plt.close()
         sf=np.loadtxt(slicefile, skiprows=2, delimiter=',')
-        print '\n-----------------------------------------------------------------'
-        print 'Read files:', slicefile, '\n'
+        logging.info('-----------------------------------------------------------------')
+        logging.info('Read files: %s' %slicefile)
 
         dim1=sf[:,0]
         dim2=sf[:,1]
         magnitudes=sf[:,2]
 
         delta_dim_1=round(abs(dim1[1]-dim1[0]),3)
-        print 'd%s'%dimension_1, '=', delta_dim_1
+        logging.info('d%s = %s' %(dimension_1, delta_dim_1))
         for i,x in enumerate(dim2):
-            if x<>dim2[i-1]:
+            if x!=dim2[i-1]:
                 delta_dim_2=round(abs(dim2[i]-dim2[i-1]),3)
-        print 'd%s'%dimension_2, '=', delta_dim_2
+        logging.info('d%s = %s' %(dimension_2, delta_dim_2))
 
         dim1_min=round(np.amin(sf[:,0]),3)
         dim1_max=round(np.amax(sf[:,0]),3)
@@ -155,8 +162,8 @@ def main():
         dim2_min=round(np.amin(sf[:,1]),3)
         dim2_max=round(np.amax(sf[:,1]),3)
 
-        print '\nDimension 1: %f (m) ... %f (m)' %(dim1_min, dim1_max)
-        print 'Dimension 2: %f (m) ... %f (m)' %(dim2_min, dim2_max)
+        logging.info('Dimension 1: %f (m) ... %f (m)' %(dim1_min, dim1_max))
+        logging.info('Dimension 2: %f (m) ... %f (m)' %(dim2_min, dim2_max))
 
         dim1=np.arange(dim1_min, dim1_max+0.01, delta_dim_1)
         dim2=np.arange(dim2_min, dim2_max+0.01, delta_dim_2)
@@ -174,8 +181,8 @@ def main():
                     obst=read_fds_line()
                     if obst[dim3_1] < specified_location[1] < obst[dim3_2]:
                         obst=[(1/delta_dim_1)*i for i in obst]
-                        geometry[obst[dim2_1]-dim2_max/delta_dim_2-1 : obst[dim2_2]-dim2_max/delta_dim_2-1, \
-                        obst[dim1_1]-dim1_max/delta_dim_1-1 : obst[dim1_2]-dim1_max/delta_dim_1-1] [:]=np.nan
+                        geometry[int(obst[dim2_1]-dim2_max/delta_dim_2-1) : int(obst[dim2_2]-dim2_max/delta_dim_2-1), \
+                        int(obst[dim1_1]-dim1_max/delta_dim_1-1) : int(obst[dim1_2]-dim1_max/delta_dim_1-1)] [:]=np.nan
 
                         if slicefile == slicefiles[0]:
                             obsts=np.append(obsts,obst)
@@ -206,7 +213,7 @@ def main():
         #collect = collect[:-1,:-1]
 
         np.savetxt('../1_meshgrid/%s_%.2f/%s.csv'%(specified_location[0], specified_location[1], slicefile[slicefile.rfind('/')+1:-4]), magnitudes, delimiter=',')
-        print '\nWrite files: ../1_meshgrid/%s_%.2f/%s.csv'%(specified_location[0], specified_location[1], slicefile[slicefile.rfind('/')+1:-4])
+        logging.info('Write files: ../1_meshgrid/%s_%.2f/%s.csv'%(specified_location[0], specified_location[1], slicefile[slicefile.rfind('/')+1:-4]))
 
         if plots==True:
             plt.figure(figsize=(cm2inch(15),cm2inch(10)), dpi=300)
@@ -224,7 +231,7 @@ def main():
             plt.savefig('../slicefiles/%s_%.2f/%s.pdf'%(specified_location[0],specified_location[1], slicefile[slicefile.rfind('/')+1:-4]))
 
 
-    print "\n*** Finished ***"
+    logging.info("*** Finished ***")
 
     # Setup of the dict that contains all relevant information about
     # crossings and transitions within the JuPedSim geometry
@@ -288,7 +295,7 @@ def main():
 
     except:
         exits_dict = {}
-        print '!!! WARNING No geometry file found - no exits extracted !!!'
+        logging.info('!!! WARNING No geometry file found - no exits extracted !!!')
         pass
 
     # print exits_dict
@@ -299,7 +306,7 @@ def main():
 
     #============storage of the most important variables to store.pckl=============
 
-    f = open('data_meshgrid.pckl', 'w')
+    f = open('data_meshgrid.pckl', 'wb')
     pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max, exits), f)
 
     f.close()
