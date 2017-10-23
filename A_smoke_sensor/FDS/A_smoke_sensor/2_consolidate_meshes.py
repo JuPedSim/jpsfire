@@ -7,13 +7,9 @@ Created on Mon Jan 19 12:50:15 2015
 @author: Benjamin
 """
 import numpy as np
-import glob
 import matplotlib.pyplot as plt
-import sys
-import re
 import pickle
 import os
-import collections
 import matplotlib
 from matplotlib import rcParams
 import logging
