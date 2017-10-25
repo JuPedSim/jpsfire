@@ -25,6 +25,7 @@ import sys
 import pickle
 import argparse
 import logging
+import glob
 
 basename = os.path.basename(__file__)
 logfile =  os.path.join(os.path.dirname(__file__), "log_%s.txt" % basename.split(".")[0])
@@ -74,7 +75,8 @@ logging.info("script path: <%s>" % script_dir)
 logging.info("fds path: <%s>" % fds_path)
 
 ### FDS CHID:
-chid = 'smoke_sensor'
+chid_fds = glob.glob('../*.fds')
+chid = (chid_fds[0].strip('.fds')).strip('../')
 
 # Parse parameter
 cmdl_args = getParserArgs()
@@ -94,9 +96,17 @@ logging.info("jps_path: %s" % jps_path)
 ## HERE  EXIT
 
 # Grid resolution in x, y and z
-dx=0.25
-dy=0.25
-dz=0.25
+
+fds_data = open('../'+chid+'.fds')
+fds_lines = fds_data.readlines()
+
+for i in fds_lines:
+    if i[0:5]=='&MESH':
+        i = i.split('IJK=')[-1]
+        i = re.split(r'[,=/]+', i)
+        dx=float(i[5])/float(i[0])
+        dy=float(i[7])/float(i[1])
+        dz=float(i[9])/float(i[2])
 
 # Parameters to be tunneled to fds2ascii:
 # types: (slice = 2)
