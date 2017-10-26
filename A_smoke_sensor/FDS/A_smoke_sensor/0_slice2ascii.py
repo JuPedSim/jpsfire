@@ -93,20 +93,21 @@ logging.info("Plot: On" if plots else "Plot: Off")
 logging.info("fds2ascii_exec: %s" % fds2ascii_exec)
 logging.info("jps_path: %s" % jps_path)
 
-## HERE  EXIT
+## HERE EXIT
 
 # Grid resolution in x, y and z
 
 fds_data = open('../'+chid+'.fds')
 fds_lines = fds_data.readlines()
 
-for i in fds_lines:
-    if i[0:5]=='&MESH':
-        i = i.split('IJK=')[-1]
-        i = re.split(r'[,=/]+', i)
-        dx=float(i[5])/float(i[0])
-        dy=float(i[7])/float(i[1])
-        dz=float(i[9])/float(i[2])
+for l in fds_lines:
+    if l.startswith("&MESH"):
+        l = l.split('IJK=')[-1]
+        l = re.split(r'[,=/]+', l)
+        dx=float(l[5])/float(l[0])
+        dy=float(l[7])/float(l[1])
+        dz=float(l[9])/float(l[2])
+        logging.info('grid resolution with dx = %.2f, dy = %.2f, dz = %.2f' % (dx,dy,dz))
 
 # Parameters to be tunneled to fds2ascii:
 # types: (slice = 2)
