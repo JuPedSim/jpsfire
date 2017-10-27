@@ -54,6 +54,17 @@ def get_tstop(fds_path, chid):
                 sys.exit("ERROR: can not read time from fds-file")
     return t_stop
 
+def get_gridres(chid):
+
+    fds_data = open('../'+chid+'.fds')
+    fds_lines = fds_data.readlines()
+
+    for l in fds_lines:
+        if l.startswith("&MESH"):
+            l = l.split('IJK=')[-1]
+            l = re.split(r'[,=/]+', l)
+            return float(l[5])/float(l[0]), float(l[7])/float(l[1]),float(l[9])/float(l[2])
+
 def getParserArgs():
     parser = argparse.ArgumentParser(description="Automation of NIST's fds2ascii. Conversion of FDS-data (slicefiles) to ascii format")
     parser.add_argument("-q", "--slice_quantity", type=str, default = "SOOT OPTICAL DENSITY", help="quantity of the slicefile (default: SOOT OPTICAL DENSITY)", required=False)
@@ -97,17 +108,10 @@ logging.info("jps_path: %s" % jps_path)
 
 # Grid resolution in x, y and z
 
-fds_data = open('../'+chid+'.fds')
-fds_lines = fds_data.readlines()
-
-for l in fds_lines:
-    if l.startswith("&MESH"):
-        l = l.split('IJK=')[-1]
-        l = re.split(r'[,=/]+', l)
-        dx=float(l[5])/float(l[0])
-        dy=float(l[7])/float(l[1])
-        dz=float(l[9])/float(l[2])
-        logging.info('grid resolution with dx = %.2f, dy = %.2f, dz = %.2f' % (dx,dy,dz))
+dx = get_gridres(chid)[0]
+dy = get_gridres(chid)[1]
+dz = get_gridres(chid)[2]
+logging.info('grid resolution with dx = %.2f, dy = %.2f, dz = %.2f' % (dx, dy, dz))
 
 # Parameters to be tunneled to fds2ascii:
 # types: (slice = 2)
