@@ -108,9 +108,7 @@ logging.info("jps_path: %s" % jps_path)
 
 # Grid resolution in x, y and z
 
-dx = get_gridres(chid)[0]
-dy = get_gridres(chid)[1]
-dz = get_gridres(chid)[2]
+dx, dy, dz = get_gridres(chid)
 logging.info('grid resolution with dx = %.2f, dy = %.2f, dz = %.2f' % (dx, dy, dz))
 
 # Parameters to be tunneled to fds2ascii:
