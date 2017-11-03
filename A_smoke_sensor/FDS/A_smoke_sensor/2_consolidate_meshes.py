@@ -13,6 +13,7 @@ import os
 import matplotlib
 from matplotlib import rcParams
 import logging
+import warnings
 
 rcParams.update({'figure.autolayout': True})
 
@@ -38,7 +39,7 @@ def cm2inch(value):
 
 def mesh_attributes(time, mesh_id):
 
-    sf=np.loadtxt('../0_slice2ascii/%s_%.2f/%s_%i.0_mesh_%i.txt'%(specified_location[0], specified_location[1], quantity, time, mesh_id), skiprows=2, delimiter=',')
+    sf=np.loadtxt('../0_slice2ascii/%s_%.2f/%s_%i_mesh_%i.txt'%(specified_location[0], specified_location[1], quantity, time, mesh_id), skiprows=2, delimiter=',')
 
     delta_dim_1 = abs(np.max(np.diff(sf[:,0])))
     delta_dim_2 = abs(np.max(np.diff(sf[:,1])))
@@ -59,10 +60,9 @@ def mesh_attributes(time, mesh_id):
 
 
 f = open('data_meshgrid.pckl', 'rb')
-(chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max, exits) = pickle.load(f)
+(chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max, exits, dx) = pickle.load(f)
 
 times = np.arange(t_start,t_stop+1,t_step)[:]
-
 
 if not os.path.exists('../2_consolidated/%s_%.2f'%(specified_location[0], specified_location[1])):
     logging.info('create directory "2_consolidated"')
@@ -90,7 +90,7 @@ for time in times:
     for mesh_id in id_meshes:
         logging.info('../%s_%.2f/%s_%i_mesh_%i.csv'%(specified_location[0], specified_location[1], quantity, time, mesh_id))
 
-        collect = np.loadtxt('../1_meshgrid/%s_%.2f/%s_%i.0_mesh_%i.csv'%(specified_location[0], specified_location[1], quantity, time, mesh_id), delimiter=',')
+        collect = np.loadtxt('../1_meshgrid/%s_%.2f/%s_%i_mesh_%i.csv'%(specified_location[0], specified_location[1], quantity, time, mesh_id), delimiter=',')
 
         dim1 = offset_dim1, mesh_attributes(time, mesh_id)[0]
         dim2 = offset_dim2, mesh_attributes(time, mesh_id)[1]
@@ -118,16 +118,19 @@ for time in times:
     dim1_resize = []
     dim2_resize = []
 
-    for i, row in enumerate(consolidated):
-        if np.isnan(np.nanmean(row)) == False:
-            dim2_resize = np.append(dim2_resize, i)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=RuntimeWarning)
 
-    for i, col in enumerate(consolidated.T):
-        if np.isnan(np.nanmean(col)) == False:
-            dim1_resize = np.append(dim1_resize, i)
-            
+        for i, row in enumerate(consolidated):
+            if np.isnan(np.nanmean(row)) == False:
+                dim2_resize = np.append(dim2_resize, i)
+
+        for i, col in enumerate(consolidated.T):
+            if np.isnan(np.nanmean(col)) == False:
+                dim1_resize = np.append(dim1_resize, i)
+
     dim1_resize = dim1_resize.astype(int)
-    dim2_resize = dim2_resize.astype(int)   
+    dim2_resize = dim2_resize.astype(int)
 
 
     consolidated = consolidated[

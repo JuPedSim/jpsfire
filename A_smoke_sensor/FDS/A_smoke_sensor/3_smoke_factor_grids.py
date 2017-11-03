@@ -18,6 +18,7 @@ from matplotlib import rcParams, gridspec
 import matplotlib.patches as patches
 from scipy.interpolate import interp1d
 import logging
+import warnings
 
 rcParams.update({'figure.autolayout': True})
 
@@ -37,7 +38,7 @@ logging.basicConfig(filename=logfile, level=logging.DEBUG, format='%(asctime)s -
 print("Running <%s>. (Logfile: <%s>)" % (__file__, logfile))
 
 f = open('data_meshgrid.pckl', 'rb')
-(chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max, exits) = pickle.load(f)
+(chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max, exits, dx) = pickle.load(f)
 
 
 # Comversion cm to inches
@@ -51,8 +52,8 @@ def m_to_pix(x_i, y_i):
 # main function
 def main(convert, exit):
 
-    if not os.path.exists('../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.6f_Y_%.6f'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1])):
-        os.makedirs('../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.6f_Y_%.6f'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1]))
+    if not os.path.exists('../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.2f_Y_%.2f'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1])):
+        os.makedirs('../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.2f_Y_%.2f'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1]))
 
     smoke_factor_grid = np.ones([int(abs(dim2_max-dim2_min)/delta_smoke_factor_grid) ,int(abs(dim1_max-dim1_min)/delta_smoke_factor_grid)])
 
@@ -98,15 +99,17 @@ def main(convert, exit):
 
     # Norm of the smoke factor grid multiplied with 10 in order to achieve a
     # factor range from 0..10
-    smoke_factor_grid_norm = smoke_factor_grid/max_Smoke_Factor*10
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=RuntimeWarning)
+        smoke_factor_grid_norm = smoke_factor_grid/max_Smoke_Factor*10
 
 
     header='Room No. 1 , Exit %s, \n dX[m], dY[m] , minX[m] , maxX[m], minY[m], maxY[m] \n   %f  ,  %f    ,  %f  ,  %f  ,  %f ,  %f' \
     %(exit, delta_smoke_factor_grid, delta_smoke_factor_grid, dim1_min, dim1_max, dim2_min, dim2_max)
-    np.savetxt('../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.6f_Y_%.6f/t_%6f.csv'\
-    %(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], float(time)), smoke_factor_grid_norm, header=header, delimiter=',', comments='')
-    logging.info('Write smoke factor grid: ../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.6f_Y_%.6f/t_%6f.csv'\
-    %(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], float(time)))
+    np.savetxt('../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.2f_Y_%.2f/t_%i.csv'\
+    %(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], time), smoke_factor_grid_norm, header=header, delimiter=',', comments='')
+    logging.info('Write smoke factor grid: ../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.2f_Y_%.2f/t_%i.csv'\
+    %(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], time))
 
     return a,b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, time
 
@@ -144,20 +147,18 @@ if plots==True:
     ## This statement yields a representative plot of the line of
     ## sights if wanted. x0 and y0 can be adjusted e.g. for debugging
 
-    x0 = 4
+    x0 = 4 #todo: define via dims
     y0 = 1
 
-    slicefile = '../2_consolidated/Z_2.25/SOOT_OPTICAL_DENSITY_120.csv'
-    sfgrid = '../3_sfgrids/dx_1.00/Z_2.25/Door_X_10.000000_Y_6.500000/t_120.000000.csv'
-    exit = 'trans_1'
-    time = 120
-
-    fds_delta = 0.25
+    slicefile = '../2_consolidated/Z_2.25/OPTICAL_DENSITY_%i.csv' %(t_stop)
+    sfgrid = '../3_sfgrids/dx_1.00/Z_2.25/Door_X_10.00_Y_6.50/t_%i.csv' %(t_stop)
+    exit = 'trans_1' #e.g. exit with smoke
+    time = t_stop
 
     ### ==== automatic part ======
 
-    x0 = x0 / fds_delta
-    y0 = y0 / fds_delta
+    x0 = x0 / dx
+    y0 = y0 / dx
 
     x, y = m_to_pix(x_i=exits[exit][0], y_i=exits[exit][1])
     x_exit, y_exit = np.linspace(x0, x, math.hypot(x - x0, y - y0)), np.linspace(y0, y, math.hypot(x - x0, y - y0))
@@ -199,7 +200,7 @@ if plots==True:
     sfgrid = np.loadtxt(sfgrid, skiprows=3, delimiter=',')
     #print np.shape(sfgrid)
 
-    for i in range(int((1/fds_delta)/2)):
+    for i in range(int((1/dx)/2)):
         sfgrid = np.kron(sfgrid, [[1,1], [1,1]])
     #print np.shape(sfgrid)
 
@@ -251,7 +252,7 @@ if plots==True:
             plt.xlabel('x (m)')
             plt.ylabel('y (m)')
             plt.tight_layout()
-            smoke_factor_grid_norm = np.loadtxt('../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.6f_Y_%.6f/t_%.6f.csv'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], time), delimiter=',', skiprows=3)
+            smoke_factor_grid_norm = np.loadtxt('../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.2f_Y_%.2f/t_%i.csv'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], time), delimiter=',', skiprows=3)
             aa = ax.pcolorfast(dim1, dim2, smoke_factor_grid_norm, cmap='coolwarm', vmin=0, vmax=10)
             ax.set_title(exit)
             ax.set_aspect('equal')

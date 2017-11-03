@@ -31,7 +31,7 @@ def main():
     matplotlib.rc('font', **font)
 
     basename = os.path.basename(__file__)
-    logfile =  os.path.join(os.path.dirname(__file__), "log_%s.txt" % basename.split(".")[0])
+    logfile = os.path.join(os.path.dirname(__file__), "log_%s.txt" % basename.split(".")[0])
 
     open(logfile, 'w').close()
     logging.basicConfig(filename=logfile, level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -77,7 +77,7 @@ def main():
         return coordinates
 
     f = open('data_slice2ascii.pckl', 'rb')
-    (chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots) = pickle.load(f)
+    (chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dx) = pickle.load(f)
 
     if not os.path.exists('../1_meshgrid/%s_%.2f'%(specified_location[0], specified_location[1])):
         logging.info('create directory "1_meshgrid"')
@@ -307,7 +307,7 @@ def main():
     #============storage of the most important variables to store.pckl=============
 
     f = open('data_meshgrid.pckl', 'wb')
-    pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max, exits), f)
+    pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dimension_1, dimension_2, dim1, dim2, delta_dim_1, delta_dim_2, geometry, magnitudes, dim1_min, dim1_max, dim2_min, dim2_max, exits, dx), f)
 
     f.close()
 
