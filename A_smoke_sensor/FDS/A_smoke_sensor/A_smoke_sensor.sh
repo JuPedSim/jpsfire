@@ -5,7 +5,7 @@
 
 #===================CHANGE PARAMETERS AS NECEASSARY=============================
 quantities=(
-'SOOT OPTICAL DENSITY'
+'OPTICAL DENSITY'
 )
 
 locations=(
