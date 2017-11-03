@@ -26,6 +26,7 @@ import pickle
 import argparse
 import logging
 import glob
+import xml.etree.ElementTree as ET
 
 basename = os.path.basename(__file__)
 logfile =  os.path.join(os.path.dirname(__file__), "log_%s.txt" % basename.split(".")[0])
@@ -33,7 +34,6 @@ logfile =  os.path.join(os.path.dirname(__file__), "log_%s.txt" % basename.split
 open(logfile, 'w').close()
 logging.basicConfig(filename=logfile, level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
-
 print("Running <%s>. (Logfile: <%s>)" % (__file__, logfile))
 
 def get_tstop(fds_path, chid):
@@ -63,20 +63,30 @@ def get_gridres(chid):
         if l.startswith("&MESH"):
             l = l.split('IJK=')[-1]
             l = re.split(r'[,=/]+', l)
-            return float(l[5])/float(l[0]), float(l[7])/float(l[1]),float(l[9])/float(l[2])
+            return (float(l[5])-float(l[4]))/float(l[0]), (float(l[7])-float(l[6]))/float(l[1]), (float(l[9])-float(l[8]))/float(l[2])
+
+def get_tstep(jps_path):
+    geo = glob.glob(jps_path+'*ini*.xml')
+    tree = ET.parse(geo[0])
+    root = tree.getroot()
+
+    for time in root.iter('A_smoke_sensor'):
+            update_time = time.attrib.get('update_time')
+    return float(update_time)
 
 def getParserArgs():
     parser = argparse.ArgumentParser(description="Automation of NIST's fds2ascii. Conversion of FDS-data (slicefiles) to ascii format")
-    parser.add_argument("-q", "--slice_quantity", type=str, default = "SOOT OPTICAL DENSITY", help="quantity of the slicefile (default: SOOT OPTICAL DENSITY)", required=False)
+    parser.add_argument("-q", "--slice_quantity", type=str, default = "OPTICAL DENSITY", help="quantity of the slicefile (default: OPTICAL DENSITY)", required=False)
     parser.add_argument("-d", "--slice_dim", type=str, default='Z', help="axis of the slicefile (default: Z)", required=False)
     parser.add_argument("-c", "--slice_coord", type=float, default=2.25, help="coordinate on the axis (default: 2.25)", required=False)
     parser.add_argument("-p", "--plot", dest="plot", action='store_true')
     parser.add_argument("-f", "--fds", type=str, default='/Applications/FDS/FDS6/bin/fds2ascii', help="Absolute path to fds2ascii", required=False)
     parser.add_argument("-j", "--jps", type=str, default='../../JuPedSim/', help="Path pointing to the JuPedSim simulation directory", required=False)
+    parser.add_argument("-s", "--start", type=float, default=0, help="start time for fds input (default: 0)", required=False)
+    parser.add_argument("-e", "--end", type=float, default=get_tstop(fds_path, chid), help="end time for fds input (default: T_END from fds file)", required=False)
     
     args = parser.parse_args()
     return args
-
 
 # Path pointing to the fire simulation directory
 script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -85,49 +95,51 @@ logging.info('Processing FDS slice quantities and locations defined in smoke_sen
 logging.info("script path: <%s>" % script_dir)
 logging.info("fds path: <%s>" % fds_path)
 
-### FDS CHID:
+# FDS CHID:
 chid_fds = glob.glob('../*.fds')
 chid = (chid_fds[0].strip('.fds')).strip('../')
 
-# Parse parameter
+# Parse parameters
 cmdl_args = getParserArgs()
-quantity = cmdl_args.slice_quantity
-location = (cmdl_args.slice_dim, cmdl_args.slice_coord)
-# location of your local fds2ascii binary
-fds2ascii_exec = cmdl_args.fds
-jps_path = cmdl_args.jps
-plots = cmdl_args.plot
 
+quantity = cmdl_args.slice_quantity
 logging.info("Quantity: " + quantity)
+
+location = (cmdl_args.slice_dim, cmdl_args.slice_coord)
 logging.info("location: " +  ", ".join(map(str, location)))
-logging.info("Plot: On" if plots else "Plot: Off")
+
+fds2ascii_exec = cmdl_args.fds
 logging.info("fds2ascii_exec: %s" % fds2ascii_exec)
+
+jps_path = cmdl_args.jps
 logging.info("jps_path: %s" % jps_path)
 
-## HERE EXIT
+plots = cmdl_args.plot
+logging.info("Plot: On" if plots else "Plot: Off")
 
 # Grid resolution in x, y and z
-
 dx, dy, dz = get_gridres(chid)
-logging.info('grid resolution with dx = %.2f, dy = %.2f, dz = %.2f' % (dx, dy, dz))
+logging.info('Grid resolution is dx = %.2f, dy = %.2f, dz = %.2f' % (dx, dy, dz))
 
 # Parameters to be tunneled to fds2ascii:
-# types: (slice = 2)
+# types: (SLCF file = 2)
 data_type=2
-# data extend: (all = 1)
+# data extend: (all data = 1)
 extend=1
 # domain size: (not limited ='n')
 domain_size="n"
-# Interpolation times sequences; adjust arange values and/or window
-t_start=0
-t_stop=120 # todo: read from fds file. Set as default. argument parsen
-t_step=20
-t_window=1            # interpolation duration prompted by fds2ascii
-
-t_stop = get_tstop(fds_path, chid)
-#===============================================================================
-
+# Interpolation time sequences; adjust arrange values and/or window
+t_start= cmdl_args.start
+logging.info("t_start: %.2f", t_start)
+t_stop = cmdl_args.end
 logging.info("t_stop: %.2f", t_stop)
+t_step=get_tstep(jps_path) #at the moment read in from ini
+logging.info("t_step: %s" % t_step)
+
+#interpolation duration prompted by fds2ascii
+t_window=1
+
+#===============================================================================
 # BEGINNING OF THE AUTOMATIC PART - NO CHANGES NEEDED
 if not os.path.exists(fds2ascii_exec):
     logging.critical("<%s> does not exist. exits." %fds2ascii_exec)
@@ -141,10 +153,7 @@ specified_location = (location[0].upper(), location[1])
 
 t_low=np.arange(t_start,t_stop+1,t_step)
 t_up=[i+t_window for i in t_low]
-# t_up = t_low + t_window
 number_slices=1
-
-output=quantity.replace(' ', '_') + '_'
 
 smv_slcfs = []
 id_slices = []
@@ -153,8 +162,6 @@ meshes = []
 
 #==============================================================================
 # Readout of FDS file:
-# 'U' is deprecated
-# See https://docs.python.org/3/library/functions.html#open
 
 fds = open('../'+chid+'.fds', newline=None)
 fds_entries = fds.readlines()
@@ -172,7 +179,7 @@ meshes = np.reshape(meshes, (-1, 6))
 
 #==============================================================================
 # Readout of SMV file:
-smv = open('../'+chid+'.smv', newline=None) # 'U' is deprecated
+smv = open('../'+chid+'.smv', newline=None)
 logging.info('open ../'+chid+'.smv')
 smv_entries = smv.readlines()
 
@@ -230,7 +237,7 @@ for k, id_slice in enumerate(id_slices):
 
     for a,b in enumerate(t_low):
         data.extend([fds_path, chid, data_type, extend, domain_size,\
-        t_low[a], t_up[a], number_slices, id_slice, '0_slice2ascii/%s_%.2f/%s_mesh_%i.txt'%(specified_location[0], specified_location[1], output+str(t_low[a]), id_meshes[k])])
+        t_low[a], t_up[a], number_slices, id_slice, '0_slice2ascii/%s_%.2f/%s_%i_mesh_%i.txt'%(specified_location[0], specified_location[1], quantity, t_low[a], id_meshes[k])])
 
     data = np.reshape(data, (len(t_low),-1))
 
@@ -279,8 +286,7 @@ for k, id_slice in enumerate(id_slices):
                 # logging.debug("not field: <%s> " %field)
                 pass
 
-        out =proc.communicate("\n")[0]
-        print(out)
+        proc.communicate("\n")[0]
 
 
     for data_row in config_lists:
@@ -289,9 +295,8 @@ for k, id_slice in enumerate(id_slices):
 
 pckl_file = os.path.join('A_smoke_sensor', 'data_slice2ascii.pckl')
 f = open(pckl_file, 'wb')
-print ((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots))
-pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots), f)
+#print ((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots))
+pickle.dump((chid, quantity, specified_location, t_start, t_stop, t_step, id_meshes, jps_path, plots, dx), f)
 f.close()
 
 logging.info("*** Finished ***")
-
