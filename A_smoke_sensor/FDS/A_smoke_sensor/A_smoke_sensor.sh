@@ -1,20 +1,31 @@
 #!/bin/sh
 
-# Execution of the python scripts to supply the Smoke Sensor
+# Execution of fire simulation and python script to supply the Smoke Sensor
 
 
 #===================CHANGE PARAMETERS AS NECEASSARY=============================
+chids=(
+'smoke_sensor'
+)
+
 quantities=(
-'OPTICAL DENSITY'
+'EXTINCTION COEFFICIENT'
 )
 
 locations=(
 'Z',2.25
 )
-#===============================================================================
+#==================AUTOMATIC PART - NO CHANGES NECEASSARY=======================
 
+# cd ..
+# for chid in "${chids[@]}"
+# do
+#   echo Running fds simulation...
+#   fds $chid.fds
+#   wait
+# done
 
-#### AUTOMATIC PART - NO CHANGES NECEASSARY ####
+cd A_smoke_sensor
 
 for location in "${locations[@]}"
 do
@@ -27,13 +38,7 @@ do
      echo Slicefile dimension: "$1"
      echo Slicefile coordinate: $2
 
-     python 0_slice2ascii.py -q "$quantity" -d "$1" -c $2
-     wait
-     python 1_meshgrid.py
-     wait
-     python 2_consolidate_meshes.py
-     wait
-     python 3_smoke_factor_grids.py
+     python3 0_main_script.py -q "$quantity" -d "$1" -c $2
 
   done
 done
