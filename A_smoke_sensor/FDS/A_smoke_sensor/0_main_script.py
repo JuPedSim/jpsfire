@@ -222,11 +222,11 @@ def get_exits(jps_path):
         return logging.info('!!! WARNING No geometry file found - no exits extracted !!!')
 def smoke_factor_conv(convert, exit):
 
-    if not os.path.exists('../sfgrids/dx_%.2f/%s_%.2f/Door_X_%.2f_Y_%.2f' % (delta_smoke_factor_grid,
+    if not os.path.exists('../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.2f_Y_%.2f' % (delta_smoke_factor_grid,
                                                                              specified_location[0],
                                                                              specified_location[1],
                                                                              exits[exit][0], exits[exit][1])):
-        os.makedirs('../sfgrids/dx_%.2f/%s_%.2f/Door_X_%.2f_Y_%.2f' % (delta_smoke_factor_grid, specified_location[0],
+        os.makedirs('../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.2f_Y_%.2f' % (delta_smoke_factor_grid, specified_location[0],
                                                                        specified_location[1],  exits[exit][0],
                                                                        exits[exit][1]))
 
@@ -282,9 +282,9 @@ def smoke_factor_conv(convert, exit):
 
     header='Room No. 1 , Exit %s, \n dX[m], dY[m] , minX[m] , maxX[m], minY[m], maxY[m] \n   %f  ,  %f    ,  %f  ,  %f  ,  %f ,  %f' \
     %(exit, delta_smoke_factor_grid, delta_smoke_factor_grid, x_min, x_max, y_min, y_max)
-    np.savetxt('../sfgrids/dx_%.2f/%s_%.2f/Door_X_%.2f_Y_%.2f/t_%.6f.csv'\
+    np.savetxt('../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.2f_Y_%.2f/t_%.0f.000000.csv'\
     %(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], time), smoke_factor_grid_norm, header=header, delimiter=',', comments='')
-    logging.info('Write smoke factor grid: ../sfgrids/dx_%.2f/%s_%.2f/Door_X_%.2f_Y_%.2f/t_%.6f.csv'\
+    logging.info('Write smoke factor grid: ../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.2f_Y_%.2f/t_%.0f.000000.csv'\
     %(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], time))
 
     return a,b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, time
@@ -375,10 +375,10 @@ if sid == -1:
 slice = sc[sid]
 
 # read in time information
-slice.readTimes(root_dir)
+slice.readAllTimes(root_dir)
 
 # read in slice data
-slice.readData(root_dir)
+slice.readTimeSelection(root_dir, dt=t_step, average_dt=1)
 
 # map data on mesh
 slice.mapData(meshes)
@@ -399,7 +399,7 @@ if not os.path.exists(Z_directory):
 logging.info("create directory <%s>" % Z_directory)
 
 # plot slice data
-for it in range(0, slice.times.size, 100):  # todo: is it possible to get defined times? (@Lukas) warum geo unterschiedlich
+for it in range(0, slice.times.size):  # todo: is it possible to get defined times? (@Lukas) warum geo unterschiedlich
     np.savetxt('../slicedata/%s_%.2f/%s_%s.txt' % (specified_location[0], specified_location[1], quantity, slice.times[it]), slice.sd[it])
 
     if plots == True:
@@ -433,7 +433,7 @@ exits = get_exits(jps_path)
 delta_smoke_factor_grid = cmdl_args.delta_sfgrid
 logging.info('Generation of smoke factor grids with mesh resolution: %s [m]' % delta_smoke_factor_grid)
 
-for it in range(0, slice.times.size, 100):
+for it in range(0, slice.times.size):
 
     convert = slice.sd[it]
     time = slice.times[it]
@@ -454,7 +454,7 @@ for it in range(0, slice.times.size, 100):
             y0 = 4
 
             #slicefile = '../slicedata/Z_2.25/OPTICAL_DENSITY_%i.txt' %(time)
-            sfgrid = '../sfgrids/dx_1.00/Z_2.25/Door_X_10.00_Y_6.50/t_%.6f.csv' % time
+            sfgrid = '../sfgrids/dx_1.00/Z_2.25/Door_X_10.00_Y_6.50/t_%.0f.csv' % time
             exit = 'trans_1' #e.g. exit with smoke
 
             ### ==== automatic part ======
@@ -548,7 +548,7 @@ for it in range(0, slice.times.size, 100):
                 plt.xlabel('x (m)')
                 plt.ylabel('y (m)')
                 plt.tight_layout()
-                smoke_factor_grid_norm = np.loadtxt('../sfgrids/dx_%.2f/%s_%.2f/Door_X_%.2f_Y_%.2f/t_%.6f.csv'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], time), delimiter=',', skiprows=3)
+                smoke_factor_grid_norm = np.loadtxt('../sfgrids/dx_%.2f/%s_%.2f/Door_X_%.2f_Y_%.2f/t_%.0f.csv'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], time), delimiter=',', skiprows=3)
                 aa = ax.pcolorfast(dim_x, dim_y, smoke_factor_grid_norm, cmap='coolwarm', vmin=0, vmax=10)
                 ax.set_title(exit)
                 ax.set_aspect('equal')

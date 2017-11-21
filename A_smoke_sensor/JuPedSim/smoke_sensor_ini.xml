@@ -17,7 +17,7 @@
 </trajectories>
 
 <JPSfire>
-	<A_smoke_sensor smoke_factor_grids="../FDS/3_sfgrids/" update_time="20" final_time="120" />
+	<A_smoke_sensor smoke_factor_grids="../FDS/3_sfgrids/" update_time="20" final_time="100" />
  	<B_walking_speed/>
  	<C_toxicity_analysis/>
 </JPSfire>
@@ -27,9 +27,9 @@
 <agents operational_model_id="3">
 	<agents_distribution>
 		<!--group group_id="1" agent_parameter_id="1" room_id="0" subroom_id="0" number="100" router_id="7" pre_movement_mean="40" pre_movement_sigma="0" y_max="4" risk_tolerance_mean="0.6" risk_tolerance_sigma="0.1"/-->
-		
+
 		<group group_id="1" agent_parameter_id="1" room_id="0" subroom_id="0" number="100" router_id="7" pre_movement_mean="40" pre_movement_sigma="0" y_max="4" risk_tolerance_alpha="1.5" risk_tolerance_beta="0.5"/>
-		
+
 	</agents_distribution>
 </agents>
 
