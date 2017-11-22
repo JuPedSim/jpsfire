@@ -348,7 +348,7 @@ SMOKF3D     1
  HRRPUV
  hrrpuv
  kW/m3
-SLCF     1 # STRUCTURED &     0    48     0    36     9     9
+SLCC     1 # STRUCTURED &     0    48     0    36    10    10
  smoke_sensor_01.sf
  SOOT EXTINCTION COEFFICIENT
  ext_coef_C0.9H0.1
