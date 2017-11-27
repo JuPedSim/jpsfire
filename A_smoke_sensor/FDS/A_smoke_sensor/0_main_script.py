@@ -222,11 +222,11 @@ def get_exits(jps_path):
         return logging.info('!!! WARNING No geometry file found - no exits extracted !!!')
 def smoke_factor_conv(convert, exit):
 
-    if not os.path.exists('../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.2f_Y_%.2f' % (delta_smoke_factor_grid,
+    if not os.path.exists('../3_sfgrids/dx_%.2f/%s_%.6f/Door_X_%.6f_Y_%.6f' % (delta_smoke_factor_grid,
                                                                              specified_location[0],
                                                                              specified_location[1],
                                                                              exits[exit][0], exits[exit][1])):
-        os.makedirs('../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.2f_Y_%.2f' % (delta_smoke_factor_grid, specified_location[0],
+        os.makedirs('../3_sfgrids/dx_%.2f/%s_%.6f/Door_X_%.6f_Y_%.6f' % (delta_smoke_factor_grid, specified_location[0],
                                                                        specified_location[1],  exits[exit][0],
                                                                        exits[exit][1]))
 
@@ -282,9 +282,9 @@ def smoke_factor_conv(convert, exit):
 
     header='Room No. 1 , Exit %s, \n dX[m], dY[m] , minX[m] , maxX[m], minY[m], maxY[m] \n   %f  ,  %f    ,  %f  ,  %f  ,  %f ,  %f' \
     %(exit, delta_smoke_factor_grid, delta_smoke_factor_grid, x_min, x_max, y_min, y_max)
-    np.savetxt('../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.2f_Y_%.2f/t_%.0f.000000.csv'\
+    np.savetxt('../3_sfgrids/dx_%.2f/%s_%.6f/Door_X_%.6f_Y_%.6f/t_%.0f.000000.csv'\
     %(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], time), smoke_factor_grid_norm, header=header, delimiter=',', comments='')
-    logging.info('Write smoke factor grid: ../3_sfgrids/dx_%.2f/%s_%.2f/Door_X_%.2f_Y_%.2f/t_%.0f.000000.csv'\
+    logging.info('Write smoke factor grid: ../3_sfgrids/dx_%.2f/%s_%.6f/Door_X_%.6f_Y_%.6f/t_%.0f.000000.csv'\
     %(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], time))
 
     return a,b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, time
@@ -389,20 +389,20 @@ for it in range(0, slice.times.size):
     cmax = np.max(slice.sd[it])
     max_coefficient = max(cmax, max_coefficient)
 
-if not os.path.exists('../slicedata'): os.makedirs('../slicedata')
-logging.info('create directory <slicedata>')
+#if not os.path.exists('../slicedata'): os.makedirs('../slicedata')
+#logging.info('create directory <slicedata>')
 
-Z_directory = os.path.join('../slicedata', '%s_%.2f' % (specified_location[0], specified_location[1]))
+#Z_directory = os.path.join('../slicedata', '%s_%.2f' % (specified_location[0], specified_location[1]))
 
-if not os.path.exists(Z_directory):
-    os.makedirs(Z_directory)
-logging.info("create directory <%s>" % Z_directory)
+#if not os.path.exists(Z_directory):
+#    os.makedirs(Z_directory)
+#logging.info("create directory <%s>" % Z_directory)
 
 # plot slice data
-for it in range(0, slice.times.size):  # todo: is it possible to get defined times? (@Lukas) warum geo unterschiedlich
-    np.savetxt('../slicedata/%s_%.2f/%s_%s.txt' % (specified_location[0], specified_location[1], quantity, slice.times[it]), slice.sd[it])
+#for it in range(0, slice.times.size):  # todo: is it possible to get defined times? (@Lukas) warum geo unterschiedlich
+#    np.savetxt('../slicedata/%s_%.2f/%s_%s.txt' % (specified_location[0], specified_location[1], quantity, slice.times[it]), slice.sd[it])
 
-    if plots == False:
+    if plots == True:
         collect = slice.sd[it]
         plt.imshow(slice.sd[it], cmap='coolwarm', vmax=max_coefficient,
                    origin='lower', extent=slice.sm.extent)
