@@ -272,10 +272,10 @@ class Slice:
 
         slice_header = np.fromfile(infile, dtype=getSliceType('header'),
                                    count=3)
-        print("slice header: ", slice_header)
+        #print("slice header: ", slice_header)
         slice_index = np.fromfile(infile, dtype=getSliceType('index'),
                                   count=1)[0]
-        print("slice index: ", slice_index)
+        #print("slice index: ", slice_index)
 
         type_time = getSliceType('time')
         type_data = getSliceType('data', self.readSize)
@@ -294,8 +294,8 @@ class Slice:
 
             central_time_index = np.where(self.all_times > t*dt)[0][0]
 
-            print("central index, time: {}, {}".format(central_time_index,
-                                                       self.all_times[central_time_index]))
+            #print("central index, time: {}, {}".format(central_time_index,
+                                                       #self.all_times[central_time_index]))
 
             self.times[t] = self.all_times[central_time_index]
             time_indices = central_time_index
@@ -304,7 +304,7 @@ class Slice:
                 time_indices = np.where((self.all_times > t*dt-average_dt/2.0) &
                                         (self.all_times < t*dt+average_dt/2.0 ))[0]
 
-            print("using time indices: {}".format(time_indices))
+            #print("using time indices: {}".format(time_indices))
 
             for st in time_indices:
                 infile.seek(offset + st * stride)
@@ -489,7 +489,7 @@ def readSliceInfos(filename):
 
             sc.slices.append(Slice(q, l, u, fn, mesh_id, [[x1, x2], [y1, y2], [z1, z2]], centered))
 
-            logging.debug("slice info: ", mesh_id, [[x1, x2], [y1, y2], [z1, z2]])
+            logging.debug("slice info: {} {}".format(mesh_id, [[x1, x2], [y1, y2], [z1, z2]]))
 
             cpos = s.find(b'SLC', cpos + 1)
 
@@ -590,4 +590,3 @@ def scanDirectory(directory: str):
 # # time_step = np.where(times > time)[0][0]
 # # print('read in time :', time, 'at step: ', time_step)
 # # data = readSliceData(os.path.join(root_dir, slice_fns[0]), time_step)
-

@@ -76,7 +76,7 @@ def get_dims(chid, spec):
             elif spec == 'grids':
                 return (l[4]-l[3])/l[0], (l[6]-l[5])/l[1], (l[8]-l[7])/l[2]
             else:
-                return 'Error, wrong specification'
+                return 'Error, wrong specification' #todo: logging
 def get_tstep(jps_path):
     geo = glob.glob(jps_path+'*ini*.xml')
     tree = ET.parse(geo[0])
@@ -402,8 +402,8 @@ logging.info("create directory <%s>" % Z_directory)
 for it in range(0, slice.times.size):  # todo: is it possible to get defined times? (@Lukas) warum geo unterschiedlich
     np.savetxt('../slicedata/%s_%.2f/%s_%s.txt' % (specified_location[0], specified_location[1], quantity, slice.times[it]), slice.sd[it])
 
-    if plots == True:
-        collect=slice.sd[it]+geometry
+    if plots == False:
+        collect = slice.sd[it]
         plt.imshow(slice.sd[it], cmap='coolwarm', vmax=max_coefficient,
                    origin='lower', extent=slice.sm.extent)
         plt.title("time = {:.2f}".format(slice.times[it]))
