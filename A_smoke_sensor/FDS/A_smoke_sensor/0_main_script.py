@@ -389,18 +389,18 @@ for it in range(0, slice.times.size):
     cmax = np.max(slice.sd[it])
     max_coefficient = max(cmax, max_coefficient)
 
-#if not os.path.exists('../slicedata'): os.makedirs('../slicedata')
-#logging.info('create directory <slicedata>')
+if not os.path.exists('../slicedata'): os.makedirs('../slicedata')
+logging.info('create directory <slicedata>')
 
-#Z_directory = os.path.join('../slicedata', '%s_%.2f' % (specified_location[0], specified_location[1]))
+Z_directory = os.path.join('../slicedata', '%s_%.2f' % (specified_location[0], specified_location[1]))
 
-#if not os.path.exists(Z_directory):
-#    os.makedirs(Z_directory)
-#logging.info("create directory <%s>" % Z_directory)
+if not os.path.exists(Z_directory):
+    os.makedirs(Z_directory)
+logging.info("create directory <%s>" % Z_directory)
 
 # plot slice data
-#for it in range(0, slice.times.size):  # todo: is it possible to get defined times? (@Lukas) warum geo unterschiedlich
-#    np.savetxt('../slicedata/%s_%.2f/%s_%s.txt' % (specified_location[0], specified_location[1], quantity, slice.times[it]), slice.sd[it])
+for it in range(0, slice.times.size):  # todo: is it possible to get defined times? (@Lukas) warum geo unterschiedlich
+    np.savetxt('../slicedata/%s_%.2f/%s_%s.txt' % (specified_location[0], specified_location[1], quantity, slice.times[it]), slice.sd[it])
 
     if plots == True:
         collect = slice.sd[it]
@@ -447,25 +447,24 @@ for it in range(0, slice.times.size):
 
         if plots == True:
 
-            ## This statement yields a representative plot of the line of
-            ## sights if wanted. x0 and y0 can be adjusted e.g. for debugging
+            # plot line of sights
 
-            x0 = 5  # todo: parse both
-            y0 = 4
+            ## ==== adjust here for debugging =====
+
+            x_0 = 12.5  # todo: parse both
+            y_0 = 5.5
 
             #slicefile = '../slicedata/Z_2.25/OPTICAL_DENSITY_%i.txt' %(time)
-            sfgrid = '../sfgrids/dx_1.00/Z_2.25/Door_X_10.00_Y_6.50/t_%.0f.csv' % time
-            exit = 'trans_1' #e.g. exit with smoke
+            sfgrid = '../3_sfgrids/dx_1.00/Z_2.250000/Door_X_25.000000_Y_6.000000/t_%.f.000000.csv' % time
+            exit = 'trans_0' #e.g. exit with smoke
 
             ### ==== automatic part ======
 
-            x0 = x0 / dx
-            y0 = y0 / dx
+            x0 = x_0 / dx
+            y0 = y_0 / dx
 
             x, y = m_to_pix(x_i=exits[exit][0], y_i=exits[exit][1])
             x_exit, y_exit = np.linspace(x0, x, math.hypot(x - x0, y - y0)), np.linspace(y0, y, math.hypot(x - x0, y - y0))
-
-            #slicefile = np.loadtxt(slicefile, delimiter=',')
 
             magnitude_along_line_of_sight = scipy.ndimage.map_coordinates(np.transpose(convert), np.vstack((x_exit,y_exit)))
 
@@ -473,93 +472,92 @@ for it in range(0, slice.times.size):
 
             gs = gridspec.GridSpec(1, 40)
 
-            ax1 = fig.add_subplot(gs[0,0:20])
-            ax2 = fig.add_subplot(gs[0,19:22])
-            ax3 = fig.add_subplot(gs[0,24:40])
-            ax1.set_xlabel('x (m)')
-            ax1.set_ylabel('y (m)')
-            ax1.set_xticks(np.arange(x_min, x_max, 5))
-            ax1.set_yticks(np.arange(y_min+1, y_max, 5))
+            ax1 = fig.add_subplot(gs[0,:20])
+            ax2 = fig.add_subplot(gs[0,15:22])
+            ax3 = fig.add_subplot(gs[0,22:])
+            ax1.set_xlabel('x [m]')
+            ax1.set_ylabel('y [m]')
+            ax1.set_xticks(np.arange(x_min, x_max+1, 5))
+            ax1.set_yticks(np.arange(y_min, y_max+1, 5))
 
             # Plot the line of sights towards each exit
-            line_of_sight = [
-            [x0*dx,
-            exits[exit][0]]
-            ,
-            [y0*dy,
-            exits[exit][1]],
-            ]
-
-            line, = ax1.plot(line_of_sight[0], line_of_sight[1], lw=2)
-
+            ax1.plot([x_0, exits[exit][0]], [y_0, exits[exit][1]], lw=1.5, ls=':', color='red', label='line of sight')
+            ax1.legend(loc='lower center', bbox_to_anchor=(0.5, 1.05), ncol=2, frameon=False)
             aa = ax1.pcolorfast(dim_x, dim_y, convert, cmap='Greys', vmin=0, vmax=2)
             ax1.minorticks_on()
             ax1.axis('image')
 
-            ax1.grid(which='major',linestyle='-', alpha=0.4)
-            ax1.grid(which='minor',linestyle='-', alpha=0.4)
+            ax1.grid(which='major', lw=0.5, alpha=0.5)
+            ax1.grid(which='minor', lw=0.5, alpha=0.5)
 
             sfgrid = np.loadtxt(sfgrid, skiprows=3, delimiter=',')
-            #print np.shape(sfgrid)
 
             for i in range(int((1/dx)/2)):
                 sfgrid = np.kron(sfgrid, [[1, 1], [1, 1]])
-            #print np.shape(sfgrid)
 
             smoke_factor = sfgrid[int(y0/delta_smoke_factor_grid), int(-x0/delta_smoke_factor_grid)]
-            #print smoke_factor
 
-            ax3.plot(magnitude_along_line_of_sight,  lw=2, label='%s: $f_{smoke}$ = %.3f'% (exit, smoke_factor))
+            ax3.plot(magnitude_along_line_of_sight,  lw=1.5, color='black', label='%s: $f_{smoke}$ = %.2f' % (exit, smoke_factor))
 
-            ax3.set_xlabel('l (m)')
+            ax3.set_xlabel('l [m]')
             labels = ax3.get_xticks()
             labels = (labels*dx).astype(int)
             ax3.set_xticklabels(labels)
 
-            ax3.set_ylabel(quantity)
-            ax3.set_ylim(0,1)
+            ax3.set_ylabel('Extinction Coefficient')
+            ax3.set_ylim(0, 2)
 
-            cbar = fig.colorbar(aa,ax=ax1,cax=ax2, orientation='vertical')
+            fig.colorbar(aa, ax=ax1, cax=ax2, orientation='vertical')
 
-            plt.legend(loc='upper left')
-            plt.grid()
+            ax3.legend(loc='upper left')
+            ax3.grid(ls='--', lw=0.5)
 
-            plt.savefig('../sfgrids/dx_%.2f/%s_%.2f/%s_%s.pdf' % (delta_smoke_factor_grid, specified_location[0],
-                                                                    specified_location[1], quantity+'_debug', time))
+            plt.savefig('../3_sfgrids/dx_%.2f/%s_%.6f/%s_%s_%.f.pdf' % (delta_smoke_factor_grid, specified_location[0],
+                                                                    specified_location[1], quantity+'_debug', exit, time))
+            plt.close()
 
+            #########################
             # Plot Smoke factor grids
+            #########################
+
+            # todo: only trans
             fig = plt.figure()
             nrows = int(math.ceil(len(exits)**0.5))
+            print(nrows)
             ncols = int(math.ceil(len(exits)**0.5))
-            fig, axes = plt.subplots(nrows+1, ncols)
 
+            #fig, axes = plt.subplots(nrows, ncols)
             gs = gridspec.GridSpec(nrows+1, ncols)
 
             for i, g in enumerate(gs):
 
                 if i == len(exits):
-                    cbar_ax = plt.subplot(gs[-1, :])
+                    cbar_ax = plt.subplot(gs[-1,:])
                     fig.colorbar(aa, cax=cbar_ax, label=r'$f_{smoke}$', orientation='horizontal')
                     break
 
                 exit = list(exits.items())[i][0]
                 ax = plt.subplot(g)
-
-                plt.xlabel('x (m)')
-                plt.ylabel('y (m)')
+                plt.xlabel('x [m]')
+                plt.ylabel('y [m]')
                 plt.tight_layout()
-                smoke_factor_grid_norm = np.loadtxt('../sfgrids/dx_%.2f/%s_%.2f/Door_X_%.2f_Y_%.2f/t_%.0f.csv'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], time), delimiter=',', skiprows=3)
-                aa = ax.pcolorfast(dim_x, dim_y, smoke_factor_grid_norm, cmap='coolwarm', vmin=0, vmax=10)
+                smoke_factor_grid_norm = np.loadtxt('../3_sfgrids/dx_%.2f/%s_%.6f/Door_X_%.6f_Y_%.6f/t_%.f.000000.csv'%
+                                                    (delta_smoke_factor_grid, specified_location[0], specified_location[1],
+                                                     exits[exit][0], exits[exit][1], time), delimiter=',', skiprows=3)
+
+                if time == 0.25: #todo: workaround as starter slice is filled with NAN's!!!
+                    continue
+                aa = ax.pcolorfast(dim_x, dim_y, smoke_factor_grid_norm, cmap='jet', vmin=0, vmax=10)
                 ax.set_title(exit)
                 ax.set_aspect('equal')
-                ax.set_xticks(np.arange(x_min, x_max,5))
-                ax.set_yticks(np.arange(y_min+1, y_max,5))
+                ax.set_xticks(np.arange(x_min, x_max+1, 5))
+                ax.set_yticks(np.arange(y_min, y_max+1, 5))
                 ax.minorticks_on()
-                ax.grid(which='major',linestyle='-', lw=1, alpha=0.4)
-                ax.grid(which='minor',linestyle='-', lw=1, alpha=0.4)
+                ax.grid(which='major', linestyle='-', lw=0.5, alpha=0.4)
+                ax.grid(which='minor', linestyle='-', lw=0.5, alpha=0.4)
 
-            plt.savefig('../sfgrids/dx_%.2f/%s_%.2f/sfgrid_%i.pdf'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  time))
-
+            plt.savefig('../3_sfgrids/dx_%.2f/%s_%.6f/sfgrids_%i.pdf'%(delta_smoke_factor_grid, specified_location[0], specified_location[1], time))
+            plt.close()
             logging.info('Plot smoke factor grid: ../sfgrids/dx_%.2f/%s_%.2f/sfgrid_%i.pdf'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  time))
 
 #dimension_1 = x
