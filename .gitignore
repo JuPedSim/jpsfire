@@ -1,5 +1,6 @@
 .DS_Store
-*.txt
 __pycache__
 *.pyc
-*.csv
+traj.xml
+cogmap.xml
+*.pdf
