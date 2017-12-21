@@ -389,6 +389,20 @@ for it in range(0, slice.times.size):
     cmax = np.max(slice.sd[it])
     max_coefficient = max(cmax, max_coefficient)
 
+if not os.path.exists('../2_extinction_grids/SOOT_EXTINCTION_COEFFICIENT'):
+    os.makedirs('../2_extinction_grids/SOOT_EXTINCTION_COEFFICIENT')
+    logging.info('create directory <2_extinction_grids>')
+
+Z_directory = os.path.join('../2_extinction_grids/SOOT_EXTINCTION_COEFFICIENT', '%s_%.2f' % (specified_location[0], specified_location[1]))
+
+if not os.path.exists(Z_directory):
+    os.makedirs(Z_directory)
+    logging.info("create directory <%s>" % Z_directory)
+
+for it in range(0, slice.times.size):
+    np.savetxt('../2_extinction_grids/SOOT_EXTINCTION_COEFFICIENT/%s_%.2f/t_%.0f.000000.csv' % (
+        specified_location[0], specified_location[1], slice.times[it]), slice.sd[it])
+
 if plots == True:
 
     if not os.path.exists('../slicedata_geo'): os.makedirs('../slicedata_geo')
@@ -398,7 +412,7 @@ if plots == True:
 
     if not os.path.exists(Z_directory):
         os.makedirs(Z_directory)
-    logging.info("create directory <%s>" % Z_directory)
+        logging.info("create directory <%s>" % Z_directory)
 
     # todo: plot geometry too!
     print(geometry)
@@ -490,7 +504,7 @@ for it in range(0, slice.times.size):
                 sfgrid = np.kron(sfgrid, [[1, 1], [1, 1]])
 
             smoke_factor = sfgrid[int(y0/delta_smoke_factor_grid), int(-x0/delta_smoke_factor_grid)]
-            print(magnitude_along_line_of_sight)
+            #print(magnitude_along_line_of_sight)
             ax3.plot(magnitude_along_line_of_sight,  lw=1.5, color='black', label='%s: $f_{smoke}$ = %.2f' % (exit, smoke_factor))
 
             ax3.set_xlabel('l [m]')
@@ -517,7 +531,6 @@ for it in range(0, slice.times.size):
             # Plot Smoke factor grids
             # =======================
 
-            # todo: only trans
             fig = plt.figure()
             nrows = int(math.ceil(len(exits)**0.5))
             ncols = int(math.ceil(len(exits)**0.5))
