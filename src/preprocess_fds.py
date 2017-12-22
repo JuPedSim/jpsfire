@@ -420,19 +420,20 @@ for it in range(0, slice.times.size):
     cmax = np.max(slice.sd[it])
     max_coefficient = max(cmax, max_coefficient)
 
-if not os.path.exists('../2_extinction_grids/SOOT_EXTINCTION_COEFFICIENT'):
-    os.makedirs('../2_extinction_grids/SOOT_EXTINCTION_COEFFICIENT')
-    logging.info('create directory <2_extinction_grids>')
+extinction_grids_path = os.path.join(fds_path, '2_extinction_grids', 'SOOT_EXTINCTION_COEFFICIENT')
+if not os.path.exists(extinction_grids_path):
+    os.makedirs(extinction_grids_path)
+    logging.info('create directory <%s>' % extinction_grids_path)
 
-Z_directory = os.path.join('../2_extinction_grids/SOOT_EXTINCTION_COEFFICIENT', '%s_%.2f' % (specified_location[0], specified_location[1]))
+Z_directory = os.path.join(extinction_grids_path, '%s_%.2f' % (specified_location[0], specified_location[1]))
 
 if not os.path.exists(Z_directory):
     os.makedirs(Z_directory)
     logging.info("create directory <%s>" % Z_directory)
 
 for it in range(0, slice.times.size):
-    np.savetxt('../2_extinction_grids/SOOT_EXTINCTION_COEFFICIENT/%s_%.2f/t_%.0f.000000.csv' % (
-        specified_location[0], specified_location[1], slice.times[it]), slice.sd[it])
+    ext_csv_file = os.path.join(Z_directory, "t_%.0f.000000.csv" % slice.times[it])
+    np.savetxt(ext_csv_file, slice.sd[it])
 
 if plots == True:
     slicedataGeo_path = os.path.join(fds_path, "slicedata_geo")
@@ -450,8 +451,9 @@ if plots == True:
     plt.title("time = {:.2f}".format(slice.times[it]))
     plt.colorbar(label="{} [{}]".format(slice.quantity, slice.units))
     geo_figname = os.path.join(slicedataGeo_path,
-                           "%s_%.2f" %(specified_location[0], specified_location[1]),
-                           "geometry.pdf")
+                               Z_directory,
+                               "geometry.pdf")
+    logging.info("plot: %s" % geo_figname)
     plt.savefig(geo_figname)
     plt.clf()
 
@@ -460,8 +462,10 @@ if plots == True:
         collect = slice.sd[it]
         plt.imshow(slice.sd[it], cmap='coolwarm', vmax=max_coefficient, origin='lower', extent=slice.sm.extent)
         plt.title("time = {:.2f}".format(slice.times[it]))
-        plt.colorbar(label="{} [{}]".format(slice.quantity, slice.units))
-        plt.savefig("../slicedata_geo/%s_%.2f/single_slice_%.f.pdf" % (specified_location[0], specified_location[1], slice.times[it]))
+        plt.colorbar(label="{} [{}]".format(slice.quantity, slice.units))        
+        figname_it = os.path.join(slicedataGeo_path, Z_directory, "single_slice_%.f.pdf" % slice.times[it])
+        logging.info("   plot: %s" % figname_it)
+        plt.savefig(figname_it)
         plt.clf()
 
 # ============================================================================
@@ -482,7 +486,7 @@ for it in range(0, slice.times.size):
     convert = slice.sd[it]
     time = slice.times[it]
 
-    logging.info('-----------------------------------------------------------------------------------------------------')
+    logging.info('--------------------------------------------------')
     logging.info('Processing files for time: %.fs' % time)
 
     for id, _exit in enumerate(exits):
