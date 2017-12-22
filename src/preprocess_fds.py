@@ -22,8 +22,9 @@ import math
 import scipy.ndimage
 import warnings
 import sys
-sys.path.append("../..")
+#sys.path.append("../..")
 import fdsreader.slice as fs
+import shutil # for rmtree
 
 __author__ = 'Benjamin Schroeder'
 __email__ = 'dev@jupedsim.org'
@@ -38,11 +39,17 @@ font = {'family': 'serif',
         'size': 9}
 matplotlib.rc('font', **font)
 
-basename = os.path.basename(__file__)
-logfile = os.path.join(os.path.dirname(__file__), "log_%s.txt" % basename.split(".")[0])
-open(logfile, 'w').close()
-logging.basicConfig(filename=logfile, level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-print("Running <%s>. (Logfile: <%s>)" % (__file__, logfile))
+def config_logger(logfile):
+    open(logfile, 'w').close()
+    rootLog = logging.getLogger()
+    if rootLog.handlers:
+        for handler in rootLog.handlers:
+            rootLog.removeHandler(handler)
+            logging.basicConfig(filename=logfile, level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+            print(">> Running: %s" % (__file__))
+
+
+
 
 def get_tstop(fds_path, chid):
     fds_file = os.path.join(fds_path, chid+".fds")
@@ -57,12 +64,13 @@ def get_tstop(fds_path, chid):
             if len(time_line) > 1:
                 t_stop = float(time_line[1])
             else:
-                logging.critical("could not read t_stop from file <%s>" % fds_file[0])
-                sys.exit("ERROR: can not read time from fds-file")
+                logging.critical("Can not read t_stop from file <%s>" % fds_file[0])
+                sys.exit()
     return t_stop
 def get_dims(chid, spec):
-
-    fds_data = open('../'+chid+'.fds')
+    # TODO: fds_file as arg instead of chid?
+    fds_file = os.path.join(fds_path, chid + ".fds") 
+    fds_data = open(fds_file) #open('../'+chid+'.fds')
     fds_lines = fds_data.readlines()
 
     for l in fds_lines:
@@ -78,7 +86,11 @@ def get_dims(chid, spec):
             else:
                 return 'Error, wrong specification' #todo: logging
 def get_tstep(jps_path):
-    geo = glob.glob(jps_path+'*ini*.xml')
+    geo = glob.glob(os.path.join(jps_path, '*ini*.xml'))
+    if len(geo) == 0:
+        logging.critical("Found no ini files in %s" % jps_path)
+        sys.exit()
+        
     tree = ET.parse(geo[0])
     root = tree.getroot()
 
@@ -91,7 +103,7 @@ def getParserArgs():
     parser.add_argument("-d", "--slice_dim", type=str, default='Z', help="axis of the slicefile (default: Z)", required=False)
     parser.add_argument("-c", "--slice_coord", type=float, default=2.25, help="coordinate on the axis (default: 2.25)", required=False)
     parser.add_argument("-p", "--plot", dest="plot", action='store_true')
-    parser.add_argument("-j", "--jps", type=str, default='../../JuPedSim/', help="Path pointing to the JuPedSim simulation directory", required=False)
+    parser.add_argument("-j", "--jps", type=str, default='../demos/A_smoke_sensor/JuPedSim', help="Path pointing to the JuPedSim simulation directory", required=False)
     parser.add_argument("-s", "--start", type=float, default=0.0, help="start time for fds input (default: 0.0)", required=False)
     parser.add_argument("-e", "--end", type=float, default=get_tstop(fds_path, chid), help="end time for fds input (default: T_END from fds file)", required=False)
     parser.add_argument("-g", "--delta_sfgrid", type=float, default=1.0, help="Resolution of smoke factor grids (default: 1.0)", required=False)
@@ -125,13 +137,13 @@ def read_fds_line(fds_entry):
         coordinates = sorted(coordinates[0:2])+sorted(coordinates[2:4])+sorted(coordinates[4:6])
         return coordinates
 def get_fds_geo(chid):
-
+    # TODO fds_file instead as arg?
     geometry = np.zeros((len(dim_y),len(dim_x)))
 
     obsts = []
     holes = []
-
-    fds = open('../'+chid+'.fds', newline=None)
+    fds_file = os.path.join(fds_path, chid + ".fds") 
+    fds = open(fds_file, newline=None)
     logging.info('Opening '+chid+'.fds'+' to read out meshes, obstacles and holes')
     fds_entries = fds.readlines()
 
@@ -162,14 +174,14 @@ def get_fds_geo(chid):
     #np.savetxt('../geometry.txt', geometry)
     return geometry
 def get_exits(jps_path):
-
     exits_dict = {}
     crossings = []
     transitions = []
 
     try:
-        geo = glob.glob(jps_path+'*eo*.xml')
-        tree = ET.parse(geo[0])
+        # TODO: get this from inifile
+        geo = os.path.join(jps_path, "geo.xml")  # glob.glob(jps_path+'*eo*.xml')
+        tree = ET.parse(geo)
         root = tree.getroot()
 
         for crossing in root.iter('crossing'):
@@ -221,15 +233,17 @@ def get_exits(jps_path):
         exits_dict = {}
         return logging.info('!!! WARNING No geometry file found - no exits extracted !!!')
 def smoke_factor_conv(convert, exit):
-
-    if not os.path.exists('../3_sfgrids/dx_%.2f/%s_%.6f/Door_X_%.6f_Y_%.6f' % (delta_smoke_factor_grid,
-                                                                             specified_location[0],
-                                                                             specified_location[1],
-                                                                             exits[exit][0], exits[exit][1])):
-        os.makedirs('../3_sfgrids/dx_%.2f/%s_%.6f/Door_X_%.6f_Y_%.6f' % (delta_smoke_factor_grid, specified_location[0],
-                                                                       specified_location[1],  exits[exit][0],
-                                                                       exits[exit][1]))
-
+    sfgrids_path = os.path.join(fds_path, "3_sfgrids")
+    door_path = os.path.join(sfgrids_path,                            
+                             'dx_%.2f',
+                             '%s_%.6f',
+                             'Door_X_%.6f_Y_%.6f') % (delta_smoke_factor_grid,
+                                                      specified_location[0],
+                                                      specified_location[1],
+                                                      exits[exit][0],
+                                                      exits[exit][1])    
+    if not os.path.exists(door_path):
+        os.makedirs(door_path)
     smoke_factor_grid = np.ones([int(abs(y_max-y_min)/delta_smoke_factor_grid),
                                  int(abs(x_max-x_min)/delta_smoke_factor_grid)])
 
@@ -282,26 +296,46 @@ def smoke_factor_conv(convert, exit):
 
     header='Room No. 1 , Exit %s, \n dX[m], dY[m] , minX[m] , maxX[m], minY[m], maxY[m] \n   %f  ,  %f    ,  %f  ,  %f  ,  %f ,  %f' \
     %(exit, delta_smoke_factor_grid, delta_smoke_factor_grid, x_min, x_max, y_min, y_max)
-    np.savetxt('../3_sfgrids/dx_%.2f/%s_%.6f/Door_X_%.6f_Y_%.6f/t_%.0f.000000.csv'\
-    %(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], time), smoke_factor_grid_norm, header=header, delimiter=',', comments='')
-    logging.info('Write smoke factor grid: ../3_sfgrids/dx_%.2f/%s_%.6f/Door_X_%.6f_Y_%.6f/t_%.0f.000000.csv'\
-    %(delta_smoke_factor_grid, specified_location[0], specified_location[1],  exits[exit][0], exits[exit][1], time))
+    csv_file = os.path.join(door_path, 't_%.0f.000000.csv' % time)
+    np.savetxt(csv_file, smoke_factor_grid_norm, header=header, delimiter=',', comments='')
+    logging.info('Write smoke factor grid -- \n %s' % csv_file)
 
-    return a,b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, time
+    return a, b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, time
 def m_to_pix(x_i, y_i):
     # Conversion m to pixel coordinates
     return (abs(x_max-x_min) - x_max + x_i)/dx, (abs(y_max-y_min) - y_max + y_i)/dy
 
+
+#TODO This is  MAIN
 # Path pointing to the fire simulation directory
 script_dir = os.path.dirname(os.path.realpath(__file__))
-fds_path = os.path.join(script_dir, "..")
-logging.info("script path: <%s>" % script_dir)
-logging.info("fds path: <%s>" % fds_path)
+fds_path = os.path.join(script_dir, "..", "demos", "A_smoke_sensor", "FDS")
+logfile = os.path.join(fds_path, "log.txt") # TODO: since we use only one fds. In future: use fds_filename 
+config_logger(logfile)
+sfgrids_path = os.path.join(fds_path, "3_sfgrids")
+if os.path.exists(sfgrids_path): #delete any existing directory
+    logging.warning("Delete {}".format(sfgrids_path))
+    shutil.rmtree(sfgrids_path)
+
+try:
+    os.makedirs(sfgrids_path)        
+except OSError as exc:
+    logging.critical("Can not make directory {} error={}".format(sfgrids_path, exc))
+    sys.exit()
+
+logging.info("Create {}".format(sfgrids_path))
 
 # FDS chid
-fds_file = glob.glob('../*.fds')
-chid = (fds_file[0].strip('.fds')).strip('../')
-
+fds_file = glob.glob(os.path.join(fds_path, '*.fds'))
+logging.info("script path: <%s>" % script_dir)
+logging.info("fds path: <%s>" % fds_path)
+logging.info("fds_file: %s" % fds_file)
+#chid = (fds_file[0].strip('.fds')).strip('../')
+if len(fds_file) == 0:
+    logging.critical("Found no fds file!")
+    sys.exit()
+    
+chid = os.path.basename(fds_file[0]).rstrip('.fds')
 # Parse parameters
 cmdl_args = getParserArgs()
 
@@ -347,9 +381,9 @@ geometry = get_fds_geo(chid)
 # ====================================================
 
 # locate smokeview file
-root_dir = "../../FDS"
+root_dir = fds_path
 smv_fn = fs.scanDirectory(root_dir)
-logging.info("smv file found: %s" % smv_fn)
+logging.info("smv file found: %s" %(smv_fn))
 
 # parse smokeview file for slice information
 sc = fs.readSliceInfos(os.path.join(root_dir, smv_fn))
@@ -369,7 +403,7 @@ for iis in range(len(sc.slices)):
         break
 
 if sid == -1:
-    logging.info("no slice matching label: {}".format(slice_label))
+    logging.critical("No slice matching label: {}".format(slice_label))
     sys.exit()
 
 slice = sc[sid]
@@ -415,7 +449,6 @@ if plots == True:
         logging.info("create directory <%s>" % Z_directory)
 
     # todo: plot geometry too!
-    print(geometry)
     plt.imshow(geometry, cmap='Greys', origin='lower', extent=slice.sm.extent)
     plt.title("time = {:.2f}".format(slice.times[it]))
     plt.colorbar(label="{} [{}]".format(slice.quantity, slice.units))
@@ -452,9 +485,9 @@ for it in range(0, slice.times.size):
     logging.info('-----------------------------------------------------------------------------------------------------')
     logging.info('Processing files for time: %.fs' % time)
 
-    for id, exit in enumerate(exits):
+    for id, _exit in enumerate(exits):
 
-        a, b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, time = smoke_factor_conv(convert, exit)
+        a, b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, time = smoke_factor_conv(convert, _exit)
 
         if plots == True:
 
@@ -465,16 +498,18 @@ for it in range(0, slice.times.size):
             # ==== adjust here for debugging =====
 
             x_0, y_0 = 12.5, 5.5  # Point of view
-            exit = 'trans_0'  # Point of exit, e.g. with smoke
-            sfgrid = np.loadtxt('../3_sfgrids/dx_1.00/Z_2.250000/Door_X_25.000000_Y_6.000000/t_%.f.000000.csv' % time,
-                                skiprows=3, delimiter=',')
+            _exit = 'trans_0'  # Point of exit, e.g. with smoke
+            # TODO: This should not be hard coded!
+            #p_csv_file = 'dx_1.00/Z_2.250000/Door_X_25.000000_Y_6.000000/t_%.f.000000.csv' % time
+            p_csv_file = os.path.join(sfgrids_path,  'dx_1.00/Z_2.250000/Door_X_12.500000_Y_5.000000/t_%.f.000000.csv' % time)
+            sfgrid = np.loadtxt(p_csv_file, skiprows=3, delimiter=',')
 
             # ==== automatic part ======
 
             x0 = x_0 / dx
             y0 = y_0 / dx
 
-            x, y = m_to_pix(x_i=exits[exit][0], y_i=exits[exit][1])
+            x, y = m_to_pix(x_i=exits[_exit][0], y_i=exits[_exit][1])
             x_exit, y_exit = np.linspace(x0, x, math.hypot(x - x0, y - y0)), np.linspace(y0, y, math.hypot(x - x0, y - y0))
 
             magnitude_along_line_of_sight = scipy.ndimage.map_coordinates(np.transpose(convert), np.vstack((x_exit,y_exit)))
@@ -491,7 +526,7 @@ for it in range(0, slice.times.size):
             ax1.set_xticks(np.arange(x_min, x_max+1, 5))
             ax1.set_yticks(np.arange(y_min, y_max+1, 5))
 
-            ax1.plot([x_0, exits[exit][0]], [y_0, exits[exit][1]], lw=1.5, ls=':', color='red', label='line of sight')
+            ax1.plot([x_0, exits[_exit][0]], [y_0, exits[_exit][1]], lw=1.5, ls=':', color='red', label='line of sight')
             ax1.legend(loc='lower center', bbox_to_anchor=(0.5, 1.05), ncol=2, frameon=False)
             aa = ax1.pcolorfast(dim_x, dim_y, convert, cmap='Greys', vmin=0, vmax=2)
             ax1.minorticks_on()
@@ -505,11 +540,11 @@ for it in range(0, slice.times.size):
 
             smoke_factor = sfgrid[int(y0/delta_smoke_factor_grid), int(-x0/delta_smoke_factor_grid)]
             #print(magnitude_along_line_of_sight)
-            ax3.plot(magnitude_along_line_of_sight,  lw=1.5, color='black', label='%s: $f_{smoke}$ = %.2f' % (exit, smoke_factor))
+            ax3.plot(magnitude_along_line_of_sight,  lw=1.5, color='black', label='%s: $f_{smoke}$ = %.2f' % (_exit, smoke_factor))
 
             ax3.set_xlabel('l [m]')
             labels = ax3.get_xticks()
-            print(labels)
+            # print(labels)
             labels = (labels*dx).astype(int)
             #print(labels)
             ax3.set_xticklabels(labels)
@@ -522,11 +557,19 @@ for it in range(0, slice.times.size):
 
             ax3.legend(loc='upper center', fancybox=False, edgecolor='inherit')
             ax3.grid(ls='--', lw=0.5)
-
-            plt.savefig('../3_sfgrids/dx_%.2f/%s_%.6f/%s_%s_%.f.pdf' % (delta_smoke_factor_grid, specified_location[0],
-                                                                    specified_location[1], quantity+'_debug', exit, time))
+            namefile = os.path.join('dx_%.2f' % delta_smoke_factor_grid,
+                                    '%s_%.6f' %(specified_location[0], specified_location[1]),
+                                    '%s_debug_%s_%.2f.pdf' %(quantity, _exit, time)
+            )
+            figname = os.path.join(sfgrids_path, namefile)     
+            plt.savefig(figname)# ('../3_sfgrids/dx_%.2f/%s_%.6f/%s_%s_%.f.pdf' % (delta_smoke_factor_grid,
+                       #                                                  specified_location[0],
+                       #                                                  specified_location[1],
+                       #                                                  quantity+'_debug',
+                       #                                                  _exit,
+                       #                                                  time))
             plt.close()
-
+            logging.info("Save: %s" % figname)
             # =======================
             # Plot Smoke factor grids
             # =======================
@@ -545,19 +588,22 @@ for it in range(0, slice.times.size):
                     fig.colorbar(aa, cax=cbar_ax, label=r'$f_{smoke}$', orientation='horizontal')
                     break
 
-                exit = list(exits.items())[i][0]
+                _exit = list(exits.items())[i][0]
                 ax = plt.subplot(g)
                 plt.xlabel('x [m]')
                 plt.ylabel('y [m]')
                 plt.tight_layout()
-                smoke_factor_grid_norm = np.loadtxt('../3_sfgrids/dx_%.2f/%s_%.6f/Door_X_%.6f_Y_%.6f/t_%.f.000000.csv'%
-                                                    (delta_smoke_factor_grid, specified_location[0], specified_location[1],
-                                                     exits[exit][0], exits[exit][1], time), delimiter=',', skiprows=3)
+                p_csv_file = os.path.join(sfgrids_path,
+                                          'dx_%.2f' % delta_smoke_factor_grid,
+                                          '%s_%.6f' % ( specified_location[0], specified_location[1]),
+                                          'Door_X_%.6f_Y_%.6f' % (exits[_exit][0], exits[_exit][1]),
+                                          't_%.f.000000.csv' % time)
 
+                smoke_factor_grid_norm = np.loadtxt(p_csv_file, delimiter=',', skiprows=3)
                 if np.ndarray.any(np.isnan(smoke_factor_grid_norm)) == True:
                     continue
                 aa = ax.pcolorfast(dim_x, dim_y, smoke_factor_grid_norm, cmap='jet', vmin=0, vmax=10)
-                ax.set_title(exit)
+                ax.set_title(_exit)
                 ax.set_aspect('equal')
                 ax.set_xticks(np.arange(x_min, x_max+1, 5))
                 ax.set_yticks(np.arange(y_min, y_max+1, 5))
@@ -565,10 +611,14 @@ for it in range(0, slice.times.size):
                 ax.grid(which='major', linestyle='-', lw=0.5, alpha=0.4)
                 ax.grid(which='minor', linestyle='-', lw=0.5, alpha=0.4)
 
-            plt.savefig('../3_sfgrids/dx_%.2f/%s_%.6f/sfgrids_%i.pdf'%(delta_smoke_factor_grid, specified_location[0], specified_location[1], time))
+                # figname = '../3_sfgrids/dx_%.2f/%s_%.6f/sfgrids_%i.pdf'%(delta_smoke_factor_grid,
+            figname = os.path.join(sfgrids_path,
+                                   'dx_%.2f' % delta_smoke_factor_grid,
+                                   '%s_%.6f' %(specified_location[0], specified_location[1]),
+                                   'sfgrids_%i.pdf' %time)
+            plt.savefig(figname)
             plt.close()
-            logging.info('Plot smoke factor grid: ../sfgrids/dx_%.2f/%s_%.2f/sfgrid_%i.pdf'%(delta_smoke_factor_grid, specified_location[0], specified_location[1],  time))
-
+            logging.info('Plot smoke factor grid: <%s>' % figname )
 #dimension_1 = x
 #dimension_2 = y
 #dim1 = dim_x
@@ -578,4 +628,6 @@ for it in range(0, slice.times.size):
 #dim2_min = y_min
 #dim2_max = y_max
 
-logging.info("*** Finished ***")
+logging.info("***  Finished ***")
+print(">> Done.")
+print(">> Logfile: %s" % logfile)
