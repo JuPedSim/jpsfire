@@ -235,13 +235,10 @@ def get_exits(jps_path):
 def smoke_factor_conv(convert, exit):
     sfgrids_path = os.path.join(fds_path, "3_sfgrids")
     door_path = os.path.join(sfgrids_path,                            
-                             'dx_%.2f',
-                             '%s_%.6f',
-                             'Door_X_%.6f_Y_%.6f') % (delta_smoke_factor_grid,
-                                                      specified_location[0],
-                                                      specified_location[1],
-                                                      exits[exit][0],
-                                                      exits[exit][1])    
+                             'dx_%.2f' % delta_smoke_factor_grid,
+                             '%s_%.6f' % (specified_location[0], specified_location[1]),
+                             'Door_X_%.6f_Y_%.6f' % (exits[exit][0], exits[exit][1]))
+    logging.info("Door_path -- \n %s" % door_path)
     if not os.path.exists(door_path):
         os.makedirs(door_path)
     smoke_factor_grid = np.ones([int(abs(y_max-y_min)/delta_smoke_factor_grid),
@@ -438,11 +435,11 @@ for it in range(0, slice.times.size):
         specified_location[0], specified_location[1], slice.times[it]), slice.sd[it])
 
 if plots == True:
+    slicedataGeo_path = os.path.join(fds_path, "slicedata_geo")
+    if not os.path.exists(slicedataGeo_path): os.makedirs(slicedataGeo_path)
+    logging.info('create slicedataGeo_path %s' %slicedataGeo_path)
 
-    if not os.path.exists('../slicedata_geo'): os.makedirs('../slicedata_geo')
-    logging.info('create directory <slicedata_geo>')
-
-    Z_directory = os.path.join('../slicedata_geo', '%s_%.2f' % (specified_location[0], specified_location[1]))
+    Z_directory = os.path.join(slicedataGeo_path, '%s_%.2f' % (specified_location[0], specified_location[1]))
 
     if not os.path.exists(Z_directory):
         os.makedirs(Z_directory)
@@ -452,7 +449,10 @@ if plots == True:
     plt.imshow(geometry, cmap='Greys', origin='lower', extent=slice.sm.extent)
     plt.title("time = {:.2f}".format(slice.times[it]))
     plt.colorbar(label="{} [{}]".format(slice.quantity, slice.units))
-    plt.savefig("../slicedata_geo/%s_%.2f/geometry.pdf" % (specified_location[0], specified_location[1]))
+    geo_figname = os.path.join(slicedataGeo_path,
+                           "%s_%.2f" %(specified_location[0], specified_location[1]),
+                           "geometry.pdf")
+    plt.savefig(geo_figname)
     plt.clf()
 
     for it in range(0, slice.times.size):
@@ -501,7 +501,8 @@ for it in range(0, slice.times.size):
             _exit = 'trans_0'  # Point of exit, e.g. with smoke
             # TODO: This should not be hard coded!
             #p_csv_file = 'dx_1.00/Z_2.250000/Door_X_25.000000_Y_6.000000/t_%.f.000000.csv' % time
-            p_csv_file = os.path.join(sfgrids_path,  'dx_1.00/Z_2.250000/Door_X_12.500000_Y_5.000000/t_%.f.000000.csv' % time)
+            p_csv_file = os.path.join(sfgrids_path,
+                                  'dx_1.00/Z_2.250000/Door_X_12.500000_Y_5.000000/t_%.f.000000.csv' % time)
             sfgrid = np.loadtxt(p_csv_file, skiprows=3, delimiter=',')
 
             # ==== automatic part ======
