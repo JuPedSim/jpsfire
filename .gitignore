@@ -8,3 +8,5 @@ cogmap.xml
 *.info
 *.log
 *.csv
+/.idea/
+/venv/
