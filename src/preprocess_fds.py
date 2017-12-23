@@ -121,9 +121,12 @@ def getParserArgs():
     parser.add_argument("-p", "--plot", dest="plot", action='store_true')
     parser.add_argument("-j", "--jps", type=str, default='../demos/A_smoke_sensor/JuPedSim',
                         help="Path pointing to the JuPedSim simulation directory", required=False)
+    parser.add_argument("-f", "--fds", type=str, default='../demos/A_smoke_sensor/FDS',
+                        help="Path pointing to the FDS simulation directory", required=False)
+    
     parser.add_argument("-s", "--start", type=float, default=0.0, help="start time for fds input (default: 0.0)",
                         required=False)
-    parser.add_argument("-e", "--end", type=float, default=get_tstop(fds_path, chid),
+    parser.add_argument("-e", "--end", type=float, default=200,
                         help="end time for fds input (default: T_END from fds file)", required=False)
     parser.add_argument("-g", "--delta_sfgrid", type=float, default=1.0,
                         help="Resolution of smoke factor grids (default: 1.0)", required=False)
@@ -447,8 +450,12 @@ def plot_smoke_grids():
 
 def main():
     global fds_path, logfile, sfgrids_path, fds_file, chid, quantity, specified_location, x_min, x_max, y_min, y_max, dx, dy, dim_x, dim_y, exits, delta_smoke_factor_grid, convert, Time
+    # Parse parameters
+    cmdl_args = getParserArgs ()
     script_dir = os.path.dirname (os.path.realpath (__file__))
-    fds_path = os.path.join (script_dir, "..", "demos", "A_smoke_sensor", "FDS")
+    #fds_path = os.path.join (script_dir, "..", "demos", "A_smoke_sensor", "FDS") # TODO: user input
+    fds_path = cmdl_args.fds
+    logging.info ("fds_path: %s" % fds_path)
     logfile = os.path.join (fds_path, "log.txt")  # TODO: since we use only one fds. In future: use fds_filename
     config_logger (logfile)
     sfgrids_path = os.path.join (fds_path, "3_sfgrids")
@@ -471,8 +478,6 @@ def main():
         logging.critical ("Found no fds file!")
         sys.exit ()
     chid = os.path.basename (fds_file[0]).rstrip ('.fds')
-    # Parse parameters
-    cmdl_args = getParserArgs ()
     jps_path = cmdl_args.jps
     logging.info ("jps_path: %s" % jps_path)
     quantity = cmdl_args.slice_quantity
