@@ -15,24 +15,21 @@ import re
 import shutil  # for rmtree
 import warnings
 import xml.etree.ElementTree as ET
-
+import sys
 import math
 import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib import rcParams, gridspec
 import numpy as np
 import scipy.ndimage
-import sys
-# import time
-from matplotlib import rcParams, gridspec
-
-# sys.path.append("../..")
 import fdsreader.slice as fs
 
 __author__ = 'Benjamin Schroeder'
+__credits__ = 'Ben Hein'
 __email__ = 'dev@jupedsim.org'
 __copyright__ = '<2009-2017> Forschungszentrum Jülich GmbH. All rights reserved.'
 __license__ = 'GNU Lesser General Public License'
-__version__ = '0.1'
+__version__ = '0.2'
 __status__ = 'Production'
 
 rcParams.update({'figure.autolayout': True})
