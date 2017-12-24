@@ -55,8 +55,8 @@ def config_logger(log_file):
             print(">> Running: %s" % (__file__))
 
 
-def get_tstop(_fds_path, chid):
-    _fds_file = os.path.join(_fds_path, chid + ".fds")
+def get_tstop(_fds_path, _chid):
+    _fds_file = os.path.join(_fds_path, _chid + ".fds")
     with open(_fds_file) as f:
         lines = f.readlines()
         for l in lines:
@@ -68,15 +68,15 @@ def get_tstop(_fds_path, chid):
             if len(time_line) > 1:
                 t_stop = float(time_line[1])
             else:
-                logging.critical("Can not read t_stop from file <%s>" % fds_file[0])
+                logging.critical("Can not read t_stop from file <%s>", fds_file[0])
                 sys.exit()
     return t_stop
 
 
-def get_dims(chid, spec):
+def get_dims(_chid, spec):
     # TODO: fds_file as arg instead of chid?
-    fds_file = os.path.join(fds_path, chid + ".fds")
-    fds_data = open(fds_file)  # open('../'+chid+'.fds')
+    _fds_file = os.path.join(fds_path, _chid + ".fds")
+    fds_data = open(_fds_file)  # open('../'+chid+'.fds')
     fds_lines = fds_data.readlines()
 
     for l in fds_lines:
@@ -93,10 +93,10 @@ def get_dims(chid, spec):
                 return 'Error, wrong specification'  # todo: logging
 
 
-def get_tstep(jps_path):
-    geo = glob.glob(os.path.join(jps_path, '*ini*.xml'))
-    if len(geo) == 0:
-        logging.critical("Found no ini files in %s" % jps_path)
+def get_tstep(_jps_path):
+    geo = glob.glob(os.path.join(_jps_path, '*ini*.xml'))
+    if not geo: #len(geo) == 0:
+        logging.critical("Found no ini files in %s", _jps_path)
         sys.exit()
 
     tree = ET.parse(geo[0])
@@ -108,25 +108,34 @@ def get_tstep(jps_path):
 
 
 def getParserArgs():
-    parser = argparse.ArgumentParser(description="Read out of SmokeView slicefiles and conversion to grid")
+    parser = argparse.ArgumentParser(
+        description="Read out of SmokeView slicefiles and conversion to grid")
     parser.add_argument("-q", "--slice_quantity", type=str, default="EXTINCTION COEFFICIENT",
-                        help="quantity of the slicefile (default: EXTINCTION COEFFICIENT)", required=False)
-    parser.add_argument("-d", "--slice_dim", type=str, default='Z', help="axis of the slicefile (default: Z)",
+                        help=
+                        "quantity of the slicefile (default: EXTINCTION COEFFICIENT)",
                         required=False)
-    parser.add_argument("-c", "--slice_coord", type=float, default=2.25, help="coordinate on the axis (default: 2.25)",
+    parser.add_argument("-d", "--slice_dim", type=str, default='Z',
+                        help="axis of the slicefile (default: Z)",
+                        required=False)
+    parser.add_argument("-c", "--slice_coord", type=float,
+                        default=2.25,
+                        help="coordinate on the axis (default: 2.25)",
                         required=False)
     parser.add_argument("-p", "--plot", dest="plot", action='store_true')
-    parser.add_argument("-j", "--jps", type=str, default='../demos/A_smoke_sensor/JuPedSim',
-                        help="Path pointing to the JuPedSim simulation directory", required=False)
+    parser.add_argument("-j", "--jps", type=str, default='../demos/A_smoke_sensor/JuPedSim', help="Path pointing to the JuPedSim simulation directory", required=False)
     parser.add_argument("-f", "--fds", type=str, default='../demos/A_smoke_sensor/FDS',
-                        help="Path pointing to the FDS simulation directory", required=False)
-    
-    parser.add_argument("-s", "--start", type=float, default=0.0, help="start time for fds input (default: 0.0)",
+                        help="Path pointing to the FDS simulation directory",
+                        required=False)
+
+    parser.add_argument("-s", "--start", type=float, default=0.0,
+                        help="start time for fds input (default: 0.0)",
                         required=False)
     parser.add_argument("-e", "--end", type=float, default=200,
-                        help="end time for fds input (default: T_END from fds file)", required=False)
+                        help="end time for fds input (default: T_END from fds file)",
+                        required=False)
     parser.add_argument("-g", "--delta_sfgrid", type=float, default=1.0,
-                        help="Resolution of smoke factor grids (default: 1.0)", required=False)
+                        help="Resolution of smoke factor grids (default: 1.0)",
+                        required=False)
 
     args = parser.parse_args()
     return args
@@ -149,29 +158,29 @@ def read_fds_line(fds_entry):
     coordinates = ''.join(coordinates)
     coordinates = re.split(', |,| |=|/', coordinates)
     for j, cord in enumerate(coordinates):
-        if isfloat(cord) == True:
+        if isfloat(cord):
             coordinates[j] = float(cord)
-        if cord.isdigit() == True:
+        if cord.isdigit():
             coordinates[j] = float(cord)
         else:
             continue
 
-    coordinates = [x for x in coordinates if type(x) != str]
+    coordinates = [x for x in coordinates if not isinstance(x, str)]#type(x) != str
     coordinates = list(map(float, coordinates))
     # increasing sorting of coordinate pairs:
     coordinates = sorted(coordinates[0:2]) + sorted(coordinates[2:4]) + sorted(coordinates[4:6])
     return coordinates
 
 
-def get_fds_geo(chid):
+def get_fds_geo(_chid):
     # TODO fds_file instead as arg?
     geometry = np.zeros((len(dim_y), len(dim_x)))
 
     obsts = []
     holes = []
-    fds_file = os.path.join(fds_path, chid + ".fds")
-    fds = open(fds_file, newline=None)
-    logging.info('Opening ' + chid + '.fds' + ' to read out meshes, obstacles and holes')
+    _fds_file = os.path.join(fds_path, _chid + ".fds")
+    fds = open(_fds_file, newline=None)
+    logging.info('Opening %s.fds to read out meshes, obstacles and holes', _chid)
     fds_entries = fds.readlines()
 
     for i, fds_entry in enumerate(fds_entries):
@@ -180,7 +189,7 @@ def get_fds_geo(chid):
             if obst[4] < specified_location[1] < obst[5]:
                 obst = [(1 / dx) * i for i in obst]
                 geometry[int(obst[2] - y_max / dy - 1): int(obst[3] - y_max / dy - 1),
-                int(obst[0] - x_max / dx - 1): int(obst[1] - x_max / dx - 1)][:] = np.nan
+                         int(obst[0] - x_max / dx - 1): int(obst[1] - x_max / dx - 1)][:] = np.nan
                 obsts = np.append(obsts, obst)
 
     obsts = np.reshape(obsts, (-1, 6))
@@ -192,7 +201,7 @@ def get_fds_geo(chid):
             if hole[4] < specified_location[1] < hole[5]:
                 hole = [(1 / dx) * i for i in hole]
                 geometry[hole[2] - y_max / dy - 1: hole[3] - y_max / dy - 1,
-                hole[0] - x_max / dx - 1: hole[1] - x_max / dx - 1][:] = 0
+                         hole[0] - x_max / dx - 1: hole[1] - x_max / dx - 1][:] = 0
                 holes = np.append(holes, hole)
 
     holes = np.reshape(holes, (-1, 6))
@@ -264,13 +273,13 @@ def get_exits(jps_path):
         return logging.info('!!! WARNING No geometry file found - no exits extracted !!!')
 
 
-def smoke_factor_conv(convert, Exit):
-    sfgrids_path = os.path.join(fds_path, "3_sfgrids")
-    door_path = os.path.join(sfgrids_path,
+def smoke_factor_conv(_convert, Exit):
+    _sfgrids_path = os.path.join(fds_path, "3_sfgrids")
+    door_path = os.path.join(_sfgrids_path,
                              'dx_%.2f' % delta_smoke_factor_grid,
                              '%s_%.6f' % (specified_location[0], specified_location[1]),
                              'Door_X_%.6f_Y_%.6f' % (exits[Exit][0], exits[Exit][1]))
-    logging.info("Door_path -- \n %s" % door_path)
+    logging.info("Door_path -- \n %s", door_path)
     if not os.path.exists(door_path):
         os.makedirs(door_path)
     smoke_factor_grid = np.ones([int(abs(y_max - y_min) / delta_smoke_factor_grid),
@@ -297,11 +306,11 @@ def smoke_factor_conv(convert, Exit):
                 smoke_factor_grid[a, b] = smoke_factor
                 continue
 
-            x_exit, y_exit = np.linspace(x0, x, math.hypot(x - x0, y - y0)), np.linspace(y0, y,
-                                                                                         math.hypot(x - x0, y - y0))
+            x_exit = np.linspace(x0, x, math.hypot(x - x0, y - y0))
+            y_exit = np.linspace(y0, math.hypot(x - x0, y - y0))
 
-            magnitude_along_line_of_sight = scipy.ndimage.map_coordinates(np.transpose(convert),
-                                                                          np.vstack((x_exit, y_exit)))
+            magnitude_along_line_of_sight = scipy.ndimage.map_coordinates(
+                np.transpose(_convert), np.vstack((x_exit, y_exit)))
 
             #### consideration of visibility straight lines whose lengt is lt 1:
             if len(magnitude_along_line_of_sight) < 1:
@@ -330,7 +339,7 @@ def smoke_factor_conv(convert, Exit):
              % (Exit, delta_smoke_factor_grid, delta_smoke_factor_grid, x_min, x_max, y_min, y_max)
     csv_file = os.path.join(door_path, 't_%.0f.000000.csv' % Time)
     np.savetxt(csv_file, smoke_factor_grid_norm, header=header, delimiter=',', comments='')
-    logging.info('Write smoke factor grid -- \n %s' % csv_file)
+    logging.info('Write smoke factor grid -- \n %s',  csv_file)
 
     return a, b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, Time
 
@@ -344,13 +353,14 @@ def plot_line_sights(Time, dx, dy, dz):
     x_0, y_0 = 12.5, 5.5  # Point of view
     _exit = 'trans_0'  # Point of exit, e.g. with smoke
     # TODO: This should not be hard coded!
-    p_csv_file = os.path.join (sfgrids_path,
-                               'dx_1.00/Z_2.250000/Door_X_12.500000_Y_5.000000/t_%.f.000000.csv' % Time)
-    sfgrid = np.loadtxt (p_csv_file, skiprows=3, delimiter=',')
+    p_csv_file = os.path.join(sfgrids_path,
+                               'dx_1.00/Z_2.250000/Door_X_12.500000_Y_5.000000/t_%.f.000000.csv'
+                              % Time)
+    sfgrid = np.loadtxt(p_csv_file, skiprows=3, delimiter=',')
     # ==== automatic part ======
     x0 = x_0 / dx
     y0 = y_0 / dx
-    x, y = m_to_pix (x_i=exits[_exit][0], y_i=exits[_exit][1])
+    x, y = m_to_pix(x_i=exits[_exit][0], y_i=exits[_exit][1])
     x_exit, y_exit = np.linspace (x0, x, math.hypot (x - x0, y - y0)), np.linspace (y0, y,
                                                                                     math.hypot (x - x0, y - y0))
     magnitude_along_line_of_sight = scipy.ndimage.map_coordinates (np.transpose (convert),
