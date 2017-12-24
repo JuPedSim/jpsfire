@@ -543,7 +543,7 @@ def main():
     extinction_grids_path = os.path.join (fds_path, '2_extinction_grids', 'SOOT_EXTINCTION_COEFFICIENT')
     if not os.path.exists (extinction_grids_path):
         os.makedirs (extinction_grids_path)
-        logging.info ('create directory <%s>' % extinction_grids_path)
+        logging.info ('create directory <%s>', extinction_grids_path)
     Z_directory = os.path.join (extinction_grids_path, '%s_%.2f' % (specified_location[0], specified_location[1]))
     if not os.path.exists (Z_directory):
         os.makedirs (Z_directory)
@@ -554,22 +554,21 @@ def main():
     if plots:
         slicedataGeo_path = os.path.join (fds_path, "slicedata_geo")
         if not os.path.exists (slicedataGeo_path): os.makedirs (slicedataGeo_path)
-        logging.info ('create slicedataGeo_path %s' % slicedataGeo_path)
+        logging.info ('create slicedataGeo_path %s',  slicedataGeo_path)
 
-        Z_directory = os.path.join (slicedataGeo_path, '%s_%.2f' % (specified_location[0], specified_location[1]))
+        pZ_directory = os.path.join (slicedataGeo_path, '%s_%.2f' % (specified_location[0], specified_location[1]))
 
-        if not os.path.exists (Z_directory):
-            os.makedirs (Z_directory)
-            logging.info ("create directory <%s>" % Z_directory)
+        if not os.path.exists (pZ_directory):
+            os.makedirs (pZ_directory)
+            logging.info ("plot create directory <%s>" % pZ_directory)
 
         # TODO: plot geometry too!
         plt.imshow (geometry, cmap='Greys', origin='lower', extent=slice.sm.extent)
         plt.title ("time = {:.2f}".format (slice.times[it]))
         plt.colorbar (label="{} [{}]".format (slice.quantity, slice.units))
-        geo_figname = os.path.join (slicedataGeo_path,
-                                    Z_directory,
+        geo_figname = os.path.join (pZ_directory,
                                     "geometry.pdf")
-        logging.info ("plot: %s" % geo_figname)
+        logging.info ("plot: %s" % geao_figname)
         plt.savefig (geo_figname)
         plt.clf ()
 
@@ -578,7 +577,7 @@ def main():
             plt.imshow (slice.sd[it], cmap='coolwarm', vmax=max_coefficient, origin='lower', extent=slice.sm.extent)
             plt.title ("time = {:.2f}".format (slice.times[it]))
             plt.colorbar (label="{} [{}]".format (slice.quantity, slice.units))
-            figname_it = os.path.join (slicedataGeo_path, Z_directory, "single_slice_%.f.pdf" % slice.times[it])
+            figname_it = os.path.join (Z_directory, "single_slice_%.f.pdf" % slice.times[it])
             logging.info ("   plot: %s" % figname_it)
             plt.savefig (figname_it)
             plt.clf ()
