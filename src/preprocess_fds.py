@@ -398,7 +398,7 @@ def plot_line_sights(Time, dx, dy, dz):
     plt.close ()
     logging.info ("Save: %s" % figname)
 
-def plot_smoke_grids():
+def plot_smoke_grids(_Time):
     global aa
     fig = plt.figure ()
     nrows = int (math.ceil (len (exits) ** 0.5))
@@ -421,7 +421,7 @@ def plot_smoke_grids():
                                    'dx_%.2f' % delta_smoke_factor_grid,
                                    '%s_%.6f' % (specified_location[0], specified_location[1]),
                                    'Door_X_%.6f_Y_%.6f' % (exits[_exit][0], exits[_exit][1]),
-                                   't_%.f.000000.csv' % Time)
+                                   't_%.f.000000.csv' % _Time)
 
         smoke_factor_grid_norm = np.loadtxt (p_csv_file, delimiter=',', skiprows=3)
         if np.ndarray.any (np.isnan (smoke_factor_grid_norm)):
@@ -439,7 +439,7 @@ def plot_smoke_grids():
         figname = os.path.join (sfgrids_path,
                             'dx_%.2f' % delta_smoke_factor_grid,
                             '%s_%.6f' % (specified_location[0], specified_location[1]),
-                            'sfgrids_%i.pdf' % Time)
+                            'sfgrids_%i.pdf' % _Time)
         plt.savefig (figname)
         plt.close ()
         logging.info ('Plot smoke factor grid: <%s>' % figname)
@@ -602,6 +602,11 @@ def main():
         for id, _exit in enumerate (exits):
             a, b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, Time = smoke_factor_conv (convert, _exit)
     if plots:
+        # ===================
+        # plot line of sights
+        # ===================
+        plot_line_sights (Time, dx, dy, dz)
+
         for it in range (0, slice.times.size):
 
             convert = slice.sd[it]
@@ -609,15 +614,11 @@ def main():
             logging.info ('--------------------------------------------------')
             logging.info ('Plotting files for time: %.fs' % Time)
             for id, _exit in enumerate (exits):
-                # ===================
-                # plot line of sights
-                # ===================
-                plot_line_sights (Time, dx, dy, dz)
 
                 # =======================
                 # Plot Smoke factor grids
                 # =======================
-                plot_smoke_grids ()
+                plot_smoke_grids (Time)
 
 
 # TODO This is  MAIN
