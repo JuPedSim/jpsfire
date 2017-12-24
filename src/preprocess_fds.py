@@ -264,13 +264,13 @@ def get_exits(jps_path):
         return logging.info('!!! WARNING No geometry file found - no exits extracted !!!')
 
 
-def smoke_factor_conv(convert, Exit):
-    sfgrids_path = os.path.join(fds_path, "3_sfgrids")
-    door_path = os.path.join(sfgrids_path,
+def smoke_factor_conv(_convert, Exit):
+    _sfgrids_path = os.path.join(fds_path, "3_sfgrids")
+    door_path = os.path.join(_sfgrids_path,
                              'dx_%.2f' % delta_smoke_factor_grid,
                              '%s_%.6f' % (specified_location[0], specified_location[1]),
                              'Door_X_%.6f_Y_%.6f' % (exits[Exit][0], exits[Exit][1]))
-    logging.info("Door_path -- \n %s" % door_path)
+    logging.info("Door_path -- \n %s", door_path)
     if not os.path.exists(door_path):
         os.makedirs(door_path)
     smoke_factor_grid = np.ones([int(abs(y_max - y_min) / delta_smoke_factor_grid),
@@ -297,10 +297,10 @@ def smoke_factor_conv(convert, Exit):
                 smoke_factor_grid[a, b] = smoke_factor
                 continue
 
-            x_exit, y_exit = np.linspace(x0, x, math.hypot(x - x0, y - y0)), np.linspace(y0, y,
-                                                                                         math.hypot(x - x0, y - y0))
+            x_exit = np.linspace(x0, x, math.hypot(x - x0, y - y0))
+            y_exit = np.linspace(y0, y, math.hypot(x - x0, y - y0))
 
-            magnitude_along_line_of_sight = scipy.ndimage.map_coordinates(np.transpose(convert),
+            magnitude_along_line_of_sight = scipy.ndimage.map_coordinates(np.transpose(_convert),
                                                                           np.vstack((x_exit, y_exit)))
 
             #### consideration of visibility straight lines whose lengt is lt 1:
