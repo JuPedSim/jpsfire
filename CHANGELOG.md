@@ -6,4 +6,5 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Directory structure !2
+
 ### Fixed
