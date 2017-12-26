@@ -1,0 +1,2 @@
+*.s3d filter=lfs diff=lfs merge=lfs -text
+*.sf filter=lfs diff=lfs merge=lfs -text
