@@ -69,7 +69,7 @@ def get_tstop(_fds_path, _chid):
                 t_stop = float(time_line[1])
             else:
                 logging.critical("Can not read t_stop from file <%s>", fds_file[0])
-                sys.exit()
+                sys.exit("Can not read t_stop from file <%s>" % fds_file[0])
     return t_stop
 
 
@@ -94,16 +94,25 @@ def get_dims(_chid, spec):
 
 
 def get_tstep(_jps_path):
-    geo = glob.glob(os.path.join(_jps_path, '*ini*.xml'))
-    if not geo: #len(geo) == 0:
+    inifile_pattern = os.path.join(_jps_path, '*ini*.xml')
+    logging.warning("Looking for inifile. Pattern <%s>", inifile_pattern)
+    inifile = glob.glob(inifile_pattern) #todo rename. list?
+    update_time = -1
+    if not inifile:
         logging.critical("Found no ini files in %s", _jps_path)
-        sys.exit()
+        sys.exit("Found no ini files in %s" % _jps_path)
 
-    tree = ET.parse(geo[0])
+    logging.warning("Found inifile %s", inifile[0])
+    tree = ET.parse(inifile[0])
     root = tree.getroot()
 
     for time in root.iter('A_smoke_sensor'):
         update_time = time.attrib.get('update_time')
+
+    if isinstance(update_time, int):
+        logging.critical("Could not read update_time in inifile %s", inifile)
+        sys.exit("Error: Could not read update_time")
+
     return float(update_time)
 
 
@@ -212,17 +221,23 @@ def get_fds_geo(_chid):
     return geometry
 
 
-def get_exits(jps_path):
+def get_exits(_jps_path):
     exits_dict = {}
     crossings = []
     transitions = []
 
     try:
-        # TODO: get this from inifile
-        geo = os.path.join(jps_path, "geo.xml")  # glob.glob(jps_path+'*eo*.xml')
-        tree = ET.parse(geo)
-        root = tree.getroot()
+        inifile_pattern = os.path.join(_jps_path, '*ini*.xml')
+        inifiles = glob.glob(inifile_pattern)
+        if not inifile_pattern:
+            logging.critical("No inifile found following the pattern %s", inifile_pattern)
+            sys.exit("Error: No inifile found!")
 
+        inifile = inifiles[0]
+        tree = ET.parse(inifile)
+        geo = tree.find('geometry').text
+        logging.info("Geometry file: %s", geo)
+        root = tree.getroot()
         for crossing in root.iter('crossing'):
             c_id = 'cross_' + crossing.attrib.get('id')
             for vert in crossing.iter('vertex'):
@@ -270,7 +285,8 @@ def get_exits(jps_path):
 
     except:
         exits_dict = {}
-        return logging.info('!!! WARNING No geometry file found - no exits extracted !!!')
+        logging.critical('No geometry file found - no exits extracted !!!')
+        sys.exit("Error: No geometry file found!")
 
 
 def smoke_factor_conv(_convert, Exit):
@@ -452,7 +468,7 @@ def plot_smoke_grids(_Time):
                             'sfgrids_%i.pdf' % _Time)
         plt.savefig (figname)
         plt.close ()
-        logging.info ('Plot smoke factor grid: <%s>' % figname)
+        logging.info ('Plot smoke factor grid: <%s>', figname)
 
 
 def main():
@@ -462,9 +478,9 @@ def main():
     script_dir = os.path.dirname (os.path.realpath (__file__))
     #fds_path = os.path.join (script_dir, "..", "demos", "A_smoke_sensor", "FDS") # TODO: user input
     fds_path = cmdl_args.fds
-    logging.info ("fds_path: %s" % fds_path)
     logfile = os.path.join (fds_path, "log.txt")  # TODO: since we use only one fds. In future: use fds_filename
     config_logger (logfile)
+    logging.info ("fds_path: %s" % fds_path)
     sfgrids_path = os.path.join (fds_path, "3_sfgrids")
     if os.path.exists (sfgrids_path):  # delete any existing directory
         logging.warning ("Delete {}".format (sfgrids_path))
@@ -473,17 +489,17 @@ def main():
         os.makedirs (sfgrids_path)
     except OSError as exc:
         logging.critical ("Can not make directory {} error={}".format (sfgrids_path, exc))
-        sys.exit ()
+        sys.exit ("Error: Can not make directory %s" % sfgrids_path)
     logging.info ("Create {}".format (sfgrids_path))
     # FDS chid
     fds_file = glob.glob (os.path.join (fds_path, '*.fds'))
-    logging.info ("script path: <%s>" % script_dir)
-    logging.info ("fds path: <%s>" % fds_path)
-    logging.info ("fds_file: %s" % fds_file)
+    logging.info ("script path: <%s>", script_dir)
+    logging.info ("fds path: <%s>", fds_path)
+    logging.info ("fds_file: %s", fds_file)
     # chid = (fds_file[0].strip('.fds')).strip('../')
-    if len (fds_file) == 0:
-        logging.critical ("Found no fds file!")
-        sys.exit ()
+    if not fds_file:
+        logging.critical("Found no fds file!")
+        sys.exit("Found no fds file!")
     chid = os.path.basename (fds_file[0]).rstrip ('.fds')
     jps_path = cmdl_args.jps
     logging.info ("jps_path: %s" % jps_path)
@@ -537,7 +553,7 @@ def main():
             break
     if sid == -1:
         logging.critical ("No slice matching label: {}".format (slice_label))
-        sys.exit ()
+        sys.exit ("No slice matching label: {}".format (slice_label))
     slice = sc[sid]
     # read in time information
     slice.readAllTimes (root_dir)
