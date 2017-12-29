@@ -294,7 +294,7 @@ def get_exits(_jps_path):
 def smoke_factor_conv(_convert, Exit):
     _sfgrids_path = os.path.join(fds_path, "3_sfgrids")
     door_path = os.path.join(_sfgrids_path,
-                             'dx_%.2f' % delta_smoke_factor_grid,
+                             '%s' % quantity,
                              '%s_%.6f' % (specified_location[0], specified_location[1]),
                              'Door_X_%.6f_Y_%.6f' % (exits[Exit][0], exits[Exit][1]))
     logging.info("Door_path -- \n %s", door_path)
@@ -372,8 +372,8 @@ def plot_line_sights(Time, dx, dy, dz):
     _exit = 'trans_0'  # Point of exit, e.g. with smoke
     # TODO: This should not be hard coded!
     p_csv_file = os.path.join(sfgrids_path,
-                               'dx_1.00/Z_2.250000/Door_X_12.500000_Y_5.000000/t_%.f.000000.csv'
-                              % Time)
+                               '%s/Z_2.250000/Door_X_12.500000_Y_5.000000/t_%.f.000000.csv'
+                              % quantity, Time)
     sfgrid = np.loadtxt(p_csv_file, skiprows=3, delimiter=',')
     # ==== automatic part ======
     x0 = x_0 / dx
@@ -568,11 +568,11 @@ def main():
     for it in range (0, slice.times.size):
         cmax = np.max (slice.sd[it])
         max_coefficient = max (cmax, max_coefficient)
-    extinction_grids_path = os.path.join (fds_path, '2_extinction_grids', 'SOOT_EXTINCTION_COEFFICIENT')
+    extinction_grids_path = os.path.join (fds_path, '2_extinction_grids', quantity)
     if not os.path.exists (extinction_grids_path):
         os.makedirs (extinction_grids_path)
         logging.info ('create directory <%s>', extinction_grids_path)
-    Z_directory = os.path.join (extinction_grids_path, '%s_%.2f' % (specified_location[0], specified_location[1]))
+    Z_directory = os.path.join (extinction_grids_path, '%s_%.6f' % (specified_location[0], specified_location[1]))
     if not os.path.exists (Z_directory):
         os.makedirs (Z_directory)
         logging.info ("create directory <%s>" % Z_directory)
