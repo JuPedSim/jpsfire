@@ -371,9 +371,10 @@ def plot_line_sights(Time, dx, dy, dz):
     x_0, y_0 = 12.5, 5.5  # Point of view
     _exit = 'trans_0'  # Point of exit, e.g. with smoke
     # TODO: This should not be hard coded!
+
     p_csv_file = os.path.join(sfgrids_path,
-                               '%s/Z_2.250000/Door_X_12.500000_Y_5.000000/t_%.f.000000.csv'
-                              % quantity, Time)
+                              '%s/Z_2.250000/Door_X_12.500000_Y_5.000000/t_%.f.000000.csv'
+                              % (quantity, Time))
     sfgrid = np.loadtxt(p_csv_file, skiprows=3, delimiter=',')
     # ==== automatic part ======
     x0 = x_0 / dx
@@ -417,9 +418,9 @@ def plot_line_sights(Time, dx, dy, dz):
     fig.colorbar (aa, ax=ax1, cax=ax2, orientation='vertical')
     ax3.legend (loc='upper center', fancybox=False, edgecolor='inherit')
     ax3.grid (ls='--', lw=0.5)
-    namefile = os.path.join ('dx_%.2f' % delta_smoke_factor_grid,
+    namefile = os.path.join ('%s' % quantity,
                              '%s_%.6f' % (specified_location[0], specified_location[1]),
-                             '%s_debug_%s_%.2f.pdf' % (quantity, _exit, Time)
+                             'debug_%s_%.2f.pdf' % (_exit, Time)
                              )
     figname = os.path.join (sfgrids_path, namefile)
     plt.savefig (figname)
@@ -446,7 +447,7 @@ def plot_smoke_grids(_Time):
         plt.ylabel ('y [m]')
         plt.tight_layout ()
         p_csv_file = os.path.join (sfgrids_path,
-                                   'dx_%.2f' % delta_smoke_factor_grid,
+                                   '%s' % quantity,
                                    '%s_%.6f' % (specified_location[0], specified_location[1]),
                                    'Door_X_%.6f_Y_%.6f' % (exits[_exit][0], exits[_exit][1]),
                                    't_%.f.000000.csv' % _Time)
@@ -465,7 +466,7 @@ def plot_smoke_grids(_Time):
 
 
         figname = os.path.join (sfgrids_path,
-                            'dx_%.2f' % delta_smoke_factor_grid,
+                            '%s' % quantity,
                             '%s_%.6f' % (specified_location[0], specified_location[1]),
                             'sfgrids_%i.pdf' % _Time)
         plt.savefig (figname)
@@ -596,7 +597,7 @@ def main():
         plt.colorbar (label="{} [{}]".format (slice.quantity, slice.units))
         geo_figname = os.path.join (pZ_directory,
                                     "geometry.pdf")
-        logging.info ("plot: %s" % geao_figname)
+        logging.info ("plot: %s" % geo_figname)
         plt.savefig (geo_figname)
         plt.clf ()
 
