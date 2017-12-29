@@ -235,8 +235,10 @@ def get_exits(_jps_path):
 
         inifile = inifiles[0]
         tree = ET.parse(inifile)
-        geo = tree.find('geometry').text
-        logging.info("Geometry file: %s", geo)
+        geofile = tree.find('geometry').text
+        logging.info("Geometry file: %s", geofile)
+        geo = os.path.join(_jps_path, geofile)
+        tree = ET.parse(geo)
         root = tree.getroot()
         for crossing in root.iter('crossing'):
             c_id = 'cross_' + crossing.attrib.get('id')
