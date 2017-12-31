@@ -373,10 +373,10 @@ def plot_line_sights(Time, dx, dy, dz):
     _exit = 'trans_0'  # Point of exit, e.g. with smoke
     # TODO: This should not be hard coded!
 
-    p_csv_file = os.path.join(sfgrids_path,
-                              '%s/Z_2.250000/Door_X_12.500000_Y_5.000000/t_%.f.000000.csv'
+    p_file = os.path.join(sfgrids_path,
+                              '%s/Z_2.250000/Door_X_12.500000_Y_5.000000/t_%.f.000000.npy'
                               % (quantity, Time))
-    sfgrid = np.loadtxt(p_csv_file, skiprows=3, delimiter=',')
+    sfgrid = np.load(p_file)
     # ==== automatic part ======
     x0 = x_0 / dx
     y0 = y_0 / dx
@@ -447,13 +447,13 @@ def plot_smoke_grids(_Time):
         plt.xlabel ('x [m]')
         plt.ylabel ('y [m]')
         plt.tight_layout ()
-        p_csv_file = os.path.join (sfgrids_path,
+        p_file = os.path.join (sfgrids_path,
                                    '%s' % quantity,
                                    '%s_%.6f' % (specified_location[0], specified_location[1]),
                                    'Door_X_%.6f_Y_%.6f' % (exits[_exit][0], exits[_exit][1]),
-                                   't_%.f.000000.csv' % _Time)
+                                   't_%.f.000000.npy' % _Time)
 
-        smoke_factor_grid_norm = np.loadtxt (p_csv_file, delimiter=',', skiprows=3)
+        smoke_factor_grid_norm = np.load (p_file)
         if np.ndarray.any (np.isnan (smoke_factor_grid_norm)):
             continue
         aa = ax.pcolorfast (dim_x, dim_y, smoke_factor_grid_norm, cmap='jet', vmin=0, vmax=10)
@@ -579,8 +579,8 @@ def main():
         os.makedirs (Z_directory)
         logging.info ("create directory <%s>" % Z_directory)
     for it in range (0, slice.times.size):
-        ext_csv_file = os.path.join (Z_directory, "t_%.0f.000000.csv" % slice.times[it])
-        np.savetxt (ext_csv_file, slice.sd[it])
+        ext_file = os.path.join (Z_directory, "t_%.0f.000000.npy" % slice.times[it])
+        np.save(ext_file, slice.sd[it])
     if plots:
         slicedataGeo_path = os.path.join (fds_path, "slicedata_geo")
         if not os.path.exists (slicedataGeo_path): os.makedirs (slicedataGeo_path)
