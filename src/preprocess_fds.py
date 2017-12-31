@@ -355,10 +355,10 @@ def smoke_factor_conv(_convert, Exit, _Time):
 
     header = 'Room No. 1 , Exit %s, \n dX[m], dY[m] , minX[m] , maxX[m], minY[m], maxY[m] \n   %f  ,  %f    ,  %f  ,  %f  ,  %f ,  %f' \
              % (Exit, delta_smoke_factor_grid, delta_smoke_factor_grid, x_min, x_max, y_min, y_max)
-    csv_file = os.path.join(door_path, 't_%.0f.000000.csv' % _Time)
+    npy_file = os.path.join(door_path, 't_%.0f.000000.npy' % _Time)
     logging.info('Call savetxt')
-    np.savetxt(csv_file, smoke_factor_grid_norm, header=header, delimiter=',', comments='')
-    logging.info('Write smoke factor grid -- \n %s',  csv_file)
+    np.save(npy_file, smoke_factor_grid_norm)
+    logging.info('Write smoke factor grid -- \n %s',  npy_file)
 
     return a, b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, _Time
 
