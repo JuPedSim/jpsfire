@@ -291,7 +291,7 @@ def get_exits(_jps_path):
         sys.exit("Error: No geometry file found!")
 
 
-def smoke_factor_conv(_convert, Exit):
+def smoke_factor_conv(_convert, Exit, _Time):
     _sfgrids_path = os.path.join(fds_path, "3_sfgrids")
     door_path = os.path.join(_sfgrids_path,
                              '%s' % quantity,
@@ -355,11 +355,12 @@ def smoke_factor_conv(_convert, Exit):
 
     header = 'Room No. 1 , Exit %s, \n dX[m], dY[m] , minX[m] , maxX[m], minY[m], maxY[m] \n   %f  ,  %f    ,  %f  ,  %f  ,  %f ,  %f' \
              % (Exit, delta_smoke_factor_grid, delta_smoke_factor_grid, x_min, x_max, y_min, y_max)
-    csv_file = os.path.join(door_path, 't_%.0f.000000.csv' % Time)
+    csv_file = os.path.join(door_path, 't_%.0f.000000.csv' % _Time)
+    logging.info('Call savetxt')
     np.savetxt(csv_file, smoke_factor_grid_norm, header=header, delimiter=',', comments='')
     logging.info('Write smoke factor grid -- \n %s',  csv_file)
 
-    return a, b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, Time
+    return a, b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, _Time
 
 
 def m_to_pix(x_i, y_i):
@@ -628,7 +629,7 @@ def main():
         logging.info ('Processing files for time: %.fs' % Time)
 
         for id, _exit in enumerate (exits):
-            a, b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, Time = smoke_factor_conv (convert, _exit)
+            a, b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, Time = smoke_factor_conv (convert, _exit, Time)
     if plots:
         # ===================
         # plot line of sights
