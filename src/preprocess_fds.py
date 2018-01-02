@@ -358,7 +358,7 @@ def smoke_factor_conv(_convert, Exit, _Time):
     npy_file = os.path.join(door_path, 't_%.0f.000000.npy' % _Time)
     logging.info('Call savetxt')
     np.save(npy_file, smoke_factor_grid_norm)
-    logging.info('Write smoke factor grid -- \n %s',  npy_file)
+    logging.info('Write smoke factor grid -- \n %s', npy_file)
 
     return a, b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, _Time
 
@@ -546,65 +546,68 @@ def main():
     # print all found information
     # sc.print()
     # read in meshes
-    meshes = fs.readMeshes (os.path.join (root_dir, smv_fn))
+    meshes = fs.readMeshes(os.path.join(root_dir, smv_fn))
     # select matching slice
     slice_label = 'ext_coef_C0.9H0.1'
     sid = -1
-    for iis in range (len (sc.slices)):
+    for iis in range(len(sc.slices)):
         if sc[iis].label == slice_label:
             sid = iis
-            logging.info ("found matching slice")
+            logging.info("found matching slice")
             break
     if sid == -1:
-        logging.critical ("No slice matching label: {}".format (slice_label))
-        sys.exit ("No slice matching label: {}".format (slice_label))
+        logging.critical("No slice matching label: {}".format(slice_label))
+        sys.exit("No slice matching label: {}".format(slice_label))
     slice = sc[sid]
     # read in time information
-    slice.readAllTimes (root_dir)
+    slice.readAllTimes(root_dir)
     # read in slice data
-    slice.readTimeSelection (root_dir, dt=t_step, average_dt=1)
+    slice.readTimeSelection(root_dir, dt=t_step, average_dt=1)
     # map data on mesh
-    slice.mapData (meshes)
+    slice.mapData(meshes)
     # get max value
     max_coefficient = 0
-    for it in range (0, slice.times.size):
-        cmax = np.max (slice.sd[it])
-        max_coefficient = max (cmax, max_coefficient)
-    extinction_grids_path = os.path.join (fds_path, '2_extinction_grids', quantity)
-    if not os.path.exists (extinction_grids_path):
-        os.makedirs (extinction_grids_path)
-        logging.info ('create directory <%s>', extinction_grids_path)
-    Z_directory = os.path.join (extinction_grids_path, '%s_%.6f' % (specified_location[0], specified_location[1]))
-    if not os.path.exists (Z_directory):
-        os.makedirs (Z_directory)
-        logging.info ("create directory <%s>" % Z_directory)
-    for it in range (0, slice.times.size):
-        ext_file = os.path.join (Z_directory, "t_%.0f.000000.npy" % slice.times[it])
+    for it in range(0, slice.times.size):
+        cmax = np.max(slice.sd[it])
+        max_coefficient = max(cmax, max_coefficient)
+    extinction_grids_path = os.path.join(fds_path, '2_extinction_grids', quantity)
+    if not os.path.exists(extinction_grids_path):
+        os.makedirs(extinction_grids_path)
+        logging.info('create directory <%s>', extinction_grids_path)
+    Z_directory = os.path.join(extinction_grids_path, '%s_%.6f' %
+                               (specified_location[0], specified_location[1]))
+    if not os.path.exists(Z_directory):
+        os.makedirs(Z_directory)
+        logging.info("create directory <%s>" % Z_directory)
+    for it in range(0, slice.times.size):
+        ext_file = os.path.join(Z_directory, "t_%.0f.000000.npy" % slice.times[it])
         np.save(ext_file, slice.sd[it])
     if plots:
-        slicedataGeo_path = os.path.join (fds_path, "slicedata_geo")
-        if not os.path.exists (slicedataGeo_path): os.makedirs (slicedataGeo_path)
-        logging.info ('create slicedataGeo_path %s',  slicedataGeo_path)
+        slicedataGeo_path = os.path.join(fds_path, "slicedata_geo")
+        if not os.path.exists(slicedataGeo_path):
+            os.makedirs(slicedataGeo_path)
+        logging.info('create slicedataGeo_path %s',  slicedataGeo_path)
 
-        pZ_directory = os.path.join (slicedataGeo_path, '%s_%.2f' % (specified_location[0], specified_location[1]))
+        pZ_directory = os.path.join(slicedataGeo_path, '%s_%.2f' %
+                                    (specified_location[0], specified_location[1]))
 
-        if not os.path.exists (pZ_directory):
-            os.makedirs (pZ_directory)
-            logging.info ("plot create directory <%s>" % pZ_directory)
+        if not os.path.exists(pZ_directory):
+            os.makedirs(pZ_directory)
+            logging.info("plot create directory <%s>", pZ_directory)
 
         # TODO: plot geometry too!
-        plt.imshow (geometry, cmap='Greys', origin='lower', extent=slice.sm.extent)
-        plt.title ("time = {:.2f}".format (slice.times[it]))
-        plt.colorbar (label="{} [{}]".format (slice.quantity, slice.units))
-        geo_figname = os.path.join (pZ_directory,
-                                    "geometry.pdf")
-        logging.info ("plot: %s" % geo_figname)
-        plt.savefig (geo_figname)
-        plt.clf ()
+        plt.imshow(geometry, cmap='Greys', origin='lower', extent=slice.sm.extent)
+        plt.title("time = {:.2f}".format(slice.times[it]))
+        plt.colorbar(label="{} [{}]".format(slice.quantity, slice.units))
+        geo_figname = os.path.join(pZ_directory,
+                                   "geometry.pdf")
+        logging.info("plot: %s", geo_figname)
+        plt.savefig(geo_figname)
+        plt.clf()
 
         for it in range (0, slice.times.size):
             collect = slice.sd[it]
-            plt.imshow (slice.sd[it], cmap='coolwarm', vmax=max_coefficient, origin='lower', extent=slice.sm.extent)
+            plt.imshow(slice.sd[it], cmap='coolwarm', vmax=max_coefficient, origin='lower', extent=slice.sm.extent)
             plt.title ("time = {:.2f}".format (slice.times[it]))
             plt.colorbar (label="{} [{}]".format (slice.quantity, slice.units))
             figname_it = os.path.join (Z_directory, "single_slice_%.f.pdf" % slice.times[it])

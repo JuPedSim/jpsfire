@@ -71,7 +71,7 @@
 
     <router router_id="7" description="AI">
       <sensors>
-				<sensor sensor_id="2" description="Smoke" status="activated"/>
+	<sensor sensor_id="2" description="Smoke" status="activated"/>
       </sensors>
       <cognitive_map status="complete"/>
 	  <parameters>
