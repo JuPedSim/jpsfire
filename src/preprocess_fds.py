@@ -352,12 +352,14 @@ def smoke_factor_conv(_convert, Exit, _Time):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=RuntimeWarning)
         smoke_factor_grid_norm = smoke_factor_grid / max_Smoke_Factor * 10
-
-    header = 'Room No. 1 , Exit %s, \n dX[m], dY[m] , minX[m] , maxX[m], minY[m], maxY[m] \n   %f  ,  %f    ,  %f  ,  %f  ,  %f ,  %f' \
-             % (Exit, delta_smoke_factor_grid, delta_smoke_factor_grid, x_min, x_max, y_min, y_max)
-    npy_file = os.path.join(door_path, 't_%.0f.000000.npy' % _Time)
-    logging.info('Call savetxt')
-    np.save(npy_file, smoke_factor_grid_norm)
+    # Exit %s, \n dX[m], dY[m] , minX[m] , maxX[m], minY[m], maxY[m] \n
+    # TODO: why is dX = dY?
+    #header = (Exit, delta_smoke_factor_grid, delta_smoke_factor_grid, x_min, x_max, y_min, y_max)
+    header = (delta_smoke_factor_grid, x_min, x_max, y_min, y_max)
+    npy_file = os.path.join(door_path, 't_%.0f.000000.npz' % _Time)
+    logging.info('Call save')
+    #array_to_save = np.array((header, smoke_factor_grid_norm))
+    np.savez(npy_file, header=header, smoke_factor_grid_norm=smoke_factor_grid_norm)
     logging.info('Write smoke factor grid -- \n %s', npy_file)
 
     return a, b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, _Time
@@ -367,7 +369,7 @@ def m_to_pix(x_i, y_i):
     # Conversion m to pixel coordinates
     return (abs(x_max - x_min) - x_max + x_i) / dx, (abs(y_max - y_min) - y_max + y_i) / dy
 
-def plot_line_sights(Time, dx, dy, dz):
+def plot_line_sights(_Time, _dx, _dy, _dz):
     # ==== adjust here for debugging =====
     x_0, y_0 = 12.5, 5.5  # Point of view
     _exit = 'trans_0'  # Point of exit, e.g. with smoke
@@ -375,58 +377,58 @@ def plot_line_sights(Time, dx, dy, dz):
 
     p_file = os.path.join(sfgrids_path,
                               '%s/Z_2.250000/Door_X_12.500000_Y_5.000000/t_%.f.000000.npy'
-                              % (quantity, Time))
+                              % (quantity, _Time))
     sfgrid = np.load(p_file)
     # ==== automatic part ======
-    x0 = x_0 / dx
-    y0 = y_0 / dx
+    x0 = x_0 / _dx
+    y0 = y_0 / _dx # FIXME: should be _dy??
     x, y = m_to_pix(x_i=exits[_exit][0], y_i=exits[_exit][1])
     x_exit, y_exit = np.linspace (x0, x, math.hypot (x - x0, y - y0)), np.linspace (y0, y,
                                                                                     math.hypot (x - x0, y - y0))
     magnitude_along_line_of_sight = scipy.ndimage.map_coordinates (np.transpose (convert),
                                                                    np.vstack ((x_exit, y_exit)))
-    fig = plt.figure ()
-    gs = gridspec.GridSpec (1, 40)
-    ax1 = fig.add_subplot (gs[0, :20])
-    ax2 = fig.add_subplot (gs[0, 15:22])
-    ax3 = fig.add_subplot (gs[0, 22:])
-    ax1.set_xlabel ('x [m]')
-    ax1.set_ylabel ('y [m]')
-    ax1.set_xticks (np.arange (x_min, x_max + 1, 5))
-    ax1.set_yticks (np.arange (y_min, y_max + 1, 5))
-    ax1.plot ([x_0, exits[_exit][0]], [y_0, exits[_exit][1]], lw=1.5, ls=':', color='red', label='line of sight')
-    ax1.legend (loc='lower center', bbox_to_anchor=(0.5, 1.05), ncol=2, frameon=False)
-    aa = ax1.pcolorfast (dim_x, dim_y, convert, cmap='Greys', vmin=0, vmax=2)
-    ax1.minorticks_on ()
-    ax1.axis ('image')
-    ax1.grid (which='major', lw=0.5, alpha=0.5)
-    ax1.grid (which='minor', lw=0.5, alpha=0.5)
-    for i in range (int ((1 / dx) / 2)):
-        sfgrid = np.kron (sfgrid, [[1, 1], [1, 1]])
-    smoke_factor = sfgrid[int (y0 / delta_smoke_factor_grid), int (-x0 / delta_smoke_factor_grid)]
+    fig = plt.figure()
+    gs = gridspec.GridSpec(1, 40)
+    ax1 = fig.add_subplot(gs[0, :20])
+    ax2 = fig.add_subplot(gs[0, 15:22])
+    ax3 = fig.add_subplot(gs[0, 22:])
+    ax1.set_xlabel('x [m]')
+    ax1.set_ylabel('y [m]')
+    ax1.set_xticks(np.arange(x_min, x_max + 1, 5))
+    ax1.set_yticks(np.arange(y_min, y_max + 1, 5))
+    ax1.plot([x_0, exits[_exit][0]], [y_0, exits[_exit][1]], lw=1.5, ls=':', color='red', label='line of sight')
+    ax1.legend(loc='lower center', bbox_to_anchor=(0.5, 1.05), ncol=2, frameon=False)
+    aa = ax1.pcolorfast(dim_x, dim_y, convert, cmap='Greys', vmin=0, vmax=2)
+    ax1.minorticks_on()
+    ax1.axis('image')
+    ax1.grid(which='major', lw=0.5, alpha=0.5)
+    ax1.grid(which='minor', lw=0.5, alpha=0.5)
+    for i in range(int ((1 / dx) / 2)):
+        sfgrid = np.kron(sfgrid, [[1, 1], [1, 1]])
+    smoke_factor = sfgrid[int(y0 / delta_smoke_factor_grid), int(-x0 / delta_smoke_factor_grid)]
     # print(magnitude_along_line_of_sight)
-    ax3.plot (magnitude_along_line_of_sight, lw=1.5, color='black',
-              label='%s: $f_{smoke}$ = %.2f' % (_exit, smoke_factor))
-    ax3.set_xlabel ('l [m]')
-    labels = ax3.get_xticks ()
+    ax3.plot(magnitude_along_line_of_sight, lw=1.5, color='black',
+             label='%s: $f_{smoke}$ = %.2f' % (_exit, smoke_factor))
+    ax3.set_xlabel('l [m]')
+    labels = ax3.get_xticks()
     # print(labels)
-    labels = (labels * dx).astype (int)
+    labels = (labels * dx).astype(int)
     # print(labels)
-    ax3.set_xticklabels (labels)
-    ax3.set_ylabel ('Extinction Coefficient')
-    ax3.set_ylim (0, 2)
+    ax3.set_xticklabels(labels)
+    ax3.set_ylabel('Extinction Coefficient')
+    ax3.set_ylim(0, 2)
     # ax3.set_xlim(0, 30)
-    fig.colorbar (aa, ax=ax1, cax=ax2, orientation='vertical')
-    ax3.legend (loc='upper center', fancybox=False, edgecolor='inherit')
-    ax3.grid (ls='--', lw=0.5)
-    namefile = os.path.join ('%s' % quantity,
+    fig.colorbar(aa, ax=ax1, cax=ax2, orientation='vertical')
+    ax3.legend(loc='upper center', fancybox=False, edgecolor='inherit')
+    ax3.grid(ls='--', lw=0.5)
+    namefile = os.path.join('%s' % quantity,
                              '%s_%.6f' % (specified_location[0], specified_location[1]),
-                             'debug_%s_%.2f.pdf' % (_exit, Time)
+                             'debug_%s_%.2f.pdf' % (_exit, _Time)
                              )
-    figname = os.path.join (sfgrids_path, namefile)
-    plt.savefig (figname)
-    plt.close ()
-    logging.info ("Save: %s" % figname)
+    figname = os.path.join(sfgrids_path, namefile)
+    plt.savefig(figname)
+    plt.close()
+    logging.info("Save: %s", figname)
 
 def plot_smoke_grids(_Time):
     global aa
