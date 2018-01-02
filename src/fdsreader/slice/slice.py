@@ -292,7 +292,7 @@ class Slice:
 
         for t in range(nSlices):
 
-            central_time_index = np.where(self.all_times > t*dt)[0][0]
+            central_time_index = np.where(self.all_times >= t*dt)[0][0]
 
             #print("central index, time: {}, {}".format(central_time_index,
                                                        #self.all_times[central_time_index]))
