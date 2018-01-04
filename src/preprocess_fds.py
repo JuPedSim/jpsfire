@@ -368,7 +368,7 @@ def smoke_factor_conv(_convert, Exit, _Time):
     np.savez(npy_file, header=header, smoke_factor_grid_norm=smoke_factor_grid_norm)
     logging.info('Write smoke factor grid -- \n %s', npy_file)
 
-    return smoke_factor_grid
+    return smoke_factor_grid_norm
 
 
 def m_to_pix(x_i, y_i):
@@ -382,14 +382,14 @@ def plot_line_sights(_Time, _dx, _dy, _dz):
     # TODO: This should not be hard coded!
 
     p_file = os.path.join(sfgrids_path,
-                              '%s/Z_2.250000/Door_X_12.500000_Y_5.000000/t_%.f.000000.npy'
+                              '%s/Z_2.250000/Door_X_12.500000_Y_5.000000/t_%.f.000000.npz'
                               % (quantity, _Time))
-    sfgrid = np.load(p_file)
+    sfgrid = np.load(p_file)['smoke_factor_grid_norm']
     # ==== automatic part ======
     x0 = x_0 / _dx
     y0 = y_0 / _dx # FIXME: should be _dy??
     x, y = m_to_pix(x_i=exits[_exit][0], y_i=exits[_exit][1])
-    x_exit, y_exit = np.linspace (x0, x, math.hypot (x - x0, y - y0)), np.linspace (y0, y,
+    x_exit, y_exit = np.linspace (x0, x, np.hypot (x - x0, y - y0)), np.linspace (y0, y,
                                                                                     np.hypot (x - x0, y - y0))
     magnitude_along_line_of_sight = scipy.ndimage.map_coordinates (np.transpose (convert),
                                                                    np.vstack ((x_exit, y_exit)))
@@ -436,51 +436,32 @@ def plot_line_sights(_Time, _dx, _dy, _dz):
     plt.close()
     logging.info("Save: %s", figname)
 
-def plot_smoke_grids(_Time):
-    global aa
-    fig = plt.figure ()
-    nrows = int (np.ceil (len (exits) ** 0.5))
-    ncols = int (np.ceil (len (exits) ** 0.5))
-    # fig, axes = plt.subplots(nrows, ncols)
-    gs = gridspec.GridSpec (nrows + 1, ncols)
-    for i, g in enumerate (gs):
+def plot_smoke_grids(_exit, _Time, _Smoke_factor_grid_norm):
+    fig = plt.figure()
+    ax = plt.subplot(111)
+    plt.xlabel('x [m]')
+    plt.ylabel('y [m]')
+    img = ax.imshow(_Smoke_factor_grid_norm, cmap='jet',
+                    vmin=0, vmax=10, origin='lower',
+                    interpolation='spline36')
+    ax.set_title("t = %s  | exit = %s"%(Time, _exit))
+    #plt.colorbar(ax, label=r'$f_{smoke}$', orientation='horizontal')
+    plt.colorbar(img, ax=ax, label='SMOKE FACTOR', orientation='horizontal')
+    ax.set_xticks(np.arange(x_min, x_max + 1, 5))
+    ax.set_yticks(np.arange(y_min, y_max + 1, 5))
+    ax.minorticks_on()
+    ax.grid(which='major', linestyle='-', lw=0.5, alpha=0.4)
+    ax.grid(which='minor', linestyle='-', lw=0.5, alpha=0.4)
 
-        if i == len (exits):
-            cbar_ax = plt.subplot (gs[-1, :])
-            fig.colorbar (aa, cax=cbar_ax, label=r'$f_{smoke}$', orientation='horizontal')
-            break
-
-        _exit = list (exits.items ())[i][0]
-        ax = plt.subplot (g)
-        plt.xlabel ('x [m]')
-        plt.ylabel ('y [m]')
-        plt.tight_layout ()
-        p_file = os.path.join (sfgrids_path,
-                                   '%s' % quantity,
-                                   '%s_%.6f' % (specified_location[0], specified_location[1]),
-                                   'Door_X_%.6f_Y_%.6f' % (exits[_exit][0], exits[_exit][1]),
-                                   't_%.f.000000.npy' % _Time)
-
-        smoke_factor_grid_norm = np.load (p_file)
-        if np.ndarray.any (np.isnan (smoke_factor_grid_norm)):
-            continue
-        aa = ax.pcolorfast (dim_x, dim_y, smoke_factor_grid_norm, cmap='jet', vmin=0, vmax=10)
-        ax.set_title (_exit)
-        ax.set_aspect ('equal')
-        ax.set_xticks (np.arange (x_min, x_max + 1, 5))
-        ax.set_yticks (np.arange (y_min, y_max + 1, 5))
-        ax.minorticks_on ()
-        ax.grid (which='major', linestyle='-', lw=0.5, alpha=0.4)
-        ax.grid (which='minor', linestyle='-', lw=0.5, alpha=0.4)
-
-
-        figname = os.path.join (sfgrids_path,
-                            '%s' % quantity,
-                            '%s_%.6f' % (specified_location[0], specified_location[1]),
-                            'sfgrids_%i.pdf' % _Time)
-        plt.savefig (figname)
-        plt.close ()
-        logging.info ('Plot smoke factor grid: <%s>', figname)
+    X = exits[_exit][0]
+    Y = exits[_exit][1]
+    figname = os.path.join(sfgrids_path,
+                           '%s' % quantity,
+                           '%s_%.6f' % (specified_location[0], specified_location[1]),
+                           'sfgrids_X%.2f_Y%.2f_%i.png' % (X, Y, _Time))
+    plt.savefig(figname)
+    plt.close()
+    logging.info('Plot smoke factor grid: <%s>', figname)
 
 
 def main():
@@ -615,13 +596,14 @@ def main():
 
         for it in range (0, slice.times.size):
             collect = slice.sd[it]
-            plt.imshow(slice.sd[it], cmap='coolwarm', vmax=max_coefficient, origin='lower', extent=slice.sm.extent)
+            plt.imshow(slice.sd[it], cmap='jet', vmax=max_coefficient, origin='lower', extent=slice.sm.extent)
             plt.title ("time = {:.2f}".format (slice.times[it]))
             plt.colorbar (label="{} [{}]".format (slice.quantity, slice.units))
-            figname_it = os.path.join (Z_directory, "single_slice_%.f.pdf" % slice.times[it])
+            figname_it = os.path.join (Z_directory, "single_slice_%.f.png" % slice.times[it])
             logging.info ("   plot: %s" % figname_it)
             plt.savefig (figname_it)
             plt.clf ()
+
     # ============================================================================
     # Readout of crossings and transitions from jps geometry (saved as dictionary)
     # ============================================================================
@@ -631,6 +613,7 @@ def main():
     # =====================================================================================
     delta_smoke_factor_grid = cmdl_args.delta_sfgrid
     logging.info ('Generation of smoke factor grids with mesh resolution: %s [m]' % delta_smoke_factor_grid)
+    once = 1
     for it in range(0, slice.times.size):
 
         convert = slice.sd[it]
@@ -639,27 +622,23 @@ def main():
         logging.info ('--------------------------------------------------')
         logging.info ('Processing files for time: %.fs' % Time)
 
-        for id, _exit in enumerate (exits):
-            smoke_factor_grid = smoke_factor_conv(convert, _exit, Time)
+        for id, _exit in enumerate(exits):
+            Smoke_factor_grid_norm = smoke_factor_conv(convert, _exit, Time)
+            if plots:
+                logging.info('--------------------------------------------------')
+                logging.info('Plotting files for time: %.fs and Exit: %s', Time, _exit)
+                # =======================
+                # Plot Smoke factor grids
+                # =======================
+                plot_smoke_grids (_exit, Time, Smoke_factor_grid_norm)
+
 
     if plots:
         # ===================
         # plot line of sights
         # ===================
-        plot_line_sights(Time, dx, dy, dz)
+            plot_line_sights(Time, dx, dy, dz)
 
-        for it in range(0, slice.times.size):
-
-            convert = slice.sd[it]
-            Time = slice.times[it]
-            logging.info('--------------------------------------------------')
-            logging.info('Plotting files for time: %.fs' % Time)
-            for id, _exit in enumerate(exits):
-
-                # =======================
-                # Plot Smoke factor grids
-                # =======================
-                plot_smoke_grids (Time)
 
 
 # TODO This is  MAIN

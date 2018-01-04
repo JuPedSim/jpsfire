@@ -23,6 +23,9 @@ def plot_npz_dir(_dirname):
     time_sorted_files = []
     for d in dirs:
         files = glob.glob("%s/*.npz"%d)
+        if not files:
+            sys.exit("No *.npz files found in %s" % d)
+
         time_sorted_files = sort_files(files)
         print(d)
         for i, f in enumerate(time_sorted_files):
@@ -35,7 +38,7 @@ def plot_npz_dir(_dirname):
                        interpolation="spline36",
                        vmin=0, vmax=10,
                        cmap=mpl.cm.spectral)
-            plt.colorbar()
+            plt.colorbar(label=r'$f_{smoke}$', orientation='horizontal')
             Time = f.split(".npz")[0].split("_")[-1]
             plt.title("t = %s  | X = %s  | Y = %s"%(Time, X, Y))
             print("Time %15s >> %s/%.3d.png"%(Time, d, i))
