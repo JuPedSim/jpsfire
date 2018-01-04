@@ -16,7 +16,6 @@ import shutil  # for rmtree
 import warnings
 import xml.etree.ElementTree as ET
 import sys
-import math
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import rcParams, gridspec
@@ -292,6 +291,13 @@ def get_exits(_jps_path):
 
 
 def smoke_factor_conv(_convert, Exit, _Time):
+    """
+
+    :param _convert: array
+    :param Exit: Exit, str
+    :param _Time: float
+    :return: creates a new file.
+    """
     _sfgrids_path = os.path.join(fds_path, "3_sfgrids")
     door_path = os.path.join(_sfgrids_path,
                              '%s' % quantity,
@@ -304,11 +310,6 @@ def smoke_factor_conv(_convert, Exit, _Time):
                                  int(abs(x_max - x_min) / delta_smoke_factor_grid)])
 
     x, y = m_to_pix(x_i=exits[Exit][0], y_i=exits[Exit][1])
-
-    ### calculation of the global max of the extracted field_quantity
-    ### (without geometry)
-    # global_D_max = np.amax(magnitudes-geometry[ :-1 , :-1])
-    # print global_D_max
 
     for a, line in enumerate(smoke_factor_grid):
 
@@ -324,8 +325,8 @@ def smoke_factor_conv(_convert, Exit, _Time):
                 smoke_factor_grid[a, b] = smoke_factor
                 continue
 
-            x_exit = np.linspace(x0, x, math.hypot(x - x0, y - y0))
-            y_exit = np.linspace(y0, y, math.hypot(x - x0, y - y0))
+            x_exit = np.linspace(x0, x, np.hypot(x - x0, y - y0))
+            y_exit = np.linspace(y0, y, np.hypot(x - x0, y - y0))
 
             magnitude_along_line_of_sight = scipy.ndimage.map_coordinates(np.transpose(_convert),
                                                                           np.vstack((x_exit, y_exit)))
@@ -336,8 +337,8 @@ def smoke_factor_conv(_convert, Exit, _Time):
 
             else:
                 #### Computation of the smoke factor towards the exit:
-                smoke_factor = np.nanmax(magnitude_along_line_of_sight) * abs(
-                    np.trapz(magnitude_along_line_of_sight, dx=dx))
+                smoke_factor = np.nanmax(magnitude_along_line_of_sight) * \
+                               np.abs(np.trapz(magnitude_along_line_of_sight, dx=dx))
                 # todo: smoke factor has a unit!!!
             #### storage of the edge factor
             smoke_factor_grid[a, b] = smoke_factor
@@ -345,13 +346,18 @@ def smoke_factor_conv(_convert, Exit, _Time):
     # if np.amax(smoke_factor_grid)>max_Smoke_Factor:
     max_Smoke_Factor = np.amax(smoke_factor_grid)
 
-    # print exit, 'maximum Smoke Factor', max_Smoke_Factor
+    print('Exit: %s | Time: %6.2f | maximum Smoke Factor %10.3f'%(Exit, _Time, max_Smoke_Factor))
 
     # Norm of the smoke factor grid multiplied with 10 in order to achieve a
     # factor range from 0..10
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", category=RuntimeWarning)
+    #with warnings.catch_warnings():
+    #    warnings.simplefilter("ignore", category=RuntimeWarning)
+    #    smoke_factor_grid_norm = smoke_factor_grid / max_Smoke_Factor * 10
+    if max_Smoke_Factor > 0:
         smoke_factor_grid_norm = smoke_factor_grid / max_Smoke_Factor * 10
+    else:
+        smoke_factor_grid_norm = smoke_factor_grid
+
     # Exit %s, \n dX[m], dY[m] , minX[m] , maxX[m], minY[m], maxY[m] \n
     # TODO: why is dX = dY?
     #header = (Exit, delta_smoke_factor_grid, delta_smoke_factor_grid, x_min, x_max, y_min, y_max)
@@ -362,7 +368,7 @@ def smoke_factor_conv(_convert, Exit, _Time):
     np.savez(npy_file, header=header, smoke_factor_grid_norm=smoke_factor_grid_norm)
     logging.info('Write smoke factor grid -- \n %s', npy_file)
 
-    return a, b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, _Time
+    return smoke_factor_grid
 
 
 def m_to_pix(x_i, y_i):
@@ -384,7 +390,7 @@ def plot_line_sights(_Time, _dx, _dy, _dz):
     y0 = y_0 / _dx # FIXME: should be _dy??
     x, y = m_to_pix(x_i=exits[_exit][0], y_i=exits[_exit][1])
     x_exit, y_exit = np.linspace (x0, x, math.hypot (x - x0, y - y0)), np.linspace (y0, y,
-                                                                                    math.hypot (x - x0, y - y0))
+                                                                                    np.hypot (x - x0, y - y0))
     magnitude_along_line_of_sight = scipy.ndimage.map_coordinates (np.transpose (convert),
                                                                    np.vstack ((x_exit, y_exit)))
     fig = plt.figure()
@@ -433,8 +439,8 @@ def plot_line_sights(_Time, _dx, _dy, _dz):
 def plot_smoke_grids(_Time):
     global aa
     fig = plt.figure ()
-    nrows = int (math.ceil (len (exits) ** 0.5))
-    ncols = int (math.ceil (len (exits) ** 0.5))
+    nrows = int (np.ceil (len (exits) ** 0.5))
+    ncols = int (np.ceil (len (exits) ** 0.5))
     # fig, axes = plt.subplots(nrows, ncols)
     gs = gridspec.GridSpec (nrows + 1, ncols)
     for i, g in enumerate (gs):
@@ -528,7 +534,7 @@ def main():
     logging.info (
         'FDS coordinates are xmin = %.2f, xmax = %.2f, ymin = %.2f, ymax = %.2f' % (x_min, x_max, y_min, y_max))
     # Grid resolution in x, y and z
-    dx, dy, dz = get_dims (chid, 'grids')
+    dx, dy, dz = get_dims(chid, 'grids')
     logging.info ('FDS grid resolution is dx = %.2f, dy = %.2f, dz = %.2f' % (dx, dy, dz))
     dim_x = np.arange (x_min, x_max + 0.01, dx)
     dim_y = np.arange (y_min, y_max + 0.01, dy)
@@ -542,11 +548,11 @@ def main():
     # locate smokeview file
     root_dir = fds_path
     smv_fn = fs.scanDirectory (root_dir)
-    logging.info ("smv file found: %s" % (smv_fn))
+    logging.info ("smv file found: %s"%(smv_fn))
     # parse smokeview file for slice information
-    sc = fs.readSliceInfos (os.path.join (root_dir, smv_fn))
+    sc = fs.readSliceInfos(os.path.join(root_dir, smv_fn))
     # print all found information
-    # sc.print()
+    sc.print()
     # read in meshes
     meshes = fs.readMeshes(os.path.join(root_dir, smv_fn))
     # select matching slice
@@ -625,7 +631,7 @@ def main():
     # =====================================================================================
     delta_smoke_factor_grid = cmdl_args.delta_sfgrid
     logging.info ('Generation of smoke factor grids with mesh resolution: %s [m]' % delta_smoke_factor_grid)
-    for it in range (0, slice.times.size):
+    for it in range(0, slice.times.size):
 
         convert = slice.sd[it]
         Time = slice.times[it]
@@ -634,20 +640,21 @@ def main():
         logging.info ('Processing files for time: %.fs' % Time)
 
         for id, _exit in enumerate (exits):
-            a, b, x0, y0, x, y, magnitude_along_line_of_sight, smoke_factor, Time = smoke_factor_conv (convert, _exit, Time)
+            smoke_factor_grid = smoke_factor_conv(convert, _exit, Time)
+
     if plots:
         # ===================
         # plot line of sights
         # ===================
-        plot_line_sights (Time, dx, dy, dz)
+        plot_line_sights(Time, dx, dy, dz)
 
-        for it in range (0, slice.times.size):
+        for it in range(0, slice.times.size):
 
             convert = slice.sd[it]
             Time = slice.times[it]
-            logging.info ('--------------------------------------------------')
-            logging.info ('Plotting files for time: %.fs' % Time)
-            for id, _exit in enumerate (exits):
+            logging.info('--------------------------------------------------')
+            logging.info('Plotting files for time: %.fs' % Time)
+            for id, _exit in enumerate(exits):
 
                 # =======================
                 # Plot Smoke factor grids
@@ -659,8 +666,11 @@ def main():
 # Path pointing to the fire simulation directory
 
 if __name__ == "__main__":
+    import time
+    t1 = time.time()
     main()
-
+    t2 = time.time()
+    elapsed_time = t2-t1
     # dimension_1 = x
     # dimension_2 = y
     # dim1 = dim_x
@@ -670,6 +680,6 @@ if __name__ == "__main__":
     # dim2_min = y_min
     # dim2_max = y_max
 
-    logging.info("***  Finished ***")
-    print(">> Done.")
+    logging.info("***  Finished in {} s ***".format(elapsed_time))
+    print(">> Done in %.2f s"%(elapsed_time))
     print(">> Logfile: %s" % logfile)
