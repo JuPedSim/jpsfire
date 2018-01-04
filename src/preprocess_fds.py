@@ -559,6 +559,8 @@ def main():
     for it in range(0, slice.times.size):
         cmax = np.max(slice.sd[it])
         max_coefficient = max(cmax, max_coefficient)
+
+    max_coefficient = 2.5 # FIXME
     extinction_grids_path = os.path.join(fds_path, '2_extinction_grids', quantity)
     if not os.path.exists(extinction_grids_path):
         os.makedirs(extinction_grids_path)
@@ -572,35 +574,15 @@ def main():
         ext_file = os.path.join(Z_directory, "t_%.0f.000000.npy" % slice.times[it])
         np.save(ext_file, slice.sd[it])
     if plots:
-        slicedataGeo_path = os.path.join(fds_path, "slicedata_geo")
-        if not os.path.exists(slicedataGeo_path):
-            os.makedirs(slicedataGeo_path)
-        logging.info('create slicedataGeo_path %s',  slicedataGeo_path)
-
-        pZ_directory = os.path.join(slicedataGeo_path, '%s_%.2f' %
-                                    (specified_location[0], specified_location[1]))
-
-        if not os.path.exists(pZ_directory):
-            os.makedirs(pZ_directory)
-            logging.info("plot create directory <%s>", pZ_directory)
-
-        # TODO: plot geometry too!
-        plt.imshow(geometry, cmap='Greys', origin='lower', extent=slice.sm.extent)
-        plt.title("time = {:.2f}".format(slice.times[it]))
-        plt.colorbar(label="{} [{}]".format(slice.quantity, slice.units))
-        geo_figname = os.path.join(pZ_directory,
-                                   "geometry.pdf")
-        logging.info("plot: %s", geo_figname)
-        plt.savefig(geo_figname)
-        plt.clf()
-
-        for it in range (0, slice.times.size):
-            collect = slice.sd[it]
-            plt.imshow(slice.sd[it], cmap='jet', vmax=max_coefficient, origin='lower', extent=slice.sm.extent)
-            plt.title ("time = {:.2f}".format (slice.times[it]))
+        for id, it in enumerate(slice.times):
+            collect = slice.sd[id] + geometry[:-1, :-1]
+            cmap = matplotlib.cm.jet
+            cmap.set_bad('white', 1.)
+            plt.imshow(collect, cmap=cmap, vmax=max_coefficient, origin='lower', extent=slice.sm.extent)
+            plt.title ("time = {:.2f}".format (slice.times[id]))
             plt.colorbar (label="{} [{}]".format (slice.quantity, slice.units))
-            figname_it = os.path.join (Z_directory, "single_slice_%.f.png" % slice.times[it])
-            logging.info ("   plot: %s" % figname_it)
+            figname_it = os.path.join (Z_directory, "single_slice_%.4d.png" % id)
+            logging.info ("plot slicedata: %s" % figname_it)
             plt.savefig (figname_it)
             plt.clf ()
 
@@ -633,15 +615,15 @@ def main():
                 plot_smoke_grids (_exit, Time, Smoke_factor_grid_norm)
 
 
-    if plots:
-        # ===================
-        # plot line of sights
-        # ===================
-            plot_line_sights(Time, dx, dy, dz)
+    # if plots:
+    #     # ===================
+    #     # plot line of sights
+    #     # ===================
+    #         plot_line_sights(Time, dx, dy, dz)
 
 
 
-# TODO This is  MAIN
+
 # Path pointing to the fire simulation directory
 
 if __name__ == "__main__":
