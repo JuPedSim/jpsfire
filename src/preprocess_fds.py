@@ -436,14 +436,19 @@ def plot_line_sights(_Time, _dx, _dy, _dz):
     plt.close()
     logging.info("Save: %s", figname)
 
-def plot_smoke_grids(_exit, _Time, _Smoke_factor_grid_norm):
+def plot_smoke_grids(_exit, _Time, _Smoke_factor_grid_norm, _geometry):
     fig = plt.figure()
     ax = plt.subplot(111)
     plt.xlabel('x [m]')
     plt.ylabel('y [m]')
-    img = ax.imshow(_Smoke_factor_grid_norm, cmap='jet',
+    cmap = matplotlib.cm.jet
+    cmap.set_bad('white', 1.)
+    img = ax.imshow(_Smoke_factor_grid_norm, cmap=cmap,
                     vmin=0, vmax=10, origin='lower',
                     interpolation='spline36')
+
+    #ax.imshow(_geometry, cmap=cmap, vmax=2.5, origin='lower')
+
     ax.set_title("t = %s  | exit = %s"%(Time, _exit))
     #plt.colorbar(ax, label=r'$f_{smoke}$', orientation='horizontal')
     plt.colorbar(img, ax=ax, label='SMOKE FACTOR', orientation='horizontal')
@@ -612,7 +617,7 @@ def main():
                 # =======================
                 # Plot Smoke factor grids
                 # =======================
-                plot_smoke_grids (_exit, Time, Smoke_factor_grid_norm)
+                plot_smoke_grids (_exit, Time, Smoke_factor_grid_norm, geometry)
 
 
     # if plots:
