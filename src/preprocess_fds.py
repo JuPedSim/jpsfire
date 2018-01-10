@@ -72,8 +72,13 @@ def get_tstop(_fds_path, _chid):
     return t_stop
 
 
-def get_dims(_chid, spec):
+def get_extend_and_grid(_chid):
     # TODO: fds_file as arg instead of chid?
+
+    x_dims=[]
+    y_dims=[]
+    z_dims=[]
+
     _fds_file = os.path.join(fds_path, _chid + ".fds")
     fds_data = open(_fds_file)  # open('../'+chid+'.fds')
     fds_lines = fds_data.readlines()
@@ -82,15 +87,16 @@ def get_dims(_chid, spec):
         if l.startswith("&MESH"):
             l = l.split('IJK=')[-1]
             l = re.split(r'[,=/]+', l)
-            l.remove(' XB'), l.remove('\n')
-            l = np.array(l[:], dtype=float)
-            if spec == 'coordinates':
-                return l[3], l[4], l[5], l[6]
-            elif spec == 'grids':
-                return (l[4] - l[3]) / l[0], (l[6] - l[5]) / l[1], (l[8] - l[7]) / l[2]
-            else:
-                return 'Error, wrong specification'  # todo: logging
+            l.remove(' XB'), l.remove('\n'), l.remove(' MPI_PROCESS')
+            l = np.array(l[:9], dtype=float)
+            x_dims.extend(l[3:5])
+            y_dims.extend(l[5:7])
+            z_dims.extend(l[7:9])
+            dx = (l[4] - l[3]) / l[0]
+            dy = (l[6] - l[5]) / l[1]
+            dz = (l[8] - l[7]) / l[2]
 
+    return min(x_dims), max(x_dims), min(y_dims), max(y_dims), min(z_dims), max(z_dims), dx, dy, dz
 
 def get_tstep(_jps_path):
     inifile_pattern = os.path.join(_jps_path, '*ini*.xml')
@@ -509,27 +515,24 @@ def main():
     logging.info ("jps_path: %s" % jps_path)
     quantity = cmdl_args.slice_quantity
     quantity = quantity.replace (' ', '_')
-    logging.info ("Quantity: %s" % quantity)
+    logging.info("Quantity: %s" % quantity)
     specified_location = (
         cmdl_args.slice_dim, cmdl_args.slice_coord)  # TODO: is this actually necessary? maybe also read from fds
-    logging.info ("Specified location: %s %s" % specified_location)
+    logging.info("Specified location: %s %s" % specified_location)
     t_start = cmdl_args.start
-    logging.info ("t_start: %.1f" % t_start)
+    logging.info("t_start: %.1f" % t_start)
     t_stop = cmdl_args.end
-    logging.info ("t_stop: %.1f" % t_stop)
+    logging.info("t_stop: %.1f" % t_stop)
     t_step = get_tstep (jps_path)
-    logging.info ("t_step: %.1f" % t_step)
+    logging.info("t_step: %.1f" % t_step)
     plots = cmdl_args.plot
-    logging.info ("Plot: On" if plots else "Plot: Off")
-    # Get spatial extend
-    #x_min, x_max, y_min, y_max = get_dims (chid, 'coordinates')
-    x_min, x_max, y_min, y_max = -10.0, 25.0, 0.0, 10.0   ## TODO: hardcoded at the moment, will be adapted soon
-    logging.info (
-        'FDS coordinates are xmin = %.2f, xmax = %.2f, ymin = %.2f, ymax = %.2f' % (x_min, x_max, y_min, y_max))
-    # Grid resolution in x, y and z
-    #dx, dy, dz = get_dims(chid, 'grids')
-    dx, dy, dz = 0.25, 0.25, 0.25 #TODO: Hardcoded at the moment, will be adapated soon
-    logging.info ('FDS grid resolution is dx = %.2f, dy = %.2f, dz = %.2f' % (dx, dy, dz))
+    logging.info("Plot: On" if plots else "Plot: Off")
+    # Get spatial extend and grid resolution in x, y and z direction
+    x_min, x_max, y_min, y_max, z_min, z_max, dx, dy, dz = get_extend_and_grid(chid)
+    logging.info(
+        'FDS coordinates are xmin = %.2f, xmax = %.2f, ymin = %.2f, ymax = %.2f, zmin = %.2f, zmax = %.2f'
+        % (x_min, x_max, y_min, y_max, z_min, z_max))
+    logging.info('FDS grid resolution is dx = %.2f, dy = %.2f, dz = %.2f' % (dx, dy, dz))
     dim_x = np.arange (x_min, x_max + 0.01, dx)
     dim_y = np.arange (y_min, y_max + 0.01, dy)
     # =============================================
@@ -581,7 +584,7 @@ def main():
         cmax = np.max(data[it])
         max_coefficient = max(cmax, max_coefficient)
 
-    #max_coefficient = 2.5 # FIXME: is this really necessary?
+    #max_coefficient = 2.5 # FIXME: is this really necessary
     extinction_grids_path = os.path.join(fds_path, '2_extinction_grids', quantity)
     if not os.path.exists(extinction_grids_path):
         os.makedirs(extinction_grids_path)
@@ -592,7 +595,7 @@ def main():
         os.makedirs(Z_directory)
         logging.info("create directory <%s>" % Z_directory)
     for it in range(0, times):
-        ext_file = os.path.join(Z_directory, "t_%.0f.000000.npy" % slice.times[it])
+        ext_file = os.path.join(Z_directory, "t_%.0f.000000.npy" % slice.times[it]) #TODO: npy or npz?
         np.save(ext_file, data[it])
     if plots:
         for id, it in enumerate(slice.times):
