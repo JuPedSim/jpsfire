@@ -272,10 +272,10 @@ class Slice:
 
         slice_header = np.fromfile(infile, dtype=getSliceType('header'),
                                    count=3)
-        print("slice header: ", slice_header)
+        #print("slice header: ", slice_header)
         slice_index = np.fromfile(infile, dtype=getSliceType('index'),
                                   count=1)[0]
-        print("slice index: ", slice_index)
+        #print("slice index: ", slice_index)
 
         type_time = getSliceType('time')
         type_data = getSliceType('data', self.readSize)
@@ -430,9 +430,9 @@ def combineSlices(slices):
     x1 = np.linspace(min_x1, max_x1, n1)
     x2 = np.linspace(min_x2, max_x2, n2)
 
-    mesh = np.meshgrid(x1, x2)
-    data = np.ones((slices[0].times.size, n1, n2))
-    mask = np.zeros((n1, n2))
+    mesh = np.meshgrid(x2, x1)
+    data = np.ones((slices[0].times.size, n2, n1))
+    mask = np.zeros((n2, n1))
     mask[:] = True
 
     for s in slices:

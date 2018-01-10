@@ -522,18 +522,20 @@ def main():
     plots = cmdl_args.plot
     logging.info ("Plot: On" if plots else "Plot: Off")
     # Get spatial extend
-    x_min, x_max, y_min, y_max = get_dims (chid, 'coordinates')
+    #x_min, x_max, y_min, y_max = get_dims (chid, 'coordinates')
+    x_min, x_max, y_min, y_max = -10.0, 25.0, 0.0, 10.0   ## TODO: hardcoded at the moment, will be adapted soon
     logging.info (
         'FDS coordinates are xmin = %.2f, xmax = %.2f, ymin = %.2f, ymax = %.2f' % (x_min, x_max, y_min, y_max))
     # Grid resolution in x, y and z
-    dx, dy, dz = get_dims(chid, 'grids')
+    #dx, dy, dz = get_dims(chid, 'grids')
+    dx, dy, dz = 0.25, 0.25, 0.25 #TODO: Hardcoded at the moment, will be adapated soon
     logging.info ('FDS grid resolution is dx = %.2f, dy = %.2f, dz = %.2f' % (dx, dy, dz))
     dim_x = np.arange (x_min, x_max + 0.01, dx)
     dim_y = np.arange (y_min, y_max + 0.01, dy)
     # =============================================
     # Readout of obstacles and holes from .fds file
     # =============================================
-    geometry = get_fds_geo (chid)
+    #geometry = get_fds_geo (chid)
     # ====================================================
     # Readout of slicefiles from .smv file using fdsreader
     # ====================================================
@@ -544,34 +546,42 @@ def main():
     # parse smokeview file for slice information
     sc = fs.readSliceInfos(os.path.join(root_dir, smv_fn))
     # print all found information
-    sc.print()
+    #sc.print()
     # read in meshes
     meshes = fs.readMeshes(os.path.join(root_dir, smv_fn))
     # select matching slice
     slice_label = 'ext_coef_C0.9H0.1'
-    sid = -1
+    sids = []
     for iis in range(len(sc.slices)):
         if sc[iis].label == slice_label:
-            sid = iis
-            logging.info("found matching slice")
-            break
-    if sid == -1:
+            sids.append(iis)
+            logging.info("found matching slice with id: {}".format(iis))
+
+    if sids == []:
         logging.critical("No slice matching label: {}".format(slice_label))
         sys.exit("No slice matching label: {}".format(slice_label))
-    slice = sc[sid]
-    # read in time information
-    slice.readAllTimes(root_dir)
-    # read in slice data
-    slice.readTimeSelection(root_dir, dt=t_step, average_dt=1)
-    # map data on mesh
-    slice.mapData(meshes)
+
+    #gather all slice data
+    slices = []
+    for iis in sids:
+        slice = sc[iis]
+        # read in time information
+        slice.readAllTimes(root_dir)
+        # read in slice data
+        slice.readTimeSelection(root_dir, dt=t_step, average_dt=1)
+        # map data on mesh
+        slice.mapData(meshes)
+        slices.append(sc[iis])
+    mesh, extent, data, mask = fs.combineSlices(slices)
+
     # get max value
     max_coefficient = 0
-    for it in range(0, slice.times.size):
-        cmax = np.max(slice.sd[it])
+    times = sc[sids[0]].times.size
+    for it in range(0, times):
+        cmax = np.max(data[it])
         max_coefficient = max(cmax, max_coefficient)
 
-    max_coefficient = 2.5 # FIXME
+    #max_coefficient = 2.5 # FIXME: is this really necessary?
     extinction_grids_path = os.path.join(fds_path, '2_extinction_grids', quantity)
     if not os.path.exists(extinction_grids_path):
         os.makedirs(extinction_grids_path)
@@ -581,15 +591,15 @@ def main():
     if not os.path.exists(Z_directory):
         os.makedirs(Z_directory)
         logging.info("create directory <%s>" % Z_directory)
-    for it in range(0, slice.times.size):
+    for it in range(0, times):
         ext_file = os.path.join(Z_directory, "t_%.0f.000000.npy" % slice.times[it])
-        np.save(ext_file, slice.sd[it])
+        np.save(ext_file, data[it])
     if plots:
         for id, it in enumerate(slice.times):
-            collect = slice.sd[id] + geometry[:-1, :-1]
+            collect = data[id] #+ geometry[:-1, :-1]
             cmap = matplotlib.cm.jet
             cmap.set_bad('white', 1.)
-            plt.imshow(collect, cmap=cmap, vmax=max_coefficient, origin='lower', extent=slice.sm.extent)
+            plt.imshow(collect, cmap=cmap, vmax=max_coefficient, origin='lower', extent=extent)
             plt.title ("time = {:.2f}".format (slice.times[id]))
             plt.colorbar (label="{} [{}]".format (slice.quantity, slice.units))
             figname_it = os.path.join (Z_directory, "single_slice_%.4d.png" % id)
@@ -609,7 +619,7 @@ def main():
     once = 1
     for it in range(0, slice.times.size):
 
-        convert = slice.sd[it]
+        convert = data[it]
         Time = slice.times[it]
 
         logging.info ('--------------------------------------------------')
@@ -643,14 +653,6 @@ if __name__ == "__main__":
     main()
     t2 = time.time()
     elapsed_time = t2-t1
-    # dimension_1 = x
-    # dimension_2 = y
-    # dim1 = dim_x
-    # dim2 = dim_y
-    # dim1_min = x_min
-    # dim1_max = x_max
-    # dim2_min = y_min
-    # dim2_max = y_max
 
     logging.info("***  Finished in {} s ***".format(elapsed_time))
     print(">> Done in %.2f s"%(elapsed_time))
