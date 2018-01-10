@@ -272,10 +272,10 @@ class Slice:
 
         slice_header = np.fromfile(infile, dtype=getSliceType('header'),
                                    count=3)
-        #print("slice header: ", slice_header)
+        print("slice header: ", slice_header)
         slice_index = np.fromfile(infile, dtype=getSliceType('index'),
                                   count=1)[0]
-        #print("slice index: ", slice_index)
+        print("slice index: ", slice_index)
 
         type_time = getSliceType('time')
         type_data = getSliceType('data', self.readSize)
@@ -314,6 +314,7 @@ class Slice:
 
             self.data_raw[t, :] /= len(time_indices)
 
+
     def readData(self, root='.'):
 
         if self.all_times is None:
@@ -344,8 +345,8 @@ class Slice:
             slice_time = np.fromfile(infile, dtype=type_time, count=1)
             # print("slice time: ", slice_time)
             slice_data = np.fromfile(infile, dtype=type_data, count=1)
-            # print(slice_data)
-            # print("slice data: ", slice_data[0][0], slice_data[0][1][0:2], slice_data[0][2])
+            print(slice_data)
+            print("slice data: ", slice_data[0][0], slice_data[0][1][0:2], slice_data[0][2])
             self.data_raw[t,:] = slice_data[0][1]
 
 
@@ -504,7 +505,7 @@ def scanDirectory(directory: str):
 
     list_fn_smv_abs = glob.glob(directory + "/*.smv")
 
-    if len(list_fn_smv_abs) == 0:
+    if not list_fn_smv_abs:
         return None
 
     if len(list_fn_smv_abs) > 1:
