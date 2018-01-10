@@ -374,11 +374,11 @@ def smoke_factor_conv(_convert, Exit, _Time):
     # TODO: why is dX = dY?
     #header = (Exit, delta_smoke_factor_grid, delta_smoke_factor_grid, x_min, x_max, y_min, y_max)
     header = (delta_smoke_factor_grid, x_min, x_max, y_min, y_max)
-    npy_file = os.path.join(door_path, 't_%.0f.000000.npz' % _Time)
+    npz_file = os.path.join(door_path, 't_%.0f.000000.npz' % _Time)
     logging.info('Call save')
     #array_to_save = np.array((header, smoke_factor_grid_norm))
-    np.savez(npy_file, header=header, smoke_factor_grid_norm=smoke_factor_grid_norm)
-    logging.info('Write smoke factor grid -- \n %s', npy_file)
+    np.savez(npz_file, header=header, smoke_factor_grid_norm=smoke_factor_grid_norm)
+    logging.info('Write smoke factor grid -- \n %s', npz_file)
 
     return smoke_factor_grid_norm
 
@@ -595,8 +595,8 @@ def main():
         os.makedirs(Z_directory)
         logging.info("create directory <%s>" % Z_directory)
     for it in range(0, times):
-        ext_file = os.path.join(Z_directory, "t_%.0f.000000.npy" % slice.times[it]) #TODO: npy or npz?
-        np.save(ext_file, data[it])
+        ext_file = os.path.join(Z_directory, 't_%.0f.000000.npz' % slice.times[it])
+        np.savez(ext_file, data[it])
     if plots:
         for id, it in enumerate(slice.times):
             collect = data[id] #+ geometry[:-1, :-1]
