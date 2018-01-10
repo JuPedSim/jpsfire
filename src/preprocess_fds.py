@@ -192,16 +192,22 @@ def get_fds_geo(_chid):
     fds_entries = fds.readlines()
 
     for i, fds_entry in enumerate(fds_entries):
-        if fds_entry[0:5] == '&OBST':
+        if fds_entry.startswith('&OBST'):
             obst = read_fds_line(fds_entry)
+            print(obst[4], obst[5], specified_location[1])
             if obst[4] < specified_location[1] < obst[5]:
+                print("HUU", dx, dy)
                 obst = [(1 / dx) * i for i in obst]
+                print("obst: ", obst)
+
                 geometry[int(obst[2] - y_max / dy - 1): int(obst[3] - y_max / dy - 1),
                          int(obst[0] - x_max / dx - 1): int(obst[1] - x_max / dx - 1)][:] = np.nan
+                print(geometry[int(obst[2] - y_max / dy - 1): int(obst[3] - y_max / dy - 1),
+                         int(obst[0] - x_max / dx - 1): int(obst[1] - x_max / dx - 1)][:])
                 obsts = np.append(obsts, obst)
-
+                input("Enter")
     obsts = np.reshape(obsts, (-1, 6))
-    # np.savetxt('obst.csv', obsts, delimiter=',')
+    np.savetxt('obst.csv', obsts, delimiter=',')
 
     for i, fds_entry in enumerate(fds_entries):
         if fds_entry[0:5] == '&HOLE':
@@ -213,10 +219,10 @@ def get_fds_geo(_chid):
                 holes = np.append(holes, hole)
 
     holes = np.reshape(holes, (-1, 6))
-    # np.savetxt('../1_meshgrid/hole.csv', holes, delimiter=',')
+    np.savetxt('hole.csv', holes, delimiter=',')
 
     fds.close()
-    # np.savetxt('../geometry.txt', geometry)
+    #np.savetxt('geometry.txt', geometry)
     return geometry
 
 
@@ -447,7 +453,7 @@ def plot_smoke_grids(_exit, _Time, _Smoke_factor_grid_norm, _geometry):
                     vmin=0, vmax=10, origin='lower',
                     interpolation='spline36')
 
-    #ax.imshow(_geometry, cmap=cmap, vmax=2.5, origin='lower')
+    #plt.imshow(_geometry, cmap=cmap, vmax=2.5, origin='lower')
 
     ax.set_title("t = %s  | exit = %s"%(Time, _exit))
     #plt.colorbar(ax, label=r'$f_{smoke}$', orientation='horizontal')
