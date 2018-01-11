@@ -72,15 +72,13 @@ def get_tstop(_fds_path, _chid):
     return t_stop
 
 
-def get_extend_and_grid(_chid):
-    # TODO: fds_file as arg instead of chid?
+def get_extend_and_grid(_fds_file):
 
     x_dims=[]
     y_dims=[]
     z_dims=[]
 
-    _fds_file = os.path.join(fds_path, _chid + ".fds")
-    fds_data = open(_fds_file)  # open('../'+chid+'.fds')
+    fds_data = open(_fds_file[0])
     fds_lines = fds_data.readlines()
 
     for l in fds_lines:
@@ -186,15 +184,13 @@ def read_fds_line(fds_entry):
     return coordinates
 
 
-def get_fds_geo(_chid):
-    # TODO fds_file instead as arg?
-    geometry = np.zeros((len(dim_y), len(dim_x)))
-
+def get_fds_geo(_fds_file):
     obsts = []
     holes = []
-    _fds_file = os.path.join(fds_path, _chid + ".fds")
-    fds = open(_fds_file, newline=None)
-    logging.info('Opening %s.fds to read out meshes, obstacles and holes', _chid)
+    geometry = np.zeros((len(dim_y), len(dim_x)))
+
+    fds = open(_fds_file[0], newline=None)
+    logging.info('Opening %s to read out meshes, obstacles and holes', _fds_file[0])
     fds_entries = fds.readlines()
 
     for i, fds_entry in enumerate(fds_entries):
@@ -351,7 +347,7 @@ def smoke_factor_conv(_convert, Exit, _Time):
                 #### Computation of the smoke factor towards the exit:
                 smoke_factor = np.nanmax(magnitude_along_line_of_sight) * \
                                np.abs(np.trapz(magnitude_along_line_of_sight, dx=dx))
-                # todo: smoke factor has a unit!!!
+                #TODO: smoke factor has a unit!!!
             #### storage of the edge factor
             smoke_factor_grid[a, b] = smoke_factor
 
@@ -371,7 +367,6 @@ def smoke_factor_conv(_convert, Exit, _Time):
         smoke_factor_grid_norm = smoke_factor_grid
 
     # Exit %s, \n dX[m], dY[m] , minX[m] , maxX[m], minY[m], maxY[m] \n
-    # TODO: why is dX = dY?
     #header = (Exit, delta_smoke_factor_grid, delta_smoke_factor_grid, x_min, x_max, y_min, y_max)
     header = (delta_smoke_factor_grid, x_min, x_max, y_min, y_max)
     npz_file = os.path.join(door_path, 't_%.0f.000000.npz' % _Time)
@@ -399,7 +394,7 @@ def plot_line_sights(_Time, _dx, _dy, _dz):
     sfgrid = np.load(p_file)['smoke_factor_grid_norm']
     # ==== automatic part ======
     x0 = x_0 / _dx
-    y0 = y_0 / _dx # FIXME: should be _dy??
+    y0 = y_0 / _dy
     x, y = m_to_pix(x_i=exits[_exit][0], y_i=exits[_exit][1])
     x_exit, y_exit = np.linspace (x0, x, np.hypot (x - x0, y - y0)), np.linspace (y0, y,
                                                                                     np.hypot (x - x0, y - y0))
@@ -528,7 +523,7 @@ def main():
     plots = cmdl_args.plot
     logging.info("Plot: On" if plots else "Plot: Off")
     # Get spatial extend and grid resolution in x, y and z direction
-    x_min, x_max, y_min, y_max, z_min, z_max, dx, dy, dz = get_extend_and_grid(chid)
+    x_min, x_max, y_min, y_max, z_min, z_max, dx, dy, dz = get_extend_and_grid(fds_file)
     logging.info(
         'FDS coordinates are xmin = %.2f, xmax = %.2f, ymin = %.2f, ymax = %.2f, zmin = %.2f, zmax = %.2f'
         % (x_min, x_max, y_min, y_max, z_min, z_max))
@@ -538,7 +533,7 @@ def main():
     # =============================================
     # Readout of obstacles and holes from .fds file
     # =============================================
-    #geometry = get_fds_geo (chid)
+    # geometry = get_fds_geo (fds_file)
     # ====================================================
     # Readout of slicefiles from .smv file using fdsreader
     # ====================================================
