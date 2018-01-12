@@ -152,7 +152,7 @@ def getParserArgs():
     parser.add_argument("-g", "--delta_sfgrid", type=float, default=1.0,
                         help="Resolution of smoke factor grids (default: 1.0)",
                         required=False)
-    parser.add_argument("-v", "--pov", type=tuple, default=(12.5,5.5),
+    parser.add_argument("-v", "--pov", type=tuple, default=(12.5,5.5),  #TODO: not taking default value
                         help="Point of view for line of sight calculation: x,y",
                         required=False)
     parser.add_argument("-ex", "--toexit", type=str, default='trans_0',
@@ -394,7 +394,6 @@ def m_to_pix(x_i, y_i):
 
 
 def plot_line_sights(_Time, _dx, _dy, _dz, _point_of_view, _agent_exit):
-    # ==== adjust here for debugging =====
     x_0, y_0 = _point_of_view # Point of view
     _exit = _agent_exit # Point of exit, e.g. with smoke
     x_exit = exits[_exit][0]
@@ -403,7 +402,6 @@ def plot_line_sights(_Time, _dx, _dy, _dz, _point_of_view, _agent_exit):
                               '%s/Z_2.250000/Door_X_%.6f_Y_%.6f/t_%.f.000000.npz'
                               % (quantity, x_exit, y_exit, _Time))
     sfgrid = np.load(p_file)['smoke_factor_grid_norm']
-    # ==== automatic part ======
     x0 = x_0 / _dx
     y0 = y_0 / _dy
     x, y = m_to_pix(x_i=exits[_exit][0], y_i=exits[_exit][1])
@@ -429,18 +427,15 @@ def plot_line_sights(_Time, _dx, _dy, _dz, _point_of_view, _agent_exit):
     ax1.grid(which='minor', lw=0.5, alpha=0.5)
     for i in range(int ((1 / dx) / 2)):
         sfgrid = np.kron(sfgrid, [[1, 1], [1, 1]])
-    smoke_factor = sfgrid[int(y0 / delta_smoke_factor_grid), int(-x0 / delta_smoke_factor_grid)]
+    smoke_factor = sfgrid[int(y0 / delta_smoke_factor_grid), int(x0 / delta_smoke_factor_grid)]
     ax3.plot(magnitude_along_line_of_sight, lw=1.5, color='black',
              label='%s: $f_{smoke}$ = %.2f' % (_exit, smoke_factor))
     ax3.set_xlabel('l [m]')
     labels = ax3.get_xticks()
-    # print(labels)
     labels = (labels * dx).astype(int)
-    # print(labels)
     ax3.set_xticklabels(labels)
     ax3.set_ylabel('Extinction Coefficient')
     ax3.set_ylim(0, 2)
-    # ax3.set_xlim(0, 30)
     fig.colorbar(aa, ax=ax1, cax=ax2, orientation='vertical')
     ax3.legend(loc='upper center', fancybox=False, edgecolor='inherit')
     ax3.grid(ls='--', lw=0.5)
@@ -561,8 +556,6 @@ def main():
     logging.info ("smv file found: %s"%(smv_fn))
     # parse smokeview file for slice information
     sc = fs.readSliceInfos(os.path.join(root_dir, smv_fn))
-    # print all found information
-    #sc.print()
     # read in meshes
     meshes = fs.readMeshes(os.path.join(root_dir, smv_fn))
     # select matching slice
@@ -598,7 +591,7 @@ def main():
         cmax = np.max(data[it])
         max_coefficient = max(cmax, max_coefficient)
 
-    #max_coefficient = 2.5 # FIXME: is this really necessary
+    max_coefficient = 2.5 # FIXME: we need to check this
     extinction_grids_path = os.path.join(fds_path, '2_extinction_grids', quantity)
     if not os.path.exists(extinction_grids_path):
         os.makedirs(extinction_grids_path)
