@@ -155,7 +155,7 @@ def getParserArgs():
     parser.add_argument("-v", "--pov", type=tuple, default=(12.5,5.5),
                         help="Point of view for line of sight calculation: x,y",
                         required=False)
-    parser.add_argument("-ex", "--exit", type=str, default='trans_0',
+    parser.add_argument("-ex", "--toexit", type=str, default='trans_0',
                         help="Exit for line of sight calculation",
                         required=False)
 
@@ -539,7 +539,7 @@ def main():
 
     point_of_view = (pv_x, pv_y)
     logging.info("View point: {}".format(point_of_view))
-    agent_exit = cmdl_args.exit
+    agent_exit = cmdl_args.toexit
     # Get spatial extend and grid resolution in x, y and z direction
     x_min, x_max, y_min, y_max, z_min, z_max, dx, dy, dz = get_extend_and_grid(fds_file)
     logging.info(
