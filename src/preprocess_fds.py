@@ -84,7 +84,11 @@ def get_extend_and_grid(_fds_file):
         if l.startswith("&MESH"):
             l = l.split('IJK=')[-1]
             l = re.split(r'[,=/]+', l)
-            l.remove(' XB'), l.remove('\n'), l.remove(' MPI_PROCESS')
+            l = [x.strip() for x in l]
+            for elem in ['XB', 'MPI_PROCESS', '\n']:
+                if l.count(elem):
+                    l.remove(elem)
+
             l = np.array(l[:9], dtype=float)
             x_dims.extend(l[3:5])
             y_dims.extend(l[5:7])
@@ -202,18 +206,18 @@ def get_fds_geo(_fds_file):
     for i, fds_entry in enumerate(fds_entries):
         if fds_entry.startswith('&OBST'):
             obst = read_fds_line(fds_entry)
-            print(obst[4], obst[5], specified_location[1])
+            #print(obst[4], obst[5], specified_location[1])
             if obst[4] < specified_location[1] < obst[5]:
-                print("HUU", dx, dy)
+                #print("HUU", dx, dy)
                 obst = [(1 / dx) * i for i in obst]
-                print("obst: ", obst)
+                #print("obst: ", obst)
 
                 geometry[int(obst[2] - y_max / dy - 1): int(obst[3] - y_max / dy - 1),
                          int(obst[0] - x_max / dx - 1): int(obst[1] - x_max / dx - 1)][:] = np.nan
-                print(geometry[int(obst[2] - y_max / dy - 1): int(obst[3] - y_max / dy - 1),
-                         int(obst[0] - x_max / dx - 1): int(obst[1] - x_max / dx - 1)][:])
+                #print(geometry[int(obst[2] - y_max / dy - 1): int(obst[3] - y_max / dy - 1),
+                #        int(obst[0] - x_max / dx - 1): int(obst[1] - x_max / dx - 1)][:])
                 obsts = np.append(obsts, obst)
-                input("Enter")
+                #input("Enter")
     obsts = np.reshape(obsts, (-1, 6))
     np.savetxt('obst.csv', obsts, delimiter=',')
 
@@ -393,7 +397,6 @@ def plot_line_sights(_Time, _dx, _dy, _dz, _point_of_view, _agent_exit):
     # ==== adjust here for debugging =====
     x_0, y_0 = _point_of_view # Point of view
     _exit = _agent_exit # Point of exit, e.g. with smoke
-    print(_exit)
     x_exit = exits[_exit][0]
     y_exit = exits[_exit][1]
     p_file = os.path.join(sfgrids_path,
@@ -536,7 +539,6 @@ def main():
 
     point_of_view = (pv_x, pv_y)
     logging.info("View point: {}".format(point_of_view))
-    input()
     agent_exit = cmdl_args.exit
     # Get spatial extend and grid resolution in x, y and z direction
     x_min, x_max, y_min, y_max, z_min, z_max, dx, dy, dz = get_extend_and_grid(fds_file)
