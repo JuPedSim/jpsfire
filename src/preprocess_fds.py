@@ -54,9 +54,8 @@ def config_logger(log_file):
             print(">> Running: %s" % (__file__))
 
 
-def get_tstop(_fds_path, _chid):
-    _fds_file = os.path.join(_fds_path, _chid + ".fds")
-    with open(_fds_file) as f:
+def get_tstop(_fds_file):
+    with open(_fds_file[0]) as f:
         lines = f.readlines()
         for l in lines:
             if l.startswith("&TIME"):
@@ -72,30 +71,35 @@ def get_tstop(_fds_path, _chid):
     return t_stop
 
 
-def get_dims(_chid, spec):
-    # TODO: fds_file as arg instead of chid?
-    _fds_file = os.path.join(fds_path, _chid + ".fds")
-    fds_data = open(_fds_file)  # open('../'+chid+'.fds')
+def get_extend_and_grid(_fds_file):
+
+    x_dims=[]
+    y_dims=[]
+    z_dims=[]
+
+    fds_data = open(_fds_file[0])
     fds_lines = fds_data.readlines()
 
     for l in fds_lines:
         if l.startswith("&MESH"):
             l = l.split('IJK=')[-1]
             l = re.split(r'[,=/]+', l)
-            l.remove(' XB'), l.remove('\n')
-            l = np.array(l[:], dtype=float)
-            if spec == 'coordinates':
-                return l[3], l[4], l[5], l[6]
-            elif spec == 'grids':
-                return (l[4] - l[3]) / l[0], (l[6] - l[5]) / l[1], (l[8] - l[7]) / l[2]
-            else:
-                return 'Error, wrong specification'  # todo: logging
+            l.remove(' XB'), l.remove('\n'), l.remove(' MPI_PROCESS')
+            l = np.array(l[:9], dtype=float)
+            x_dims.extend(l[3:5])
+            y_dims.extend(l[5:7])
+            z_dims.extend(l[7:9])
+            dx = (l[4] - l[3]) / l[0]
+            dy = (l[6] - l[5]) / l[1]
+            dz = (l[8] - l[7]) / l[2]
+
+    return min(x_dims), max(x_dims), min(y_dims), max(y_dims), min(z_dims), max(z_dims), dx, dy, dz
 
 
 def get_tstep(_jps_path):
     inifile_pattern = os.path.join(_jps_path, '*ini*.xml')
     logging.warning("Looking for inifile. Pattern <%s>", inifile_pattern)
-    inifile = glob.glob(inifile_pattern) #todo rename. list?
+    inifile = glob.glob(inifile_pattern) #TODO rename. list?
     update_time = -1
     if not inifile:
         logging.critical("Found no ini files in %s", _jps_path)
@@ -144,6 +148,12 @@ def getParserArgs():
     parser.add_argument("-g", "--delta_sfgrid", type=float, default=1.0,
                         help="Resolution of smoke factor grids (default: 1.0)",
                         required=False)
+    parser.add_argument("-v", "--pov", type=tuple, default=(12.5, 5.5), # TODO: not working?
+                        help="Point of view for line of sight calculation",
+                        required=False)
+    parser.add_argument("-ex", "--exit", type=str, default='trans_0',
+                        help="Exit for line of sight calculation",
+                        required=False)
 
     args = parser.parse_args()
     return args
@@ -180,15 +190,13 @@ def read_fds_line(fds_entry):
     return coordinates
 
 
-def get_fds_geo(_chid):
-    # TODO fds_file instead as arg?
-    geometry = np.zeros((len(dim_y), len(dim_x)))
-
+def get_fds_geo(_fds_file):
     obsts = []
     holes = []
-    _fds_file = os.path.join(fds_path, _chid + ".fds")
-    fds = open(_fds_file, newline=None)
-    logging.info('Opening %s.fds to read out meshes, obstacles and holes', _chid)
+    geometry = np.zeros((len(dim_y), len(dim_x)))
+
+    fds = open(_fds_file[0], newline=None)
+    logging.info('Opening %s to read out meshes, obstacles and holes', _fds_file[0])
     fds_entries = fds.readlines()
 
     for i, fds_entry in enumerate(fds_entries):
@@ -345,14 +353,14 @@ def smoke_factor_conv(_convert, Exit, _Time):
                 #### Computation of the smoke factor towards the exit:
                 smoke_factor = np.nanmax(magnitude_along_line_of_sight) * \
                                np.abs(np.trapz(magnitude_along_line_of_sight, dx=dx))
-                # todo: smoke factor has a unit!!!
+                #TODO: smoke factor has a unit!!!
             #### storage of the edge factor
             smoke_factor_grid[a, b] = smoke_factor
 
     # if np.amax(smoke_factor_grid)>max_Smoke_Factor:
     max_Smoke_Factor = np.amax(smoke_factor_grid)
 
-    print('Exit: %s | Time: %6.2f | maximum Smoke Factor %10.3f'%(Exit, _Time, max_Smoke_Factor))
+    #print('Exit: %s | Time: %6.2f | maximum Smoke Factor %10.3f'%(Exit, _Time, max_Smoke_Factor))
 
     # Norm of the smoke factor grid multiplied with 10 in order to achieve a
     # factor range from 0..10
@@ -365,14 +373,13 @@ def smoke_factor_conv(_convert, Exit, _Time):
         smoke_factor_grid_norm = smoke_factor_grid
 
     # Exit %s, \n dX[m], dY[m] , minX[m] , maxX[m], minY[m], maxY[m] \n
-    # TODO: why is dX = dY?
     #header = (Exit, delta_smoke_factor_grid, delta_smoke_factor_grid, x_min, x_max, y_min, y_max)
     header = (delta_smoke_factor_grid, x_min, x_max, y_min, y_max)
-    npy_file = os.path.join(door_path, 't_%.0f.000000.npz' % _Time)
+    npz_file = os.path.join(door_path, 't_%.0f.000000.npz' % _Time)
     logging.info('Call save')
     #array_to_save = np.array((header, smoke_factor_grid_norm))
-    np.savez(npy_file, header=header, smoke_factor_grid_norm=smoke_factor_grid_norm)
-    logging.info('Write smoke factor grid -- \n %s', npy_file)
+    np.savez(npz_file, header=header, smoke_factor_grid_norm=smoke_factor_grid_norm)
+    logging.info('Write smoke factor grid -- \n %s', npz_file)
 
     return smoke_factor_grid_norm
 
@@ -381,19 +388,20 @@ def m_to_pix(x_i, y_i):
     # Conversion m to pixel coordinates
     return (abs(x_max - x_min) - x_max + x_i) / dx, (abs(y_max - y_min) - y_max + y_i) / dy
 
-def plot_line_sights(_Time, _dx, _dy, _dz):
-    # ==== adjust here for debugging =====
-    x_0, y_0 = 12.5, 5.5  # Point of view
-    _exit = 'trans_0'  # Point of exit, e.g. with smoke
-    # TODO: This should not be hard coded!
 
+def plot_line_sights(_Time, _dx, _dy, _dz, _point_of_view, _agent_exit):
+    # ==== adjust here for debugging =====
+    x_0, y_0 = _point_of_view # Point of view
+    _exit = _agent_exit # Point of exit, e.g. with smoke
+    x_exit = exits[_exit][0]
+    y_exit = exits[_exit][1]
     p_file = os.path.join(sfgrids_path,
-                              '%s/Z_2.250000/Door_X_12.500000_Y_5.000000/t_%.f.000000.npz'
-                              % (quantity, _Time))
+                              '%s/Z_2.250000/Door_X_%.6f_Y_%.6f/t_%.f.000000.npz'
+                              % (quantity, x_exit, y_exit, _Time))
     sfgrid = np.load(p_file)['smoke_factor_grid_norm']
     # ==== automatic part ======
     x0 = x_0 / _dx
-    y0 = y_0 / _dx # FIXME: should be _dy??
+    y0 = y_0 / _dy
     x, y = m_to_pix(x_i=exits[_exit][0], y_i=exits[_exit][1])
     x_exit, y_exit = np.linspace (x0, x, np.hypot (x - x0, y - y0)), np.linspace (y0, y,
                                                                                     np.hypot (x - x0, y - y0))
@@ -418,7 +426,6 @@ def plot_line_sights(_Time, _dx, _dy, _dz):
     for i in range(int ((1 / dx) / 2)):
         sfgrid = np.kron(sfgrid, [[1, 1], [1, 1]])
     smoke_factor = sfgrid[int(y0 / delta_smoke_factor_grid), int(-x0 / delta_smoke_factor_grid)]
-    # print(magnitude_along_line_of_sight)
     ax3.plot(magnitude_along_line_of_sight, lw=1.5, color='black',
              label='%s: $f_{smoke}$ = %.2f' % (_exit, smoke_factor))
     ax3.set_xlabel('l [m]')
@@ -442,7 +449,8 @@ def plot_line_sights(_Time, _dx, _dy, _dz):
     plt.close()
     logging.info("Save: %s", figname)
 
-def plot_smoke_grids(_exit, _Time, _Smoke_factor_grid_norm, _geometry):
+
+def plot_smoke_grids(_exit, _Time, _Smoke_factor_grid_norm): #TODO: deleted _geometry as arg until fix
     fig = plt.figure()
     ax = plt.subplot(111)
     plt.xlabel('x [m]')
@@ -451,7 +459,8 @@ def plot_smoke_grids(_exit, _Time, _Smoke_factor_grid_norm, _geometry):
     cmap.set_bad('white', 1.)
     img = ax.imshow(_Smoke_factor_grid_norm, cmap=cmap,
                     vmin=0, vmax=10, origin='lower',
-                    interpolation='spline36')
+                    interpolation='spline36', #looks nice but is not the data we use...
+                    extent=(x_min,x_max,y_min,y_max))
 
     #plt.imshow(_geometry, cmap=cmap, vmax=2.5, origin='lower')
 
@@ -476,15 +485,20 @@ def plot_smoke_grids(_exit, _Time, _Smoke_factor_grid_norm, _geometry):
 
 
 def main():
-    global fds_path, logfile, sfgrids_path, fds_file, chid, quantity, specified_location, x_min, x_max, y_min, y_max, dx, dy, dim_x, dim_y, exits, delta_smoke_factor_grid, convert, Time
+    global fds_path, logfile, sfgrids_path, fds_file, quantity, specified_location, x_min, x_max, y_min, y_max, dx, dy, dim_x, dim_y, exits, delta_smoke_factor_grid, convert, Time
     # Parse parameters
     cmdl_args = getParserArgs ()
     script_dir = os.path.dirname (os.path.realpath (__file__))
-    #fds_path = os.path.join (script_dir, "..", "demos", "A_smoke_sensor", "FDS") # TODO: user input
     fds_path = cmdl_args.fds
     logfile = os.path.join (fds_path, "log.txt")  # TODO: since we use only one fds. In future: use fds_filename
     config_logger (logfile)
-    logging.info ("fds_path: %s" % fds_path)
+    logging.info ("script path: <%s>", script_dir)
+    logging.info ("fds path: <%s>", fds_path)
+    fds_file = glob.glob (os.path.join (fds_path, '*.fds'))
+    logging.info ("fds_file: %s", fds_file[0])
+    if not fds_file:
+        logging.critical("Found no fds file!")
+        sys.exit("Found no fds file!")
     sfgrids_path = os.path.join (fds_path, "3_sfgrids")
     if os.path.exists (sfgrids_path):  # delete any existing directory
         logging.warning ("Delete {}".format (sfgrids_path))
@@ -495,45 +509,36 @@ def main():
         logging.critical ("Can not make directory {} error={}".format (sfgrids_path, exc))
         sys.exit ("Error: Can not make directory %s" % sfgrids_path)
     logging.info ("Create {}".format (sfgrids_path))
-    # FDS chid
-    fds_file = glob.glob (os.path.join (fds_path, '*.fds'))
-    logging.info ("script path: <%s>", script_dir)
-    logging.info ("fds path: <%s>", fds_path)
-    logging.info ("fds_file: %s", fds_file)
-    # chid = (fds_file[0].strip('.fds')).strip('../')
-    if not fds_file:
-        logging.critical("Found no fds file!")
-        sys.exit("Found no fds file!")
-    chid = os.path.basename (fds_file[0]).rstrip ('.fds')
     jps_path = cmdl_args.jps
     logging.info ("jps_path: %s" % jps_path)
     quantity = cmdl_args.slice_quantity
     quantity = quantity.replace (' ', '_')
-    logging.info ("Quantity: %s" % quantity)
+    logging.info("Quantity: %s" % quantity)
     specified_location = (
         cmdl_args.slice_dim, cmdl_args.slice_coord)  # TODO: is this actually necessary? maybe also read from fds
-    logging.info ("Specified location: %s %s" % specified_location)
+    logging.info("Specified location: %s %s" % specified_location)
     t_start = cmdl_args.start
-    logging.info ("t_start: %.1f" % t_start)
+    logging.info("t_start: %.1f" % t_start)
     t_stop = cmdl_args.end
-    logging.info ("t_stop: %.1f" % t_stop)
+    logging.info("t_stop: %.1f" % t_stop)
     t_step = get_tstep (jps_path)
-    logging.info ("t_step: %.1f" % t_step)
+    logging.info("t_step: %.1f" % t_step)
     plots = cmdl_args.plot
-    logging.info ("Plot: On" if plots else "Plot: Off")
-    # Get spatial extend
-    x_min, x_max, y_min, y_max = get_dims (chid, 'coordinates')
-    logging.info (
-        'FDS coordinates are xmin = %.2f, xmax = %.2f, ymin = %.2f, ymax = %.2f' % (x_min, x_max, y_min, y_max))
-    # Grid resolution in x, y and z
-    dx, dy, dz = get_dims(chid, 'grids')
-    logging.info ('FDS grid resolution is dx = %.2f, dy = %.2f, dz = %.2f' % (dx, dy, dz))
+    logging.info("Plot: On" if plots else "Plot: Off")
+    point_of_view = cmdl_args.pov
+    agent_exit = cmdl_args.exit
+    # Get spatial extend and grid resolution in x, y and z direction
+    x_min, x_max, y_min, y_max, z_min, z_max, dx, dy, dz = get_extend_and_grid(fds_file)
+    logging.info(
+        'FDS coordinates are xmin = %.2f, xmax = %.2f, ymin = %.2f, ymax = %.2f, zmin = %.2f, zmax = %.2f'
+        % (x_min, x_max, y_min, y_max, z_min, z_max))
+    logging.info('FDS grid resolution is dx = %.2f, dy = %.2f, dz = %.2f' % (dx, dy, dz))
     dim_x = np.arange (x_min, x_max + 0.01, dx)
     dim_y = np.arange (y_min, y_max + 0.01, dy)
     # =============================================
     # Readout of obstacles and holes from .fds file
     # =============================================
-    geometry = get_fds_geo (chid)
+    # geometry = get_fds_geo (fds_file)
     # ====================================================
     # Readout of slicefiles from .smv file using fdsreader
     # ====================================================
@@ -544,34 +549,43 @@ def main():
     # parse smokeview file for slice information
     sc = fs.readSliceInfos(os.path.join(root_dir, smv_fn))
     # print all found information
-    sc.print()
+    #sc.print()
     # read in meshes
     meshes = fs.readMeshes(os.path.join(root_dir, smv_fn))
     # select matching slice
     slice_label = 'ext_coef_C0.9H0.1'
-    sid = -1
+    sids = []
     for iis in range(len(sc.slices)):
         if sc[iis].label == slice_label:
-            sid = iis
-            logging.info("found matching slice")
-            break
-    if sid == -1:
+            sids.append(iis)
+            logging.info("found matching slice with id: {}".format(iis))
+
+    if sids == []:
         logging.critical("No slice matching label: {}".format(slice_label))
         sys.exit("No slice matching label: {}".format(slice_label))
-    slice = sc[sid]
-    # read in time information
-    slice.readAllTimes(root_dir)
-    # read in slice data
-    slice.readTimeSelection(root_dir, dt=t_step, average_dt=1)
-    # map data on mesh
-    slice.mapData(meshes)
+
+    #gather all slice data
+    slices = []
+    for iis in sids:
+        slice = sc[iis]
+        # read in time information
+        slice.readAllTimes(root_dir)
+        # read in slice data
+        slice.readTimeSelection(root_dir, dt=t_step, average_dt=1)
+        # map data on mesh
+        slice.mapData(meshes)
+        slices.append(sc[iis])
+    mesh, extent, data, mask = fs.combineSlices(slices)
+    logging.info("Combination for number of slices: %i" % len(slices))
+
     # get max value
     max_coefficient = 0
-    for it in range(0, slice.times.size):
-        cmax = np.max(slice.sd[it])
+    times = sc[sids[0]].times.size
+    for it in range(0, times):
+        cmax = np.max(data[it])
         max_coefficient = max(cmax, max_coefficient)
 
-    max_coefficient = 2.5 # FIXME
+    #max_coefficient = 2.5 # FIXME: is this really necessary
     extinction_grids_path = os.path.join(fds_path, '2_extinction_grids', quantity)
     if not os.path.exists(extinction_grids_path):
         os.makedirs(extinction_grids_path)
@@ -581,15 +595,15 @@ def main():
     if not os.path.exists(Z_directory):
         os.makedirs(Z_directory)
         logging.info("create directory <%s>" % Z_directory)
-    for it in range(0, slice.times.size):
-        ext_file = os.path.join(Z_directory, "t_%.0f.000000.npy" % slice.times[it])
-        np.save(ext_file, slice.sd[it])
+    for it in range(0, times):
+        ext_file = os.path.join(Z_directory, 't_%.0f.000000.npz' % slice.times[it])
+        np.savez(ext_file, data[it])
     if plots:
         for id, it in enumerate(slice.times):
-            collect = slice.sd[id] + geometry[:-1, :-1]
+            collect = data[id] #+ geometry[:-1, :-1]
             cmap = matplotlib.cm.jet
             cmap.set_bad('white', 1.)
-            plt.imshow(collect, cmap=cmap, vmax=max_coefficient, origin='lower', extent=slice.sm.extent)
+            plt.imshow(collect, cmap=cmap, vmax=max_coefficient, origin='lower', extent=extent)
             plt.title ("time = {:.2f}".format (slice.times[id]))
             plt.colorbar (label="{} [{}]".format (slice.quantity, slice.units))
             figname_it = os.path.join (Z_directory, "single_slice_%.4d.png" % id)
@@ -609,7 +623,7 @@ def main():
     once = 1
     for it in range(0, slice.times.size):
 
-        convert = slice.sd[it]
+        convert = data[it]
         Time = slice.times[it]
 
         logging.info ('--------------------------------------------------')
@@ -617,22 +631,20 @@ def main():
 
         for id, _exit in enumerate(exits):
             Smoke_factor_grid_norm = smoke_factor_conv(convert, _exit, Time)
+
             if plots:
                 logging.info('--------------------------------------------------')
                 logging.info('Plotting files for time: %.fs and Exit: %s', Time, _exit)
                 # =======================
                 # Plot Smoke factor grids
                 # =======================
-                plot_smoke_grids (_exit, Time, Smoke_factor_grid_norm, geometry)
+                plot_smoke_grids(_exit, Time, Smoke_factor_grid_norm) #TODO: deleted geometry as arg until fix
 
-
-    # if plots:
-    #     # ===================
-    #     # plot line of sights
-    #     # ===================
-    #         plot_line_sights(Time, dx, dy, dz)
-
-
+        if plots:
+            # ===================
+            # plot line of sights
+            # ===================
+            plot_line_sights(Time, dx, dy, dz, point_of_view, agent_exit)
 
 
 # Path pointing to the fire simulation directory
@@ -643,14 +655,6 @@ if __name__ == "__main__":
     main()
     t2 = time.time()
     elapsed_time = t2-t1
-    # dimension_1 = x
-    # dimension_2 = y
-    # dim1 = dim_x
-    # dim2 = dim_y
-    # dim1_min = x_min
-    # dim1_max = x_max
-    # dim2_min = y_min
-    # dim2_max = y_max
 
     logging.info("***  Finished in {} s ***".format(elapsed_time))
     print(">> Done in %.2f s"%(elapsed_time))
