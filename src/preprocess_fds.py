@@ -599,22 +599,22 @@ def main():
         ext_file = os.path.join(Z_directory, 't_%.0f.000000.npz' % slice.times[it])
         np.savez(ext_file, data[it])
     if plots:
-        for id, it in enumerate(slice.times):
-            collect = data[id] #+ geometry[:-1, :-1]
+        for _id, it in enumerate(slice.times):
+            collect = data[_id] #+ geometry[:-1, :-1]
             cmap = matplotlib.cm.jet
             cmap.set_bad('white', 1.)
             plt.imshow(collect, cmap=cmap, vmax=max_coefficient, origin='lower', extent=extent)
-            plt.title ("time = {:.2f}".format (slice.times[id]))
-            plt.colorbar (label="{} [{}]".format (slice.quantity, slice.units))
-            figname_it = os.path.join (Z_directory, "single_slice_%.4d.png" % id)
-            logging.info ("plot slicedata: %s" % figname_it)
-            plt.savefig (figname_it)
-            plt.clf ()
+            plt.title("time = {:.2f}".format(it))
+            plt.colorbar(label="{} [{}]".format(slice.quantity, slice.units))
+            figname_it = os.path.join(Z_directory, "single_slice_%.4d.png" % _id)
+            logging.info("plot slicedata: %s", figname_it)
+            plt.savefig(figname_it)
+            plt.clf()
 
     # ============================================================================
     # Readout of crossings and transitions from jps geometry (saved as dictionary)
     # ============================================================================
-    exits = get_exits (jps_path)
+    exits = get_exits(jps_path)
     # =====================================================================================
     # Calculation of smoke factor grid, default resolution: delta_smoke_factor_grid = 1 (m)
     # =====================================================================================
