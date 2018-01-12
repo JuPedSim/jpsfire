@@ -148,8 +148,8 @@ def getParserArgs():
     parser.add_argument("-g", "--delta_sfgrid", type=float, default=1.0,
                         help="Resolution of smoke factor grids (default: 1.0)",
                         required=False)
-    parser.add_argument("-v", "--pov", type=tuple, default=(12.5, 5.5),
-                        help="Point of view for line of sight calculation: xy",
+    parser.add_argument("-v", "--pov", type=tuple, default=(12.5,5.5),
+                        help="Point of view for line of sight calculation: x,y",
                         required=False)
     parser.add_argument("-ex", "--exit", type=str, default='trans_0',
                         help="Exit for line of sight calculation",
@@ -393,6 +393,7 @@ def plot_line_sights(_Time, _dx, _dy, _dz, _point_of_view, _agent_exit):
     # ==== adjust here for debugging =====
     x_0, y_0 = _point_of_view # Point of view
     _exit = _agent_exit # Point of exit, e.g. with smoke
+    print(_exit)
     x_exit = exits[_exit][0]
     y_exit = exits[_exit][1]
     p_file = os.path.join(sfgrids_path,
@@ -525,12 +526,17 @@ def main():
     logging.info("t_step: %.1f" % t_step)
     plots = cmdl_args.plot
     logging.info("Plot: On" if plots else "Plot: Off")
-    if isinstance(cmdl_args.pov, tuple) and len(cmdl_args.pov) == 2:
-        point_of_view = tuple(map(float, cmdl_args.pov))
+    if cmdl_args.pov.count(","):
+        komma = cmdl_args.pov.index(",")
+        pv_x = float(''.join(cmdl_args.pov[:komma]))
+        pv_y = float(''.join(cmdl_args.pov[komma+1:]))
     else:
-        logging.exception("View point: {} is not a tuple of length 2".format(cmdl_args.pov))
+        logging.exception("View point: {} should be two numbers separated with a comma".format(cmdl_args.pov))
         sys.exit("ERROR: Wrong argument for -v. See %s"%logfile)
+
+    point_of_view = (pv_x, pv_y)
     logging.info("View point: {}".format(point_of_view))
+    input()
     agent_exit = cmdl_args.exit
     # Get spatial extend and grid resolution in x, y and z direction
     x_min, x_max, y_min, y_max, z_min, z_max, dx, dy, dz = get_extend_and_grid(fds_file)
