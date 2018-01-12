@@ -4,9 +4,13 @@ __pycache__
 traj.xml
 cogmap.xml
 *.pdf
+*.png
+*.npz
+*.npy
 *.dat
 *.info
 *.log
 *.csv
 /.idea/
 /venv/
+*2_extinction_grids*
