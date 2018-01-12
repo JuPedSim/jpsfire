@@ -148,6 +148,12 @@ def getParserArgs():
     parser.add_argument("-g", "--delta_sfgrid", type=float, default=1.0,
                         help="Resolution of smoke factor grids (default: 1.0)",
                         required=False)
+    parser.add_argument("-v", "--pov", type=tuple, default=(12.5, 5.5), # TODO: not working?
+                        help="Point of view for line of sight calculation",
+                        required=False)
+    parser.add_argument("-ex", "--exit", type=str, default='trans_0',
+                        help="Exit for line of sight calculation",
+                        required=False)
 
     args = parser.parse_args()
     return args
@@ -383,15 +389,15 @@ def m_to_pix(x_i, y_i):
     return (abs(x_max - x_min) - x_max + x_i) / dx, (abs(y_max - y_min) - y_max + y_i) / dy
 
 
-def plot_line_sights(_Time, _dx, _dy, _dz):
+def plot_line_sights(_Time, _dx, _dy, _dz, _point_of_view, _agent_exit):
     # ==== adjust here for debugging =====
-    x_0, y_0 = 12.5, 5.5  # Point of view
-    _exit = 'trans_0'  # Point of exit, e.g. with smoke
-    # TODO: This should not be hard coded!
-
+    x_0, y_0 = _point_of_view # Point of view
+    _exit = _agent_exit # Point of exit, e.g. with smoke
+    x_exit = exits[_exit][0]
+    y_exit = exits[_exit][1]
     p_file = os.path.join(sfgrids_path,
-                              '%s/Z_2.250000/Door_X_25.000000_Y_6.000000/t_%.f.000000.npz'
-                              % (quantity, _Time))
+                              '%s/Z_2.250000/Door_X_%.6f_Y_%.6f/t_%.f.000000.npz'
+                              % (quantity, x_exit, y_exit, _Time))
     sfgrid = np.load(p_file)['smoke_factor_grid_norm']
     # ==== automatic part ======
     x0 = x_0 / _dx
@@ -519,6 +525,8 @@ def main():
     logging.info("t_step: %.1f" % t_step)
     plots = cmdl_args.plot
     logging.info("Plot: On" if plots else "Plot: Off")
+    point_of_view = cmdl_args.pov
+    agent_exit = cmdl_args.exit
     # Get spatial extend and grid resolution in x, y and z direction
     x_min, x_max, y_min, y_max, z_min, z_max, dx, dy, dz = get_extend_and_grid(fds_file)
     logging.info(
@@ -636,7 +644,7 @@ def main():
             # ===================
             # plot line of sights
             # ===================
-            plot_line_sights(Time, dx, dy, dz)
+            plot_line_sights(Time, dx, dy, dz, point_of_view, agent_exit)
 
 
 # Path pointing to the fire simulation directory
