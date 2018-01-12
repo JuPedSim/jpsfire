@@ -151,7 +151,7 @@ def getParserArgs():
     parser.add_argument("-v", "--pov", type=tuple, default=(12.5,5.5),
                         help="Point of view for line of sight calculation: x,y",
                         required=False)
-    parser.add_argument("-ex", "--exit", type=str, default='trans_0',
+    parser.add_argument("-ex", "--toexit", type=str, default='trans_0',
                         help="Exit for line of sight calculation",
                         required=False)
 
@@ -393,7 +393,6 @@ def plot_line_sights(_Time, _dx, _dy, _dz, _point_of_view, _agent_exit):
     # ==== adjust here for debugging =====
     x_0, y_0 = _point_of_view # Point of view
     _exit = _agent_exit # Point of exit, e.g. with smoke
-    print(_exit)
     x_exit = exits[_exit][0]
     y_exit = exits[_exit][1]
     p_file = os.path.join(sfgrids_path,
@@ -536,8 +535,7 @@ def main():
 
     point_of_view = (pv_x, pv_y)
     logging.info("View point: {}".format(point_of_view))
-    input()
-    agent_exit = cmdl_args.exit
+    agent_exit = cmdl_args.toexit
     # Get spatial extend and grid resolution in x, y and z direction
     x_min, x_max, y_min, y_max, z_min, z_max, dx, dy, dz = get_extend_and_grid(fds_file)
     logging.info(
