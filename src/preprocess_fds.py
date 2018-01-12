@@ -390,7 +390,7 @@ def plot_line_sights(_Time, _dx, _dy, _dz):
     # TODO: This should not be hard coded!
 
     p_file = os.path.join(sfgrids_path,
-                              '%s/Z_2.250000/Door_X_12.500000_Y_5.000000/t_%.f.000000.npz'
+                              '%s/Z_2.250000/Door_X_25.000000_Y_6.000000/t_%.f.000000.npz'
                               % (quantity, _Time))
     sfgrid = np.load(p_file)['smoke_factor_grid_norm']
     # ==== automatic part ======
@@ -420,7 +420,6 @@ def plot_line_sights(_Time, _dx, _dy, _dz):
     for i in range(int ((1 / dx) / 2)):
         sfgrid = np.kron(sfgrid, [[1, 1], [1, 1]])
     smoke_factor = sfgrid[int(y0 / delta_smoke_factor_grid), int(-x0 / delta_smoke_factor_grid)]
-    # print(magnitude_along_line_of_sight)
     ax3.plot(magnitude_along_line_of_sight, lw=1.5, color='black',
              label='%s: $f_{smoke}$ = %.2f' % (_exit, smoke_factor))
     ax3.set_xlabel('l [m]')
@@ -445,7 +444,7 @@ def plot_line_sights(_Time, _dx, _dy, _dz):
     logging.info("Save: %s", figname)
 
 
-def plot_smoke_grids(_exit, _Time, _Smoke_factor_grid_norm, _geometry):
+def plot_smoke_grids(_exit, _Time, _Smoke_factor_grid_norm): #TODO: deleted _geometry as arg until fix
     fig = plt.figure()
     ax = plt.subplot(111)
     plt.xlabel('x [m]')
@@ -454,7 +453,8 @@ def plot_smoke_grids(_exit, _Time, _Smoke_factor_grid_norm, _geometry):
     cmap.set_bad('white', 1.)
     img = ax.imshow(_Smoke_factor_grid_norm, cmap=cmap,
                     vmin=0, vmax=10, origin='lower',
-                    interpolation='spline36')
+                    interpolation='spline36', #looks nice but is not the data we use...
+                    extent=(x_min,x_max,y_min,y_max))
 
     #plt.imshow(_geometry, cmap=cmap, vmax=2.5, origin='lower')
 
@@ -623,22 +623,20 @@ def main():
 
         for id, _exit in enumerate(exits):
             Smoke_factor_grid_norm = smoke_factor_conv(convert, _exit, Time)
+
             if plots:
                 logging.info('--------------------------------------------------')
                 logging.info('Plotting files for time: %.fs and Exit: %s', Time, _exit)
                 # =======================
                 # Plot Smoke factor grids
                 # =======================
-                plot_smoke_grids (_exit, Time, Smoke_factor_grid_norm, geometry)
+                plot_smoke_grids(_exit, Time, Smoke_factor_grid_norm) #TODO: deleted geometry as arg until fix
 
-
-    # if plots:
-    #     # ===================
-    #     # plot line of sights
-    #     # ===================
-    #         plot_line_sights(Time, dx, dy, dz)
-
-
+        if plots:
+            # ===================
+            # plot line of sights
+            # ===================
+            plot_line_sights(Time, dx, dy, dz)
 
 
 # Path pointing to the fire simulation directory
