@@ -148,8 +148,8 @@ def getParserArgs():
     parser.add_argument("-g", "--delta_sfgrid", type=float, default=1.0,
                         help="Resolution of smoke factor grids (default: 1.0)",
                         required=False)
-    parser.add_argument("-v", "--pov", type=tuple, default=(12.5, 5.5), # TODO: not working?
-                        help="Point of view for line of sight calculation",
+    parser.add_argument("-v", "--pov", type=tuple, default=(12.5, 5.5),
+                        help="Point of view for line of sight calculation: xy",
                         required=False)
     parser.add_argument("-ex", "--exit", type=str, default='trans_0',
                         help="Exit for line of sight calculation",
@@ -442,7 +442,7 @@ def plot_line_sights(_Time, _dx, _dy, _dz, _point_of_view, _agent_exit):
     ax3.grid(ls='--', lw=0.5)
     namefile = os.path.join('%s' % quantity,
                              '%s_%.6f' % (specified_location[0], specified_location[1]),
-                             'debug_%s_%.2f.pdf' % (_exit, _Time)
+                             'debug_%s_%.2f.png' % (_exit, _Time)
                              )
     figname = os.path.join(sfgrids_path, namefile)
     plt.savefig(figname)
@@ -459,7 +459,7 @@ def plot_smoke_grids(_exit, _Time, _Smoke_factor_grid_norm): #TODO: deleted _geo
     cmap.set_bad('white', 1.)
     img = ax.imshow(_Smoke_factor_grid_norm, cmap=cmap,
                     vmin=0, vmax=10, origin='lower',
-                    interpolation='spline36', #looks nice but is not the data we use...
+                    #interpolation='spline36', #looks nice but is not the data we use...
                     extent=(x_min,x_max,y_min,y_max))
 
     #plt.imshow(_geometry, cmap=cmap, vmax=2.5, origin='lower')
@@ -525,7 +525,12 @@ def main():
     logging.info("t_step: %.1f" % t_step)
     plots = cmdl_args.plot
     logging.info("Plot: On" if plots else "Plot: Off")
-    point_of_view = cmdl_args.pov
+    if isinstance(cmdl_args.pov, tuple) and len(cmdl_args.pov) == 2:
+        point_of_view = tuple(map(float, cmdl_args.pov))
+    else:
+        logging.exception("View point: {} is not a tuple of length 2".format(cmdl_args.pov))
+        sys.exit("ERROR: Wrong argument for -v. See %s"%logfile)
+    logging.info("View point: {}".format(point_of_view))
     agent_exit = cmdl_args.exit
     # Get spatial extend and grid resolution in x, y and z direction
     x_min, x_max, y_min, y_max, z_min, z_max, dx, dy, dz = get_extend_and_grid(fds_file)
@@ -656,6 +661,6 @@ if __name__ == "__main__":
     t2 = time.time()
     elapsed_time = t2-t1
 
-    logging.info("***  Finished in {} s ***".format(elapsed_time))
+    logging.info("***  Finished in {:.2f} s ***".format(elapsed_time))
     print(">> Done in %.2f s"%(elapsed_time))
     print(">> Logfile: %s" % logfile)
