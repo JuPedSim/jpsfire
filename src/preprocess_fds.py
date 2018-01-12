@@ -54,9 +54,8 @@ def config_logger(log_file):
             print(">> Running: %s" % (__file__))
 
 
-def get_tstop(_fds_path, _chid):
-    _fds_file = os.path.join(_fds_path, _chid + ".fds")
-    with open(_fds_file) as f:
+def get_tstop(_fds_file):
+    with open(_fds_file[0]) as f:
         lines = f.readlines()
         for l in lines:
             if l.startswith("&TIME"):
@@ -96,10 +95,11 @@ def get_extend_and_grid(_fds_file):
 
     return min(x_dims), max(x_dims), min(y_dims), max(y_dims), min(z_dims), max(z_dims), dx, dy, dz
 
+
 def get_tstep(_jps_path):
     inifile_pattern = os.path.join(_jps_path, '*ini*.xml')
     logging.warning("Looking for inifile. Pattern <%s>", inifile_pattern)
-    inifile = glob.glob(inifile_pattern) #todo rename. list?
+    inifile = glob.glob(inifile_pattern) #TODO rename. list?
     update_time = -1
     if not inifile:
         logging.critical("Found no ini files in %s", _jps_path)
@@ -354,7 +354,7 @@ def smoke_factor_conv(_convert, Exit, _Time):
     # if np.amax(smoke_factor_grid)>max_Smoke_Factor:
     max_Smoke_Factor = np.amax(smoke_factor_grid)
 
-    print('Exit: %s | Time: %6.2f | maximum Smoke Factor %10.3f'%(Exit, _Time, max_Smoke_Factor))
+    #print('Exit: %s | Time: %6.2f | maximum Smoke Factor %10.3f'%(Exit, _Time, max_Smoke_Factor))
 
     # Norm of the smoke factor grid multiplied with 10 in order to achieve a
     # factor range from 0..10
@@ -381,6 +381,7 @@ def smoke_factor_conv(_convert, Exit, _Time):
 def m_to_pix(x_i, y_i):
     # Conversion m to pixel coordinates
     return (abs(x_max - x_min) - x_max + x_i) / dx, (abs(y_max - y_min) - y_max + y_i) / dy
+
 
 def plot_line_sights(_Time, _dx, _dy, _dz):
     # ==== adjust here for debugging =====
@@ -443,6 +444,7 @@ def plot_line_sights(_Time, _dx, _dy, _dz):
     plt.close()
     logging.info("Save: %s", figname)
 
+
 def plot_smoke_grids(_exit, _Time, _Smoke_factor_grid_norm, _geometry):
     fig = plt.figure()
     ax = plt.subplot(111)
@@ -477,15 +479,20 @@ def plot_smoke_grids(_exit, _Time, _Smoke_factor_grid_norm, _geometry):
 
 
 def main():
-    global fds_path, logfile, sfgrids_path, fds_file, chid, quantity, specified_location, x_min, x_max, y_min, y_max, dx, dy, dim_x, dim_y, exits, delta_smoke_factor_grid, convert, Time
+    global fds_path, logfile, sfgrids_path, fds_file, quantity, specified_location, x_min, x_max, y_min, y_max, dx, dy, dim_x, dim_y, exits, delta_smoke_factor_grid, convert, Time
     # Parse parameters
     cmdl_args = getParserArgs ()
     script_dir = os.path.dirname (os.path.realpath (__file__))
-    #fds_path = os.path.join (script_dir, "..", "demos", "A_smoke_sensor", "FDS") # TODO: user input
     fds_path = cmdl_args.fds
     logfile = os.path.join (fds_path, "log.txt")  # TODO: since we use only one fds. In future: use fds_filename
     config_logger (logfile)
-    logging.info ("fds_path: %s" % fds_path)
+    logging.info ("script path: <%s>", script_dir)
+    logging.info ("fds path: <%s>", fds_path)
+    fds_file = glob.glob (os.path.join (fds_path, '*.fds'))
+    logging.info ("fds_file: %s", fds_file[0])
+    if not fds_file:
+        logging.critical("Found no fds file!")
+        sys.exit("Found no fds file!")
     sfgrids_path = os.path.join (fds_path, "3_sfgrids")
     if os.path.exists (sfgrids_path):  # delete any existing directory
         logging.warning ("Delete {}".format (sfgrids_path))
@@ -496,16 +503,6 @@ def main():
         logging.critical ("Can not make directory {} error={}".format (sfgrids_path, exc))
         sys.exit ("Error: Can not make directory %s" % sfgrids_path)
     logging.info ("Create {}".format (sfgrids_path))
-    # FDS chid
-    fds_file = glob.glob (os.path.join (fds_path, '*.fds'))
-    logging.info ("script path: <%s>", script_dir)
-    logging.info ("fds path: <%s>", fds_path)
-    logging.info ("fds_file: %s", fds_file)
-    # chid = (fds_file[0].strip('.fds')).strip('../')
-    if not fds_file:
-        logging.critical("Found no fds file!")
-        sys.exit("Found no fds file!")
-    chid = os.path.basename (fds_file[0]).rstrip ('.fds')
     jps_path = cmdl_args.jps
     logging.info ("jps_path: %s" % jps_path)
     quantity = cmdl_args.slice_quantity
@@ -571,6 +568,7 @@ def main():
         slice.mapData(meshes)
         slices.append(sc[iis])
     mesh, extent, data, mask = fs.combineSlices(slices)
+    logging.info("Combination for number of slices: %i" % len(slices))
 
     # get max value
     max_coefficient = 0
