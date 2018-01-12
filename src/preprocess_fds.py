@@ -152,7 +152,7 @@ def getParserArgs():
     parser.add_argument("-g", "--delta_sfgrid", type=float, default=1.0,
                         help="Resolution of smoke factor grids (default: 1.0)",
                         required=False)
-    parser.add_argument("-v", "--pov", type=tuple, default=(12.5,5.5),  #TODO: not taking default value
+    parser.add_argument("-v", "--pov", type=tuple, default=('12.5', ',', '5.5'),
                         help="Point of view for line of sight calculation: x,y",
                         required=False)
     parser.add_argument("-ex", "--toexit", type=str, default='trans_0',
