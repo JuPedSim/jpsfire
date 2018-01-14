@@ -19,6 +19,7 @@ import sys
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import rcParams, gridspec
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
 import scipy.ndimage
 import fdsreader.slice as fs
@@ -192,50 +193,39 @@ def read_fds_line(fds_entry):
     coordinates = [float(x) for x in coordinates if isfloat(x)]
     # increasing sorting of coordinate pairs:
     coordinates = sorted(coordinates[0:2]) + sorted(coordinates[2:4]) + sorted(coordinates[4:6])
-    return coordinates
+    return np.array(coordinates)
 
 
 def get_fds_geo(_fds_file):
     obsts = []
     holes = []
     geometry = np.zeros((len(dim_y), len(dim_x)))
-
+    logging.info('Opening %s to read out meshes, obstacles and holes', _fds_file)
     fds = open(_fds_file, newline=None)
-    logging.info('Opening %s to read out meshes, obstacles and holes', _fds_file[0])
     fds_entries = fds.readlines()
-
-    for i, fds_entry in enumerate(fds_entries):
+    fds.close()
+    for fds_entry in fds_entries:
         if fds_entry.startswith('&OBST'):
             obst = read_fds_line(fds_entry)
-            #print(obst[4], obst[5], specified_location[1])
             if obst[4] < specified_location[1] < obst[5]:
-                #print("HUU", dx, dy)
-                obst = [(1 / dx) * i for i in obst]
-                #print("obst: ", obst)
-
-                geometry[int(obst[2] - y_max / dy - 1): int(obst[3] - y_max / dy - 1),
-                         int(obst[0] - x_max / dx - 1): int(obst[1] - x_max / dx - 1)][:] = np.nan
-                #print(geometry[int(obst[2] - y_max / dy - 1): int(obst[3] - y_max / dy - 1),
-                #        int(obst[0] - x_max / dx - 1): int(obst[1] - x_max / dx - 1)][:])
+                index_y = np.logical_and(dim_y >= obst[2], dim_y <= obst[3])
+                index_x = np.logical_and(dim_x >= obst[0], dim_x <= obst[1])
+                geometry[index_y, index_x] = np.nan
                 obsts = np.append(obsts, obst)
-                #input("Enter")
-    obsts = np.reshape(obsts, (-1, 6))
-    np.savetxt('obst.csv', obsts, delimiter=',')
-
-    for i, fds_entry in enumerate(fds_entries):
-        if fds_entry[0:5] == '&HOLE':
+        elif fds_entry.startswith('&HOLE'):
             hole = read_fds_line(fds_entry)
             if hole[4] < specified_location[1] < hole[5]:
-                hole = [(1 / dx) * i for i in hole]
-                geometry[hole[2] - y_max / dy - 1: hole[3] - y_max / dy - 1,
-                         hole[0] - x_max / dx - 1: hole[1] - x_max / dx - 1][:] = 0
+                index_y = np.logical_and(dim_y >= hole[2], dim_y <= hole[3])
+                index_x = np.logical_and(dim_x >= hole[0], dim_x <= hole[1])
+                geometry[index_y, index_x] = 0
                 holes = np.append(holes, hole)
 
+    obsts = np.reshape(obsts, (-1, 6))
     holes = np.reshape(holes, (-1, 6))
-    np.savetxt('hole.csv', holes, delimiter=',')
+    np.savetxt('obst.txt', obsts)
+    np.savetxt('hole.txt', holes)
+    np.savetxt('geometry.txt', geometry)
 
-    fds.close()
-    #np.savetxt('geometry.txt', geometry)
     return geometry
 
 
@@ -450,21 +440,22 @@ def plot_line_sights(_Time, _dx, _dy, _dz, _point_of_view, _agent_exit):
     logging.info("Save: %s", figname)
 
 
-def plot_smoke_grids(_exit, _Time, _Smoke_factor_grid_norm): #TODO: deleted _geometry as arg until fix
+def plot_smoke_grids(_exit, _Time, _Smoke_factor_grid_norm, _geometry):
     fig = plt.figure()
     ax = plt.subplot(111)
     plt.xlabel('x [m]')
     plt.ylabel('y [m]')
     cmap = matplotlib.cm.jet
     cmap.set_bad('white', 1.)
+    if _Smoke_factor_grid_norm.shape == _geometry[:-1, :-1].shape: # this is the case when -g dx
+        _Smoke_factor_grid_norm += _geometry[:-1, :-1]
     img = ax.imshow(_Smoke_factor_grid_norm, cmap=cmap,
                     vmin=0, vmax=10, origin='lower',
                     #interpolation='spline36', #looks nice but is not the data we use...
                     extent=(x_min,x_max,y_min,y_max))
 
-    #plt.imshow(_geometry, cmap=cmap, vmax=2.5, origin='lower')
 
-    ax.set_title("t = %s  | exit = %s"%(Time, _exit))
+    ax.set_title("%10.2f s | exit = %s"%(_Time, _exit))
     #plt.colorbar(ax, label=r'$f_{smoke}$', orientation='horizontal')
     plt.colorbar(img, ax=ax, label='SMOKE FACTOR', orientation='horizontal')
     ax.set_xticks(np.arange(x_min, x_max + 1, 5))
@@ -549,7 +540,7 @@ def main():
     # =============================================
     # Readout of obstacles and holes from .fds file
     # =============================================
-    # geometry = get_fds_geo (fds_file)
+    geometry = get_fds_geo (fds_file)
     # ====================================================
     # Readout of slicefiles from .smv file using fdsreader
     # ====================================================
@@ -586,7 +577,6 @@ def main():
         slices.append(sc[iis])
     mesh, extent, data, mask = fs.combineSlices(slices)
     logging.info("Combination for number of slices: %i" % len(slices))
-
     # get max value
     max_coefficient = 0
     times = sc[sids[0]].times.size
@@ -608,13 +598,17 @@ def main():
         ext_file = os.path.join(Z_directory, 't_%.0f.000000.npz' % slice.times[it])
         np.savez(ext_file, data[it])
     if plots:
+        plt.figure()
         for _id, it in enumerate(slice.times):
-            collect = data[_id] #+ geometry[:-1, :-1]
+            ax = plt.gca()
+            divider = make_axes_locatable(ax)
+            cax = divider.append_axes("right", size="5%", pad=0.15)
+            collect = data[_id] + geometry[:-1, :-1]
             cmap = matplotlib.cm.jet
             cmap.set_bad('white', 1.)
-            plt.imshow(collect, cmap=cmap, vmax=max_coefficient, origin='lower', extent=extent)
-            plt.title("time = {:.2f}".format(it))
-            plt.colorbar(label="{} [{}]".format(slice.quantity, slice.units))
+            im=ax.imshow(collect, cmap=cmap, vmax=max_coefficient, origin='lower', extent=extent)
+            ax.set_title("{:10.2f} s".format(it))
+            plt.colorbar(im, cax=cax, label="{} [{}]".format(slice.quantity, slice.units))
             figname_it = os.path.join(Z_directory, "single_slice_%.4d.png" % _id)
             logging.info("plot slicedata: %s", figname_it)
             plt.savefig(figname_it)
@@ -647,7 +641,7 @@ def main():
                 # =======================
                 # Plot Smoke factor grids
                 # =======================
-                plot_smoke_grids(_exit, Time, Smoke_factor_grid_norm) #TODO: deleted geometry as arg until fix
+                plot_smoke_grids(_exit, Time, Smoke_factor_grid_norm, geometry)
 
         if plots:
             # ===================
