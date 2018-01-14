@@ -72,32 +72,43 @@ def get_tstop(_fds_file):
 
 
 def get_extend_and_grid(_fds_file):
-
+    """
+    :param fds_file: str
+    :return: 9 values
+      - <min, max> in x-axis
+      - <min, max> in y-axis
+      - <min, max> in z-axis
+      - dx
+      - dy
+      - dz
+    """
     x_dims = []
     y_dims = []
     z_dims = []
-    print("_fds_file", _fds_file)
     fds_data = open(_fds_file)
     fds_lines = fds_data.readlines()
+    with open(_fds_file) as f:
+        fds_lines = f.readlines()
+        for l in fds_lines:
+            if l.startswith("&MESH"):
+                l = l.split('IJK=')[-1]
+                l = re.split(r'[,=/]+', l)
+                l = [x.strip() for x in l]
+                print("l= ", l)
+                for elem in ['XB', 'MPI_PROCESS', '\n']:
+                    if l.count(elem):
+                        l.remove(elem)
 
-    for l in fds_lines:
-        if l.startswith("&MESH"):
-            l = l.split('IJK=')[-1]
-            l = re.split(r'[,=/]+', l)
-            l = [x.strip() for x in l]
-            for elem in ['XB', 'MPI_PROCESS', '\n']:
-                if l.count(elem):
-                    l.remove(elem)
+                l = np.array(l[:9], dtype=float)
+                x_dims.extend(l[3:5])
+                y_dims.extend(l[5:7])
+                z_dims.extend(l[7:9])
+                _dx = (l[4] - l[3]) / l[0]
+                _dy = (l[6] - l[5]) / l[1]
+                _dz = (l[8] - l[7]) / l[2]
+                # TODO: these dx, dy, dz are mesh dependent. Multiple meshes -> different values?
 
-            l = np.array(l[:9], dtype=float)
-            x_dims.extend(l[3:5])
-            y_dims.extend(l[5:7])
-            z_dims.extend(l[7:9])
-            dx = (l[4] - l[3]) / l[0]
-            dy = (l[6] - l[5]) / l[1]
-            dz = (l[8] - l[7]) / l[2]
-
-    return min(x_dims), max(x_dims), min(y_dims), max(y_dims), min(z_dims), max(z_dims), dx, dy, dz
+    return min(x_dims), max(x_dims), min(y_dims), max(y_dims), min(z_dims), max(z_dims), _dx, _dy, _dz
 
 
 def get_tstep(_jps_path):
