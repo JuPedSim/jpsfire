@@ -124,8 +124,8 @@ def get_tstep(_jps_path):
     tree = ET.parse(inifile[0])
     root = tree.getroot()
 
-    for time in root.iter('A_smoke_sensor'):
-        update_time = time.attrib.get('update_time')
+    for _time in root.iter('A_smoke_sensor'):
+        update_time = _time.attrib.get('update_time')
 
     if isinstance(update_time, int):
         logging.critical("Could not read update_time in inifile %s", inifile)
@@ -191,9 +191,7 @@ def read_fds_line(fds_entry):
     coordinates = ''.join(coordinates)
     coordinates = re.split(', |,| |=|/', coordinates)
     for j, cord in enumerate(coordinates):
-        if isfloat(cord):
-            coordinates[j] = float(cord)
-        if cord.isdigit():
+        if isfloat(cord) or cord.isdigit():
             coordinates[j] = float(cord)
         else:
             continue
