@@ -469,7 +469,7 @@ def plot_smoke_grids(_exit, _Time, _Smoke_factor_grid_norm, _geometry):
     figname = os.path.join(sfgrids_path,
                            '%s' % quantity,
                            '%s_%.6f' % (specified_location[0], specified_location[1]),
-                           'sfgrids_X%.2f_Y%.2f_%i.png' % (X, Y, _Time))
+                           'sfgrids_X%.2f_Y%.2f_%.4d.png' % (X, Y, _Time))
     plt.savefig(figname)
     plt.close()
     logging.info('Plot smoke factor grid: <%s>', figname)
