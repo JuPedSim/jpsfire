@@ -55,7 +55,7 @@ def config_logger(log_file):
 
 
 def get_tstop(_fds_file):
-    with open(_fds_file[0]) as f:
+    with open(_fds_file) as f:
         lines = f.readlines()
         for l in lines:
             if l.startswith("&TIME"):
@@ -66,18 +66,18 @@ def get_tstop(_fds_file):
             if len(time_line) > 1:
                 t_stop = float(time_line[1])
             else:
-                logging.critical("Can not read t_stop from file <%s>", fds_file[0])
-                sys.exit("Can not read t_stop from file <%s>" % fds_file[0])
+                logging.critical("Can not read t_stop from file <%s>", fds_file)
+                sys.exit("Can not read t_stop from file <%s>" % fds_file)
     return t_stop
 
 
 def get_extend_and_grid(_fds_file):
 
-    x_dims=[]
-    y_dims=[]
-    z_dims=[]
-
-    fds_data = open(_fds_file[0])
+    x_dims = []
+    y_dims = []
+    z_dims = []
+    print("_fds_file", _fds_file)
+    fds_data = open(_fds_file)
     fds_lines = fds_data.readlines()
 
     for l in fds_lines:
@@ -199,7 +199,7 @@ def get_fds_geo(_fds_file):
     holes = []
     geometry = np.zeros((len(dim_y), len(dim_x)))
 
-    fds = open(_fds_file[0], newline=None)
+    fds = open(_fds_file, newline=None)
     logging.info('Opening %s to read out meshes, obstacles and holes', _fds_file[0])
     fds_entries = fds.readlines()
 
@@ -493,11 +493,13 @@ def main():
     config_logger (logfile)
     logging.info ("script path: <%s>", script_dir)
     logging.info ("fds path: <%s>", fds_path)
-    fds_file = glob.glob (os.path.join (fds_path, '*.fds'))
-    logging.info ("fds_file: %s", fds_file[0])
-    if not fds_file:
+    fds_files = glob.glob (os.path.join (fds_path, '*.fds'))
+    if not fds_files:
         logging.critical("Found no fds file!")
         sys.exit("Found no fds file!")
+
+    fds_file = fds_files[0] # TODO: process only one file
+    logging.info ("fds_file: %s", fds_file)
     sfgrids_path = os.path.join (fds_path, "3_sfgrids")
     if os.path.exists (sfgrids_path):  # delete any existing directory
         logging.warning ("Delete {}".format (sfgrids_path))
