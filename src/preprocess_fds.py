@@ -94,7 +94,6 @@ def get_extend_and_grid(_fds_file):
                 l = l.split('IJK=')[-1]
                 l = re.split(r'[,=/]+', l)
                 l = [x.strip() for x in l]
-                print("l= ", l)
                 for elem in ['XB', 'MPI_PROCESS', '\n']:
                     if l.count(elem):
                         l.remove(elem)
@@ -190,14 +189,7 @@ def read_fds_line(fds_entry):
     coordinates = [x.strip() for x in fds_entry.split('XB')][1:]
     coordinates = ''.join(coordinates)
     coordinates = re.split(', |,| |=|/', coordinates)
-    for j, cord in enumerate(coordinates):
-        if isfloat(cord) or cord.isdigit():
-            coordinates[j] = float(cord)
-        else:
-            continue
-
-    coordinates = [x for x in coordinates if not isinstance(x, str)]#type(x) != str
-    coordinates = list(map(float, coordinates))
+    coordinates = [float(x) for x in coordinates if isfloat(x)]
     # increasing sorting of coordinate pairs:
     coordinates = sorted(coordinates[0:2]) + sorted(coordinates[2:4]) + sorted(coordinates[4:6])
     return coordinates
