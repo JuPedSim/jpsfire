@@ -69,7 +69,7 @@
 <!-- route choice models -->
   <route_choice_models>
 
-    <router router_id="7" description="AI">
+    <router router_id="7" description="smoke">
       <sensors>
 	<sensor sensor_id="2" description="Smoke" status="activated"/>
       </sensors>
