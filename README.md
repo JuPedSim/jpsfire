@@ -41,3 +41,18 @@ Available components:
 Upcoming components:
 -------------------
 Detection
+
+
+
+Roadmap
+-----
+
+
+- Further examples for SmokeSensor
+   - 3D?
+- Walking speed example
+- Toxicity analysis
+- Individual detection of smoke
+- Use floor field for everything
+
+
