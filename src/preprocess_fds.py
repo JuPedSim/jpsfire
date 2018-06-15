@@ -157,8 +157,8 @@ def getParserArgs():
     parser.add_argument("-e", "--end", type=float, default=200,
                         help="end time for fds input (default: T_END from fds file)",
                         required=False)
-    parser.add_argument("-g", "--delta_sfgrid", type=float, default=1.0,
-                        help="Resolution of smoke factor grids (default: 1.0)",
+    parser.add_argument("-g", "--delta_sfgrid", type=float, default=0.25, # fast fix as sim has dx=0.25
+                        help="Resolution of smoke factor grids (default: 0.25)",
                         required=False)
     parser.add_argument("-v", "--pov", type=tuple, default=('12.5', ',', '5.5'),
                         help="Point of view for line of sight calculation: x,y",
@@ -304,7 +304,7 @@ def smoke_factor_conv(_convert, Exit, _Time):
     :param _Time: float
     :return: creates a new file.
     """
-    _sfgrids_path = os.path.join(fds_path, "3_sfgrids")
+    _sfgrids_path = os.path.join(fds_path, "sf_grids")
     door_path = os.path.join(_sfgrids_path,
                              '%s' % quantity,
                              '%s_%.6f' % (specified_location[0], specified_location[1]),
@@ -368,6 +368,7 @@ def smoke_factor_conv(_convert, Exit, _Time):
     npz_file = os.path.join(door_path, 't_%.0f.000000.npz' % _Time)
     logging.info('Call save')
     # array_to_save = np.array((header, smoke_factor_grid_norm))
+    print(np.shape(smoke_factor_grid_norm))
     np.savez(npz_file, header=header, smoke_factor_grid_norm=smoke_factor_grid_norm)
     logging.info('Write smoke factor grid -- \n %s', npz_file)
 
@@ -458,7 +459,7 @@ def plot_smoke_grids(_exit, _Time, _Smoke_factor_grid_norm, _geometry):
     figname = os.path.join(sfgrids_path,
                            '%s' % quantity,
                            '%s_%.6f' % (specified_location[0], specified_location[1]),
-                           'sfgrids_X%.2f_Y%.2f_%.4d.png' % (X, Y, _Time))
+                           'sf_grids_X%.2f_Y%.2f_%.4d.png' % (X, Y, _Time))
     plt.savefig(figname)
     plt.close()
     logging.info('Plot smoke factor grid: <%s>', figname)
@@ -482,7 +483,7 @@ def main():
 
     fds_file = fds_files[0]  # TODO: process only one file
     logging.info("fds_file: %s", fds_file)
-    sfgrids_path = os.path.join(fds_path, "3_sfgrids")
+    sfgrids_path = os.path.join(fds_path, "sf_grids")
     if os.path.exists(sfgrids_path):  # delete any existing directory
         logging.warning("Delete {}".format(sfgrids_path))
         shutil.rmtree(sfgrids_path)
@@ -526,6 +527,7 @@ def main():
     logging.info('FDS grid resolution is dx = %.2f, dy = %.2f, dz = %.2f' % (dx, dy, dz))
     dim_x = np.arange(x_min, x_max + 0.01, dx)
     dim_y = np.arange(y_min, y_max + 0.01, dy)
+    delta_smoke_factor_grid = cmdl_args.delta_sfgrid
     # =============================================
     # Readout of obstacles and holes from .fds file
     # =============================================
@@ -574,7 +576,7 @@ def main():
         max_coefficient = max(cmax, max_coefficient)
 
     max_coefficient = 2.5  # FIXME: we need to check this
-    extinction_grids_path = os.path.join(fds_path, '2_extinction_grids', quantity)
+    extinction_grids_path = os.path.join(fds_path, 'extinction_grids', quantity)
     if not os.path.exists(extinction_grids_path):
         os.makedirs(extinction_grids_path)
         logging.info('create directory <%s>', extinction_grids_path)
@@ -584,8 +586,13 @@ def main():
         os.makedirs(Z_directory)
         logging.info("create directory <%s>" % Z_directory)
     for it in range(0, times):
+        header = (delta_smoke_factor_grid, x_min, x_max, y_min, y_max)
+        extinction_norm = 1 # FIXME: fast fix so that npz files are read
         ext_file = os.path.join(Z_directory, 't_%.0f.000000.npz' % slice_data.times[it])
-        np.savez(ext_file, data[it])
+        #print(np.max(data[it]))
+        print(np.shape(data[it]))
+        print(data[it])
+        np.savez(ext_file, header=header, smoke_factor_grid_norm=data[it])
     if plots:
         plt.figure()
         for _id, it in enumerate(slice_data.times):

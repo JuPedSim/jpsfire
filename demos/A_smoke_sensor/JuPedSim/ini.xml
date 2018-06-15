@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<JuPedSim project="scenario_ben" version="0.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../xsd/jps_ini_core.xsd">
+<JuPedSim project="scenario_ben" version="0.8"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="../../xsd/jps_ini_core.xsd">
 
 <!-- header: seed, geometry, output format -->
-<seed>54574</seed>
+<seed>54683</seed>
 <max_sim_time>200</max_sim_time>
 <!--maxCPU>1</maxCPU-->
 
@@ -19,18 +21,18 @@
 
 <!-- configuration of fire simulation input -->
 <JPSfire>
-	<A_smoke_sensor smoke_factor_grids="../FDS/3_sfgrids/" update_time="10.0" final_time="100.0" />
-	<!--B_walking_speed extinction_grids="../FDS/2_extinction_grids/"
-		update_time="10.0" final_time="90.0" study="Frantzich+Nilsson2003" irritant="false"/-->
-
+	<A_smoke_sensor smoke_factor_grids="../FDS/sf_grids/"
+		update_time="10.0" final_time="100.0"/>
+	<B_walking_speed extinction_grids="../FDS/extinction_grids/"
+		update_time="10.0" final_time="100.0" study="Fridolf2018" irritant="false"/>
 </JPSfire>
 
 <!-- agents -->
 <agents operational_model_id="3">
 	<agents_distribution>
 		<group group_id="1" agent_parameter_id="1" room_id="0" subroom_id="0"
-			number="60" router_id="7" pre_movement_mean="10" pre_movement_sigma="0"
-			risk_tolerance_alpha="12.0" risk_tolerance_beta="7.0"/>
+			number="50" router_id="7" pre_movement_mean="50" pre_movement_sigma="0"
+			risk_tolerance_alpha="12.0" risk_tolerance_beta="3.0"/>
 
 			<!--risk tolerance values for orientation: #todo: into wiki
 			low risk (taking no-smoke route) alpha=12.0 beta=12.0
@@ -48,7 +50,7 @@
 			<solver>euler</solver>
 			<stepsize>0.1</stepsize>
 	<periodic>0</periodic>
-			<exit_crossing_strategy>1</exit_crossing_strategy>
+			<exit_crossing_strategy>3</exit_crossing_strategy>
 			<linkedcells enabled="true" cell_size="30"/>
 			<force_ped  a="5" D="0.1"/>
 			<force_wall a="5" D="0.02"/>
@@ -68,7 +70,6 @@
 
 <!-- route choice models -->
   <route_choice_models>
-
     <router router_id="7" description="smoke">
       <sensors>
 	<sensor sensor_id="2" description="Smoke" status="activated"/>
@@ -77,7 +78,6 @@
 	  <parameters>
         </parameters>
     </router>
-
   </route_choice_models>
 
 </JuPedSim>
