@@ -157,7 +157,7 @@ def getParserArgs():
     parser.add_argument("-e", "--end", type=float, default=200,
                         help="end time for fds input (default: T_END from fds file)",
                         required=False)
-    parser.add_argument("-g", "--delta_sfgrid", type=float, default=0.25, # fast fix as sim has dx=0.25
+    parser.add_argument("-g", "--delta_sfgrid", type=float, default=dx, # fast fix as sim has dx=0.25, use dx from fds
                         help="Resolution of smoke factor grids (default: 0.25)",
                         required=False)
     parser.add_argument("-v", "--pov", type=tuple, default=('12.5', ',', '5.5'),
@@ -368,7 +368,7 @@ def smoke_factor_conv(_convert, Exit, _Time):
     npz_file = os.path.join(door_path, 't_%.0f.000000.npz' % _Time)
     logging.info('Call save')
     # array_to_save = np.array((header, smoke_factor_grid_norm))
-    print(np.shape(smoke_factor_grid_norm))
+    #print(np.shape(smoke_factor_grid_norm))
     np.savez(npz_file, header=header, smoke_factor_grid_norm=smoke_factor_grid_norm)
     logging.info('Write smoke factor grid -- \n %s', npz_file)
 
@@ -587,11 +587,10 @@ def main():
         logging.info("create directory <%s>" % Z_directory)
     for it in range(0, times):
         header = (delta_smoke_factor_grid, x_min, x_max, y_min, y_max)
-        extinction_norm = 1 # FIXME: fast fix so that npz files are read
         ext_file = os.path.join(Z_directory, 't_%.0f.000000.npz' % slice_data.times[it])
         #print(np.max(data[it]))
-        print(np.shape(data[it]))
-        print(data[it])
+        #print(np.shape(data[it]))
+        #print(data[it])
         np.savez(ext_file, header=header, smoke_factor_grid_norm=data[it])
     if plots:
         plt.figure()

@@ -25,6 +25,9 @@
 		update_time="10.0" final_time="100.0"/>
 	<B_walking_speed extinction_grids="../FDS/extinction_grids/"
 		update_time="10.0" final_time="100.0" study="Fridolf2018" irritant="false"/>
+	<C_toxicity_analysis toxicity_grids="../FDS/toxicity_grids/"
+		update_time="20" final_time="100.0" />
+
 </JPSfire>
 
 <!-- agents -->
