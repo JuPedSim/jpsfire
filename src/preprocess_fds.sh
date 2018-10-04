@@ -8,9 +8,7 @@ chids=(
 'smoke_sensor'
 )
 
-quantities=(
-'EXTINCTION COEFFICIENT'
-)
+quantities=('CO2','EXTINCTION COEFFICIENT', 'CO', 'HCN', 'TEMPERATURE')
 
 locations=(
 'Z',2.25
@@ -25,20 +23,17 @@ locations=(
 #   wait
 # done
 
-cd A_smoke_sensor
+# cd A_smoke_sensor
 
-for location in "${locations[@]}"
-do
-  IFS=","; set $location;
-  # $1 = slice_dim as str and $2 = slice_coord as float
+#for quantity in "${quantities[@]}"
+#do
+#  echo Slicefile quantity: "$quantity"
+#  echo python3 preprocess_fds.py -q "$quantity"
+#  python3 preprocess_fds.py -q "$quantity"
+#done
 
-  for quantity in "${quantities[@]}"
-  do
-     echo Slicefile quantity: "$quantity"
-     echo Slicefile dimension: "$1"
-     echo Slicefile coordinate: $2
-
-     python3 0_main_script.py -q "$quantity" -d "$1" -c $2
-
-  done
-done
+python3 preprocess_fds.py -q 'CO2'
+python3 preprocess_fds.py -q 'CO'
+python3 preprocess_fds.py -q 'HCN'
+python3 preprocess_fds.py -q 'TEMPERATURE'
+python3 preprocess_fds.py -q 'EXTINCTION COEFFICIENT'
