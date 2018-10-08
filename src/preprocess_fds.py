@@ -464,6 +464,17 @@ def plot_smoke_grids(_exit, _Time, _Smoke_factor_grid_norm, _geometry):
     plt.close()
     logging.info('Plot smoke factor grid: <%s>', figname)
 
+def slice_label_conv(quantity):
+    if quantity == 'EXTINCTION_COEFFICIENT':
+        return 'ext_coef_C1H0'
+    elif quantity == 'CARBON_DIOXIDE_VOLUME_FRACTION':
+        return 'X_CO2'
+    elif quantity == 'CARBON_MONOXIDE_VOLUME_FRACTION':
+        return 'X_CO'
+    elif quantity == 'HYDROGEN_CYANIDE_VOLUME_FRACTION':
+        return 'X_HCN'
+    elif quantity == 'TEMPERATURE':
+        return 'temp'
 
 def main():
     global fds_path, logfile, sfgrids_path, fds_file, quantity, specified_location, \
@@ -488,7 +499,7 @@ def main():
     quantity = cmdl_args.slice_quantity
     quantity = quantity.replace(' ', '_')
     logging.info("Quantity: %s" % quantity)
-    specified_location = (cmdl_args.slice_dim, cmdl_args.slice_coord)  # TODO: necessary?
+    specified_location = (cmdl_args.slice_dim, cmdl_args.slice_coord)
     logging.info("Specified location: %s %s" % specified_location)
     t_start = cmdl_args.start
     logging.info("t_start: %.1f" % t_start)
@@ -534,17 +545,7 @@ def main():
     # read in meshes
     meshes = fs.readMeshes(os.path.join(root_dir, smv_fn))
     # select matching slice
-    if quantity == 'EXTINCTION_COEFFICIENT': # TODO: maybe a function for this conversion
-        slice_label = 'ext_coef_C1H0'
-    elif quantity == 'CO2':
-        slice_label = 'X_CO2'
-    elif quantity == 'CO':
-        slice_label = 'X_CO'
-    elif quantity == 'HCN':
-        slice_label = 'X_HCN'
-    elif quantity == 'TEMPERATURE':
-        slice_label = 'temp'
-
+    slice_label = slice_label_conv(quantity)
     sids = []
     for iis in range(len(sc.slices)):
         if sc[iis].label == slice_label:
@@ -575,24 +576,23 @@ def main():
         cmax = np.max(data[it])
         max_coefficient = max(cmax, max_coefficient)
 
-    max_coefficient = 2.5  # FIXME: we need to check this
-    extinction_grids_path = os.path.join(fds_path, 'grids', quantity)
-    if not os.path.exists(extinction_grids_path):
-        os.makedirs(extinction_grids_path)
-        logging.info('create directory <%s>', extinction_grids_path)
-    Z_directory = os.path.join(extinction_grids_path, '%s_%.6f' %
+    #max_coefficient = 2.5  # FIXME: actually not necessary
+    grids_path = os.path.join(fds_path, 'grids', quantity)
+    if not os.path.exists(grids_path):
+        os.makedirs(grids_path)
+        logging.info('create directory <%s>', grids_path)
+    Z_directory = os.path.join(grids_path, '%s_%.6f' %
                                (specified_location[0], specified_location[1]))
     if not os.path.exists(Z_directory):
         os.makedirs(Z_directory)
         logging.info("create directory <%s>" % Z_directory)
     for it in range(0, times):
         header = (delta_smoke_factor_grid, x_min, x_max, y_min, y_max)
-        ext_file = os.path.join(Z_directory, 't_%.0f.000000.npz' % slice_data.times[it]) # change back to .npz after tests
+        ext_file = os.path.join(Z_directory, 't_%.0f.000000.npz' % slice_data.times[it])
         #print(np.max(data[it]))
         #print(np.shape(data[it]))
         #print(data[it])
         np.savez(ext_file, header=header, smoke_factor_grid_norm=data[it])
-        #np.savetxt(ext_file, data[it])
     if plots:
         plt.figure()
         for _id, it in enumerate(slice_data.times):
@@ -610,7 +610,8 @@ def main():
             plt.savefig(figname_it)
             plt.clf()
 
-    if quantity == 'EXTINCTION_COEFFICIENT': #smoke factor grids do not need to be produced for gas concentrations
+    # smoke factor grids do not need to be produced for gas concentrations
+    if quantity == 'EXTINCTION_COEFFICIENT':
         sfgrids_path = os.path.join(fds_path, "sf_grids")
         if os.path.exists(sfgrids_path):  # delete any existing directory
             logging.warning("Delete {}".format(sfgrids_path))
@@ -620,7 +621,7 @@ def main():
         except OSError as exc:
             logging.critical("Can not make directory {} error={}".format(sfgrids_path, exc))
             sys.exit("Error: Can not make directory %s" % sfgrids_path)
-        logging.info("Create {}".format(sfgrids_path))        
+        logging.info("Create {}".format(sfgrids_path))
         # ============================================================================
         # Readout of crossings and transitions from jps geometry (saved as dictionary)
         # ============================================================================
