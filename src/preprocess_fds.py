@@ -219,9 +219,9 @@ def get_fds_geo(_fds_file):
 
     obsts = np.reshape(obsts, (-1, 6))
     holes = np.reshape(holes, (-1, 6))
-    np.savetxt('obst.txt', obsts)
-    np.savetxt('hole.txt', holes)
-    np.savetxt('geometry.txt', geometry)
+    #np.savetxt('obst.txt', obsts)
+    #np.savetxt('hole.txt', holes)
+    #np.savetxt('geometry.txt', geometry)
 
     return geometry
 

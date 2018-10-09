@@ -15,6 +15,14 @@ locations=(
 'Z',2.25 #height for extinction coefficient (must be compliant with FDS simulation)
 'Z',1.75 #height for FED calculation (must be compliant with FDS simulation)
 )
+
+#jps_path=(
+#'../demos/C_toxicity_analysis/JuPedSim'
+#)
+
+#fds_path=(
+#'../demos/C_toxicity_analysis/FDS'
+#)
 #==================AUTOMATIC PART - NO CHANGES NECEASSARY=======================
 
 #FED grids
@@ -25,6 +33,7 @@ for quantity in "${quantities_FED[@]}"
 do
   echo Slicefile quantity: "$quantity"
   echo Slicefile dimension: "$1", coordinate: $2 m
+  #python3 preprocess_fds.py -q "$quantity" -d "$1" -c $2 -p -j "${jps_path}" -f "${fds_path}"
   python3 preprocess_fds.py -q "$quantity" -d "$1" -c $2 -p
 done
 
