@@ -135,7 +135,7 @@ def getParserArgs():
         description="Read out of SmokeView slicefiles and conversion to grid")
     parser.add_argument("-q", "--slice_quantity", type=str, default='EXTINCTION COEFFICIENT',
                         help=
-                        "quantity of the slicefile (default: EXTINCTION COEFFICIENT), further quantities are: CO2, CO, HCN, TEMPERATURE",
+                        "quantity of the slicefile (default: EXTINCTION COEFFICIENT), further quantities are: CO2, CO, HCN, HCL, TEMPERATURE",
                         required=False)
     parser.add_argument("-d", "--slice_dim", type=str, default='Z',
                         help="axis of the slicefile (default: Z)",
@@ -473,6 +473,8 @@ def slice_label_conv(quantity):
         return 'X_CO'
     elif quantity == 'HYDROGEN_CYANIDE_VOLUME_FRACTION':
         return 'X_HCN'
+    elif quantity == 'HYDROGEN_CHLORIDE_VOLUME_FRACTION':
+        return 'X_HCl'
     elif quantity == 'TEMPERATURE':
         return 'temp'
 

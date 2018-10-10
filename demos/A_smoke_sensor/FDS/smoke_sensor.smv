@@ -659,6 +659,11 @@ SLCC     1 # STRUCTURED &     0   140     0    20     8     8
  mol/mol
 SLCC     1 # STRUCTURED &     0   140     0    20     8     8
  smoke_sensor_0001_05.sf
+ HYDROGEN CHLORIDE VOLUME FRACTION
+ X_HCl
+ mol/mol
+SLCC     1 # STRUCTURED &     0   140     0    20     8     8
+ smoke_sensor_0001_06.sf
  TEMPERATURE
  temp
  C
@@ -694,6 +699,11 @@ SLCC     2 # STRUCTURED &     0   140     0    20     8     8
  mol/mol
 SLCC     2 # STRUCTURED &     0   140     0    20     8     8
  smoke_sensor_0002_05.sf
+ HYDROGEN CHLORIDE VOLUME FRACTION
+ X_HCl
+ mol/mol
+SLCC     2 # STRUCTURED &     0   140     0    20     8     8
+ smoke_sensor_0002_06.sf
  TEMPERATURE
  temp
  C
