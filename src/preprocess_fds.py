@@ -145,9 +145,9 @@ def getParserArgs():
                         help="coordinate on the axis (default: 2.25)",
                         required=False)
     parser.add_argument("-p", "--plot", dest="plot", action='store_true')
-    parser.add_argument("-j", "--jps", type=str, default='../demos/A_smoke_sensor/JuPedSim',
+    parser.add_argument("-j", "--jps", type=str, default='../demos/0_demo/JuPedSim',
                         help="Path pointing to the JuPedSim simulation directory", required=False)
-    parser.add_argument("-f", "--fds", type=str, default='../demos/A_smoke_sensor/FDS',
+    parser.add_argument("-f", "--fds", type=str, default='../demos/0_demo/FDS',
                         help="Path pointing to the FDS simulation directory",
                         required=False)
 
