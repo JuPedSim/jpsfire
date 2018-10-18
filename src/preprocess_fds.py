@@ -613,7 +613,7 @@ def main():
             plt.clf()
 
     # smoke factor grids do not need to be produced for gas concentrations
-    if quantity == 'EXTINCTION_COEFFICIENT':
+    if quantity == 'EXTINCTION_COEFFICIENT' and specified_location == ('Z', 2.25):
         sfgrids_path = os.path.join(fds_path, "sf_grids")
         if os.path.exists(sfgrids_path):  # delete any existing directory
             logging.warning("Delete {}".format(sfgrids_path))

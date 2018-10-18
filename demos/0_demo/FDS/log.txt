@@ -17,6 +17,8 @@ INFO [preprocess_fds.py:get_fds_geo:200]  Opening ../demos/0_demo/FDS/jpsfire.fd
 INFO [preprocess_fds.py:main:544]  smv file found: jpsfire_demo.smv
 DEBUG [slice.py:readSliceInfos:463]  scanning smv file for slices: ../demos/0_demo/FDS/jpsfire_demo.smv
 DEBUG [slice.py:readSliceInfos:474]  slice centered: True
+DEBUG [slice.py:readSliceInfos:493]  slice info: 0 [[0, 140], [0, 20], [8, 8]]
+DEBUG [slice.py:readSliceInfos:474]  slice centered: True
 DEBUG [slice.py:readSliceInfos:493]  slice info: 0 [[0, 140], [0, 20], [10, 10]]
 DEBUG [slice.py:readSliceInfos:474]  slice centered: True
 DEBUG [slice.py:readSliceInfos:493]  slice info: 0 [[0, 140], [0, 20], [8, 8]]
@@ -28,6 +30,8 @@ DEBUG [slice.py:readSliceInfos:474]  slice centered: True
 DEBUG [slice.py:readSliceInfos:493]  slice info: 0 [[0, 140], [0, 20], [8, 8]]
 DEBUG [slice.py:readSliceInfos:474]  slice centered: True
 DEBUG [slice.py:readSliceInfos:493]  slice info: 0 [[0, 140], [0, 20], [8, 8]]
+DEBUG [slice.py:readSliceInfos:474]  slice centered: True
+DEBUG [slice.py:readSliceInfos:493]  slice info: 1 [[0, 140], [0, 20], [8, 8]]
 DEBUG [slice.py:readSliceInfos:474]  slice centered: True
 DEBUG [slice.py:readSliceInfos:493]  slice info: 1 [[0, 140], [0, 20], [10, 10]]
 DEBUG [slice.py:readSliceInfos:474]  slice centered: True
@@ -46,8 +50,10 @@ DEBUG [slice.py:readMeshes:141]  number of cells: 141 x 21 x 11
 DEBUG [slice.py:readMeshes:130]  found MESH with label: Mesh2
 DEBUG [slice.py:readMeshes:141]  number of cells: 141 x 21 x 11
 INFO [preprocess_fds.py:main:555]  found matching slice with id: 0
-INFO [preprocess_fds.py:main:555]  found matching slice with id: 6
-INFO [preprocess_fds.py:main:573]  Combination for number of slices: 2
+INFO [preprocess_fds.py:main:555]  found matching slice with id: 1
+INFO [preprocess_fds.py:main:555]  found matching slice with id: 7
+INFO [preprocess_fds.py:main:555]  found matching slice with id: 8
+INFO [preprocess_fds.py:main:573]  Combination for number of slices: 4
 INFO [preprocess_fds.py:main:590]  create directory <../demos/0_demo/FDS/grids/EXTINCTION_COEFFICIENT/Z_2.250000>
 INFO [preprocess_fds.py:main:611]  plot slicedata: ../demos/0_demo/FDS/grids/EXTINCTION_COEFFICIENT/Z_2.250000/single_slice_0000.png
 INFO [preprocess_fds.py:main:611]  plot slicedata: ../demos/0_demo/FDS/grids/EXTINCTION_COEFFICIENT/Z_2.250000/single_slice_0001.png
@@ -61,7 +67,6 @@ INFO [preprocess_fds.py:main:611]  plot slicedata: ../demos/0_demo/FDS/grids/EXT
 INFO [preprocess_fds.py:main:611]  plot slicedata: ../demos/0_demo/FDS/grids/EXTINCTION_COEFFICIENT/Z_2.250000/single_slice_0009.png
 INFO [preprocess_fds.py:main:611]  plot slicedata: ../demos/0_demo/FDS/grids/EXTINCTION_COEFFICIENT/Z_2.250000/single_slice_0010.png
 INFO [preprocess_fds.py:main:611]  plot slicedata: ../demos/0_demo/FDS/grids/EXTINCTION_COEFFICIENT/Z_2.250000/single_slice_0011.png
-WARNING [preprocess_fds.py:main:619]  Delete ../demos/0_demo/FDS/sf_grids
 INFO [preprocess_fds.py:main:626]  Create ../demos/0_demo/FDS/sf_grids
 INFO [preprocess_fds.py:get_exits:244]  Geometry file: jpsfire_geo.xml
 INFO [preprocess_fds.py:main:635]  Generation of smoke factor grids with mesh resolution: 0.25 [m]
@@ -485,4 +490,4 @@ INFO [preprocess_fds.py:main:648]  ---------------------------------------------
 INFO [preprocess_fds.py:main:649]  Plotting files for time: 110s and Exit: trans_1
 INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X-10.00_Y6.00_0110.png>
 INFO [preprocess_fds.py:plot_line_sights:433]  Save: ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/debug_trans_0_110.12.png
-INFO [preprocess_fds.py:<module>:671]  ***  Finished in 84.91 s ***
+INFO [preprocess_fds.py:<module>:671]  ***  Finished in 84.43 s ***

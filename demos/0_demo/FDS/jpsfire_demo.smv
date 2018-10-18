@@ -637,33 +637,38 @@ SMOKF3D     1
  HRRPUV
  hrrpuv
  kW/m3
-SLCC     1 # STRUCTURED &     0   140     0    20    10    10
+SLCC     1 # STRUCTURED &     0   140     0    20     8     8
  jpsfire_demo_0001_01.sf
  SOOT EXTINCTION COEFFICIENT
  ext_coef_C1H0
  1/m
-SLCC     1 # STRUCTURED &     0   140     0    20     8     8
+SLCC     1 # STRUCTURED &     0   140     0    20    10    10
  jpsfire_demo_0001_02.sf
+ SOOT EXTINCTION COEFFICIENT
+ ext_coef_C1H0
+ 1/m
+SLCC     1 # STRUCTURED &     0   140     0    20     8     8
+ jpsfire_demo_0001_03.sf
  CARBON DIOXIDE VOLUME FRACTION
  X_CO2
  mol/mol
 SLCC     1 # STRUCTURED &     0   140     0    20     8     8
- jpsfire_demo_0001_03.sf
+ jpsfire_demo_0001_04.sf
  CARBON MONOXIDE VOLUME FRACTION
  X_CO
  mol/mol
 SLCC     1 # STRUCTURED &     0   140     0    20     8     8
- jpsfire_demo_0001_04.sf
+ jpsfire_demo_0001_05.sf
  HYDROGEN CYANIDE VOLUME FRACTION
  X_HCN
  mol/mol
 SLCC     1 # STRUCTURED &     0   140     0    20     8     8
- jpsfire_demo_0001_05.sf
+ jpsfire_demo_0001_06.sf
  HYDROGEN CHLORIDE VOLUME FRACTION
  X_HCl
  mol/mol
 SLCC     1 # STRUCTURED &     0   140     0    20     8     8
- jpsfire_demo_0001_06.sf
+ jpsfire_demo_0001_07.sf
  TEMPERATURE
  temp
  C
@@ -677,33 +682,38 @@ SMOKF3D     2
  HRRPUV
  hrrpuv
  kW/m3
-SLCC     2 # STRUCTURED &     0   140     0    20    10    10
+SLCC     2 # STRUCTURED &     0   140     0    20     8     8
  jpsfire_demo_0002_01.sf
  SOOT EXTINCTION COEFFICIENT
  ext_coef_C1H0
  1/m
-SLCC     2 # STRUCTURED &     0   140     0    20     8     8
+SLCC     2 # STRUCTURED &     0   140     0    20    10    10
  jpsfire_demo_0002_02.sf
+ SOOT EXTINCTION COEFFICIENT
+ ext_coef_C1H0
+ 1/m
+SLCC     2 # STRUCTURED &     0   140     0    20     8     8
+ jpsfire_demo_0002_03.sf
  CARBON DIOXIDE VOLUME FRACTION
  X_CO2
  mol/mol
 SLCC     2 # STRUCTURED &     0   140     0    20     8     8
- jpsfire_demo_0002_03.sf
+ jpsfire_demo_0002_04.sf
  CARBON MONOXIDE VOLUME FRACTION
  X_CO
  mol/mol
 SLCC     2 # STRUCTURED &     0   140     0    20     8     8
- jpsfire_demo_0002_04.sf
+ jpsfire_demo_0002_05.sf
  HYDROGEN CYANIDE VOLUME FRACTION
  X_HCN
  mol/mol
 SLCC     2 # STRUCTURED &     0   140     0    20     8     8
- jpsfire_demo_0002_05.sf
+ jpsfire_demo_0002_06.sf
  HYDROGEN CHLORIDE VOLUME FRACTION
  X_HCl
  mol/mol
 SLCC     2 # STRUCTURED &     0   140     0    20     8     8
- jpsfire_demo_0002_06.sf
+ jpsfire_demo_0002_07.sf
  TEMPERATURE
  temp
  C
