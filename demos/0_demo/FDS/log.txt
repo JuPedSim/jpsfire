@@ -1,0 +1,493 @@
+INFO [preprocess_fds.py:main:490]  script path: </Users/benhein/Workspace/jpsfire/src>
+INFO [preprocess_fds.py:main:491]  fds path: <../demos/0_demo/FDS>
+INFO [preprocess_fds.py:main:498]  fds_file: ../demos/0_demo/FDS/jpsfire.fds
+INFO [preprocess_fds.py:main:500]  jps_path: ../demos/0_demo/JuPedSim
+INFO [preprocess_fds.py:main:503]  Quantity: EXTINCTION_COEFFICIENT
+INFO [preprocess_fds.py:main:505]  Specified location: Z 2.25
+INFO [preprocess_fds.py:main:507]  t_start: 0.0
+INFO [preprocess_fds.py:main:509]  t_stop: 200.0
+WARNING [preprocess_fds.py:get_tstep:112]  Looking for inifile. Pattern <../demos/0_demo/JuPedSim/*ini*.xml>
+WARNING [preprocess_fds.py:get_tstep:119]  Found inifile ../demos/0_demo/JuPedSim/jpsfire_ini.xml
+INFO [preprocess_fds.py:main:511]  t_step: 10.0
+INFO [preprocess_fds.py:main:513]  Plot: On
+INFO [preprocess_fds.py:main:523]  View point: (12.5, 5.5)
+INFO [preprocess_fds.py:main:529]  FDS coordinates are xmin = -10.00, xmax = 25.00, ymin = 0.00, ymax = 10.00, zmin = 0.00, zmax = 2.50
+INFO [preprocess_fds.py:main:530]  FDS grid resolution is dx = 0.25, dy = 0.25, dz = 0.25
+INFO [preprocess_fds.py:get_fds_geo:200]  Opening ../demos/0_demo/FDS/jpsfire.fds to read out meshes, obstacles and holes
+INFO [preprocess_fds.py:main:544]  smv file found: jpsfire_demo.smv
+DEBUG [slice.py:readSliceInfos:463]  scanning smv file for slices: ../demos/0_demo/FDS/jpsfire_demo.smv
+DEBUG [slice.py:readSliceInfos:474]  slice centered: True
+DEBUG [slice.py:readSliceInfos:493]  slice info: 0 [[0, 140], [0, 20], [8, 8]]
+DEBUG [slice.py:readSliceInfos:474]  slice centered: True
+DEBUG [slice.py:readSliceInfos:493]  slice info: 0 [[0, 140], [0, 20], [10, 10]]
+DEBUG [slice.py:readSliceInfos:474]  slice centered: True
+DEBUG [slice.py:readSliceInfos:493]  slice info: 0 [[0, 140], [0, 20], [8, 8]]
+DEBUG [slice.py:readSliceInfos:474]  slice centered: True
+DEBUG [slice.py:readSliceInfos:493]  slice info: 0 [[0, 140], [0, 20], [8, 8]]
+DEBUG [slice.py:readSliceInfos:474]  slice centered: True
+DEBUG [slice.py:readSliceInfos:493]  slice info: 0 [[0, 140], [0, 20], [8, 8]]
+DEBUG [slice.py:readSliceInfos:474]  slice centered: True
+DEBUG [slice.py:readSliceInfos:493]  slice info: 0 [[0, 140], [0, 20], [8, 8]]
+DEBUG [slice.py:readSliceInfos:474]  slice centered: True
+DEBUG [slice.py:readSliceInfos:493]  slice info: 0 [[0, 140], [0, 20], [8, 8]]
+DEBUG [slice.py:readSliceInfos:474]  slice centered: True
+DEBUG [slice.py:readSliceInfos:493]  slice info: 1 [[0, 140], [0, 20], [8, 8]]
+DEBUG [slice.py:readSliceInfos:474]  slice centered: True
+DEBUG [slice.py:readSliceInfos:493]  slice info: 1 [[0, 140], [0, 20], [10, 10]]
+DEBUG [slice.py:readSliceInfos:474]  slice centered: True
+DEBUG [slice.py:readSliceInfos:493]  slice info: 1 [[0, 140], [0, 20], [8, 8]]
+DEBUG [slice.py:readSliceInfos:474]  slice centered: True
+DEBUG [slice.py:readSliceInfos:493]  slice info: 1 [[0, 140], [0, 20], [8, 8]]
+DEBUG [slice.py:readSliceInfos:474]  slice centered: True
+DEBUG [slice.py:readSliceInfos:493]  slice info: 1 [[0, 140], [0, 20], [8, 8]]
+DEBUG [slice.py:readSliceInfos:474]  slice centered: True
+DEBUG [slice.py:readSliceInfos:493]  slice info: 1 [[0, 140], [0, 20], [8, 8]]
+DEBUG [slice.py:readSliceInfos:474]  slice centered: True
+DEBUG [slice.py:readSliceInfos:493]  slice info: 1 [[0, 140], [0, 20], [8, 8]]
+DEBUG [slice.py:readMeshes:119]  scanning smv file for meshes: ../demos/0_demo/FDS/jpsfire_demo.smv
+DEBUG [slice.py:readMeshes:130]  found MESH with label: Mesh1
+DEBUG [slice.py:readMeshes:141]  number of cells: 141 x 21 x 11
+DEBUG [slice.py:readMeshes:130]  found MESH with label: Mesh2
+DEBUG [slice.py:readMeshes:141]  number of cells: 141 x 21 x 11
+INFO [preprocess_fds.py:main:555]  found matching slice with id: 0
+INFO [preprocess_fds.py:main:555]  found matching slice with id: 1
+INFO [preprocess_fds.py:main:555]  found matching slice with id: 7
+INFO [preprocess_fds.py:main:555]  found matching slice with id: 8
+INFO [preprocess_fds.py:main:573]  Combination for number of slices: 4
+INFO [preprocess_fds.py:main:590]  create directory <../demos/0_demo/FDS/grids/EXTINCTION_COEFFICIENT/Z_2.250000>
+INFO [preprocess_fds.py:main:611]  plot slicedata: ../demos/0_demo/FDS/grids/EXTINCTION_COEFFICIENT/Z_2.250000/single_slice_0000.png
+INFO [preprocess_fds.py:main:611]  plot slicedata: ../demos/0_demo/FDS/grids/EXTINCTION_COEFFICIENT/Z_2.250000/single_slice_0001.png
+INFO [preprocess_fds.py:main:611]  plot slicedata: ../demos/0_demo/FDS/grids/EXTINCTION_COEFFICIENT/Z_2.250000/single_slice_0002.png
+INFO [preprocess_fds.py:main:611]  plot slicedata: ../demos/0_demo/FDS/grids/EXTINCTION_COEFFICIENT/Z_2.250000/single_slice_0003.png
+INFO [preprocess_fds.py:main:611]  plot slicedata: ../demos/0_demo/FDS/grids/EXTINCTION_COEFFICIENT/Z_2.250000/single_slice_0004.png
+INFO [preprocess_fds.py:main:611]  plot slicedata: ../demos/0_demo/FDS/grids/EXTINCTION_COEFFICIENT/Z_2.250000/single_slice_0005.png
+INFO [preprocess_fds.py:main:611]  plot slicedata: ../demos/0_demo/FDS/grids/EXTINCTION_COEFFICIENT/Z_2.250000/single_slice_0006.png
+INFO [preprocess_fds.py:main:611]  plot slicedata: ../demos/0_demo/FDS/grids/EXTINCTION_COEFFICIENT/Z_2.250000/single_slice_0007.png
+INFO [preprocess_fds.py:main:611]  plot slicedata: ../demos/0_demo/FDS/grids/EXTINCTION_COEFFICIENT/Z_2.250000/single_slice_0008.png
+INFO [preprocess_fds.py:main:611]  plot slicedata: ../demos/0_demo/FDS/grids/EXTINCTION_COEFFICIENT/Z_2.250000/single_slice_0009.png
+INFO [preprocess_fds.py:main:611]  plot slicedata: ../demos/0_demo/FDS/grids/EXTINCTION_COEFFICIENT/Z_2.250000/single_slice_0010.png
+INFO [preprocess_fds.py:main:611]  plot slicedata: ../demos/0_demo/FDS/grids/EXTINCTION_COEFFICIENT/Z_2.250000/single_slice_0011.png
+INFO [preprocess_fds.py:main:626]  Create ../demos/0_demo/FDS/sf_grids
+INFO [preprocess_fds.py:get_exits:244]  Geometry file: jpsfire_geo.xml
+INFO [preprocess_fds.py:main:635]  Generation of smoke factor grids with mesh resolution: 0.25 [m]
+INFO [preprocess_fds.py:main:641]  --------------------------------------------------
+INFO [preprocess_fds.py:main:642]  Processing files for time: 0s
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000/t_0.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 0s and Exit: cross_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X12.50_Y5.00_0000.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000/t_0.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 0s and Exit: cross_3
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X17.50_Y7.00_0000.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000/t_0.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 0s and Exit: trans_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X25.00_Y6.00_0000.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000/t_0.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 0s and Exit: trans_1
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X-10.00_Y6.00_0000.png>
+INFO [preprocess_fds.py:plot_line_sights:433]  Save: ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/debug_trans_0_0.25.png
+INFO [preprocess_fds.py:main:641]  --------------------------------------------------
+INFO [preprocess_fds.py:main:642]  Processing files for time: 10s
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000/t_10.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 10s and Exit: cross_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X12.50_Y5.00_0010.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000/t_10.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 10s and Exit: cross_3
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X17.50_Y7.00_0010.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000/t_10.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 10s and Exit: trans_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X25.00_Y6.00_0010.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000/t_10.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 10s and Exit: trans_1
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X-10.00_Y6.00_0010.png>
+INFO [preprocess_fds.py:plot_line_sights:433]  Save: ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/debug_trans_0_10.09.png
+INFO [preprocess_fds.py:main:641]  --------------------------------------------------
+INFO [preprocess_fds.py:main:642]  Processing files for time: 20s
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000/t_20.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 20s and Exit: cross_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X12.50_Y5.00_0020.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000/t_20.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 20s and Exit: cross_3
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X17.50_Y7.00_0020.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000/t_20.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 20s and Exit: trans_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X25.00_Y6.00_0020.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000/t_20.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 20s and Exit: trans_1
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X-10.00_Y6.00_0020.png>
+INFO [preprocess_fds.py:plot_line_sights:433]  Save: ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/debug_trans_0_20.13.png
+INFO [preprocess_fds.py:main:641]  --------------------------------------------------
+INFO [preprocess_fds.py:main:642]  Processing files for time: 30s
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000/t_30.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 30s and Exit: cross_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X12.50_Y5.00_0030.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000/t_30.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 30s and Exit: cross_3
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X17.50_Y7.00_0030.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000/t_30.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 30s and Exit: trans_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X25.00_Y6.00_0030.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000/t_30.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 30s and Exit: trans_1
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X-10.00_Y6.00_0030.png>
+INFO [preprocess_fds.py:plot_line_sights:433]  Save: ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/debug_trans_0_30.07.png
+INFO [preprocess_fds.py:main:641]  --------------------------------------------------
+INFO [preprocess_fds.py:main:642]  Processing files for time: 40s
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000/t_40.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 40s and Exit: cross_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X12.50_Y5.00_0040.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000/t_40.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 40s and Exit: cross_3
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X17.50_Y7.00_0040.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000/t_40.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 40s and Exit: trans_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X25.00_Y6.00_0040.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000/t_40.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 40s and Exit: trans_1
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X-10.00_Y6.00_0040.png>
+INFO [preprocess_fds.py:plot_line_sights:433]  Save: ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/debug_trans_0_40.05.png
+INFO [preprocess_fds.py:main:641]  --------------------------------------------------
+INFO [preprocess_fds.py:main:642]  Processing files for time: 50s
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000/t_50.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 50s and Exit: cross_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X12.50_Y5.00_0050.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000/t_50.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 50s and Exit: cross_3
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X17.50_Y7.00_0050.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000/t_50.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 50s and Exit: trans_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X25.00_Y6.00_0050.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000/t_50.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 50s and Exit: trans_1
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X-10.00_Y6.00_0050.png>
+INFO [preprocess_fds.py:plot_line_sights:433]  Save: ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/debug_trans_0_50.12.png
+INFO [preprocess_fds.py:main:641]  --------------------------------------------------
+INFO [preprocess_fds.py:main:642]  Processing files for time: 60s
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000/t_60.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 60s and Exit: cross_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X12.50_Y5.00_0060.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000/t_60.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 60s and Exit: cross_3
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X17.50_Y7.00_0060.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000/t_60.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 60s and Exit: trans_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X25.00_Y6.00_0060.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000/t_60.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 60s and Exit: trans_1
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X-10.00_Y6.00_0060.png>
+INFO [preprocess_fds.py:plot_line_sights:433]  Save: ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/debug_trans_0_60.04.png
+INFO [preprocess_fds.py:main:641]  --------------------------------------------------
+INFO [preprocess_fds.py:main:642]  Processing files for time: 70s
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000/t_70.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 70s and Exit: cross_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X12.50_Y5.00_0070.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000/t_70.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 70s and Exit: cross_3
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X17.50_Y7.00_0070.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000/t_70.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 70s and Exit: trans_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X25.00_Y6.00_0070.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000/t_70.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 70s and Exit: trans_1
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X-10.00_Y6.00_0070.png>
+INFO [preprocess_fds.py:plot_line_sights:433]  Save: ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/debug_trans_0_70.12.png
+INFO [preprocess_fds.py:main:641]  --------------------------------------------------
+INFO [preprocess_fds.py:main:642]  Processing files for time: 80s
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000/t_80.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 80s and Exit: cross_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X12.50_Y5.00_0080.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000/t_80.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 80s and Exit: cross_3
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X17.50_Y7.00_0080.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000/t_80.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 80s and Exit: trans_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X25.00_Y6.00_0080.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000/t_80.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 80s and Exit: trans_1
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X-10.00_Y6.00_0080.png>
+INFO [preprocess_fds.py:plot_line_sights:433]  Save: ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/debug_trans_0_80.05.png
+INFO [preprocess_fds.py:main:641]  --------------------------------------------------
+INFO [preprocess_fds.py:main:642]  Processing files for time: 90s
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000/t_90.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 90s and Exit: cross_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X12.50_Y5.00_0090.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000/t_90.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 90s and Exit: cross_3
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X17.50_Y7.00_0090.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000/t_90.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 90s and Exit: trans_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X25.00_Y6.00_0090.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000/t_90.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 90s and Exit: trans_1
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X-10.00_Y6.00_0090.png>
+INFO [preprocess_fds.py:plot_line_sights:433]  Save: ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/debug_trans_0_90.05.png
+INFO [preprocess_fds.py:main:641]  --------------------------------------------------
+INFO [preprocess_fds.py:main:642]  Processing files for time: 100s
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000/t_100.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 100s and Exit: cross_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X12.50_Y5.00_0100.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000/t_100.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 100s and Exit: cross_3
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X17.50_Y7.00_0100.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000/t_100.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 100s and Exit: trans_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X25.00_Y6.00_0100.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000/t_100.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 100s and Exit: trans_1
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X-10.00_Y6.00_0100.png>
+INFO [preprocess_fds.py:plot_line_sights:433]  Save: ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/debug_trans_0_100.00.png
+INFO [preprocess_fds.py:main:641]  --------------------------------------------------
+INFO [preprocess_fds.py:main:642]  Processing files for time: 110s
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_12.500000_Y_5.000000/t_110.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 110s and Exit: cross_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X12.50_Y5.00_0110.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_17.500000_Y_7.000000/t_110.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 110s and Exit: cross_3
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X17.50_Y7.00_0110.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_25.000000_Y_6.000000/t_110.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 110s and Exit: trans_0
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X25.00_Y6.00_0110.png>
+INFO [preprocess_fds.py:smoke_factor_conv:312]  Door_path -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000
+INFO [preprocess_fds.py:smoke_factor_conv:369]  Call save
+INFO [preprocess_fds.py:smoke_factor_conv:373]  Write smoke factor grid -- 
+ ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/Door_X_-10.000000_Y_6.000000/t_110.000000.npz
+INFO [preprocess_fds.py:main:648]  --------------------------------------------------
+INFO [preprocess_fds.py:main:649]  Plotting files for time: 110s and Exit: trans_1
+INFO [preprocess_fds.py:plot_smoke_grids:465]  Plot smoke factor grid: <../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/sf_grids_X-10.00_Y6.00_0110.png>
+INFO [preprocess_fds.py:plot_line_sights:433]  Save: ../demos/0_demo/FDS/sf_grids/EXTINCTION_COEFFICIENT/Z_2.250000/debug_trans_0_110.12.png
+INFO [preprocess_fds.py:<module>:671]  ***  Finished in 84.43 s ***

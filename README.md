@@ -12,7 +12,7 @@ Usage:
 - In `Test` create two directories `FDS` and `JuPedSim`
   - In `FDS`: put fds-file and all corresponding `fds`-simulation results
   - In `JuPedSim`: put the files necessary to run a `jpscore` simulation, especially an ini-file and a geometry file.
-    Have a look into [demos/A_smoke_sensor/JuPedSim/ini.xml](demos/A_smoke_sensor/JuPedSim/ini.xml) to see
+    Have a look into [0_demo/JuPedSim/jpsfire_ini.xml](0_demo/JuPedSim/jpsfire_ini.xml) to see
     how to define the `jpsfire`-relevant information.
   - Run [src/preprocess_fds.py](src/preprocess_fds.py) to generate out of the FDS-simulation the relevant `npz-files`,
     which will be read during `jpscore` simulations.
@@ -33,9 +33,9 @@ Available components:
 
 - Smoke sensor
 
-- Walking speed reduction in smoke (WIP)
+- Walking speed reduction in smoke
 
-- Fire hazard analyses (WIP)
+- Fire hazard analyses
 
 
 Upcoming components:
@@ -43,15 +43,10 @@ Upcoming components:
 Detection
 
 
-
 Roadmap
 -----
 
-
-- Further examples for SmokeSensor
-   - 3D?
-- Walking speed example
-- Toxicity analysis
+- Further examples for SmokeSensor (3D?)
 - Individual detection of smoke
 - Use floor field for everything
 
