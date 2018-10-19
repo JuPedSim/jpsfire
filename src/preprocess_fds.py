@@ -133,9 +133,9 @@ def get_tstep(_jps_path):
 def getParserArgs():
     parser = argparse.ArgumentParser(
         description="Read out of SmokeView slicefiles and conversion to grid")
-    parser.add_argument("-q", "--slice_quantity", type=str, default="EXTINCTION COEFFICIENT",
+    parser.add_argument("-q", "--slice_quantity", type=str, default='EXTINCTION COEFFICIENT',
                         help=
-                        "quantity of the slicefile (default: EXTINCTION COEFFICIENT)",
+                        "quantity of the slicefile (default: EXTINCTION COEFFICIENT), further quantities are: CO2, CO, HCN, HCL, TEMPERATURE",
                         required=False)
     parser.add_argument("-d", "--slice_dim", type=str, default='Z',
                         help="axis of the slicefile (default: Z)",
@@ -145,9 +145,9 @@ def getParserArgs():
                         help="coordinate on the axis (default: 2.25)",
                         required=False)
     parser.add_argument("-p", "--plot", dest="plot", action='store_true')
-    parser.add_argument("-j", "--jps", type=str, default='../demos/A_smoke_sensor/JuPedSim',
+    parser.add_argument("-j", "--jps", type=str, default='../demos/0_demo/JuPedSim',
                         help="Path pointing to the JuPedSim simulation directory", required=False)
-    parser.add_argument("-f", "--fds", type=str, default='../demos/A_smoke_sensor/FDS',
+    parser.add_argument("-f", "--fds", type=str, default='../demos/0_demo/FDS',
                         help="Path pointing to the FDS simulation directory",
                         required=False)
 
@@ -157,7 +157,7 @@ def getParserArgs():
     parser.add_argument("-e", "--end", type=float, default=200,
                         help="end time for fds input (default: T_END from fds file)",
                         required=False)
-    parser.add_argument("-g", "--delta_sfgrid", type=float, default=0.25, # fast fix as sim has dx=0.25
+    parser.add_argument("-g", "--delta_sfgrid", type=float, default=0.25, # fast fix as sim has dx=0.25, use dx from fds
                         help="Resolution of smoke factor grids (default: 0.25)",
                         required=False)
     parser.add_argument("-v", "--pov", type=tuple, default=('12.5', ',', '5.5'),
@@ -219,9 +219,9 @@ def get_fds_geo(_fds_file):
 
     obsts = np.reshape(obsts, (-1, 6))
     holes = np.reshape(holes, (-1, 6))
-    np.savetxt('obst.txt', obsts)
-    np.savetxt('hole.txt', holes)
-    np.savetxt('geometry.txt', geometry)
+    #np.savetxt('obst.txt', obsts)
+    #np.savetxt('hole.txt', holes)
+    #np.savetxt('geometry.txt', geometry)
 
     return geometry
 
@@ -368,7 +368,7 @@ def smoke_factor_conv(_convert, Exit, _Time):
     npz_file = os.path.join(door_path, 't_%.0f.000000.npz' % _Time)
     logging.info('Call save')
     # array_to_save = np.array((header, smoke_factor_grid_norm))
-    print(np.shape(smoke_factor_grid_norm))
+    #print(np.shape(smoke_factor_grid_norm))
     np.savez(npz_file, header=header, smoke_factor_grid_norm=smoke_factor_grid_norm)
     logging.info('Write smoke factor grid -- \n %s', npz_file)
 
@@ -464,6 +464,19 @@ def plot_smoke_grids(_exit, _Time, _Smoke_factor_grid_norm, _geometry):
     plt.close()
     logging.info('Plot smoke factor grid: <%s>', figname)
 
+def slice_label_conv(quantity):
+    if quantity == 'EXTINCTION_COEFFICIENT':
+        return 'ext_coef_C1H0'
+    elif quantity == 'CARBON_DIOXIDE_VOLUME_FRACTION':
+        return 'X_CO2'
+    elif quantity == 'CARBON_MONOXIDE_VOLUME_FRACTION':
+        return 'X_CO'
+    elif quantity == 'HYDROGEN_CYANIDE_VOLUME_FRACTION':
+        return 'X_HCN'
+    elif quantity == 'HYDROGEN_CHLORIDE_VOLUME_FRACTION':
+        return 'X_HCl'
+    elif quantity == 'TEMPERATURE':
+        return 'temp'
 
 def main():
     global fds_path, logfile, sfgrids_path, fds_file, quantity, specified_location, \
@@ -483,22 +496,12 @@ def main():
 
     fds_file = fds_files[0]  # TODO: process only one file
     logging.info("fds_file: %s", fds_file)
-    sfgrids_path = os.path.join(fds_path, "sf_grids")
-    if os.path.exists(sfgrids_path):  # delete any existing directory
-        logging.warning("Delete {}".format(sfgrids_path))
-        shutil.rmtree(sfgrids_path)
-    try:
-        os.makedirs(sfgrids_path)
-    except OSError as exc:
-        logging.critical("Can not make directory {} error={}".format(sfgrids_path, exc))
-        sys.exit("Error: Can not make directory %s" % sfgrids_path)
-    logging.info("Create {}".format(sfgrids_path))
     jps_path = cmdl_args.jps
     logging.info("jps_path: %s" % jps_path)
     quantity = cmdl_args.slice_quantity
     quantity = quantity.replace(' ', '_')
     logging.info("Quantity: %s" % quantity)
-    specified_location = (cmdl_args.slice_dim, cmdl_args.slice_coord)  # TODO: necessary?
+    specified_location = (cmdl_args.slice_dim, cmdl_args.slice_coord)
     logging.info("Specified location: %s %s" % specified_location)
     t_start = cmdl_args.start
     logging.info("t_start: %.1f" % t_start)
@@ -544,7 +547,7 @@ def main():
     # read in meshes
     meshes = fs.readMeshes(os.path.join(root_dir, smv_fn))
     # select matching slice
-    slice_label = 'ext_coef_C0.9H0.1'
+    slice_label = slice_label_conv(quantity)
     sids = []
     for iis in range(len(sc.slices)):
         if sc[iis].label == slice_label:
@@ -575,23 +578,22 @@ def main():
         cmax = np.max(data[it])
         max_coefficient = max(cmax, max_coefficient)
 
-    max_coefficient = 2.5  # FIXME: we need to check this
-    extinction_grids_path = os.path.join(fds_path, 'extinction_grids', quantity)
-    if not os.path.exists(extinction_grids_path):
-        os.makedirs(extinction_grids_path)
-        logging.info('create directory <%s>', extinction_grids_path)
-    Z_directory = os.path.join(extinction_grids_path, '%s_%.6f' %
+    #max_coefficient = 2.5  # FIXME: actually not necessary
+    grids_path = os.path.join(fds_path, 'grids', quantity)
+    if not os.path.exists(grids_path):
+        os.makedirs(grids_path)
+        logging.info('create directory <%s>', grids_path)
+    Z_directory = os.path.join(grids_path, '%s_%.6f' %
                                (specified_location[0], specified_location[1]))
     if not os.path.exists(Z_directory):
         os.makedirs(Z_directory)
         logging.info("create directory <%s>" % Z_directory)
     for it in range(0, times):
         header = (delta_smoke_factor_grid, x_min, x_max, y_min, y_max)
-        extinction_norm = 1 # FIXME: fast fix so that npz files are read
         ext_file = os.path.join(Z_directory, 't_%.0f.000000.npz' % slice_data.times[it])
         #print(np.max(data[it]))
-        print(np.shape(data[it]))
-        print(data[it])
+        #print(np.shape(data[it]))
+        #print(data[it])
         np.savez(ext_file, header=header, smoke_factor_grid_norm=data[it])
     if plots:
         plt.figure()
@@ -610,39 +612,51 @@ def main():
             plt.savefig(figname_it)
             plt.clf()
 
-    # ============================================================================
-    # Readout of crossings and transitions from jps geometry (saved as dictionary)
-    # ============================================================================
-    exits = get_exits(jps_path)
-    # =====================================================================================
-    # Calculation of smoke factor grid, default resolution: delta_smoke_factor_grid = 1 (m)
-    # =====================================================================================
-    delta_smoke_factor_grid = cmdl_args.delta_sfgrid
-    logging.info('Generation of smoke factor grids with mesh resolution: %s [m]' % delta_smoke_factor_grid)
-    for it in range(0, slice_data.times.size):
+    # smoke factor grids do not need to be produced for gas concentrations
+    if quantity == 'EXTINCTION_COEFFICIENT' and specified_location == ('Z', 2.25):
+        sfgrids_path = os.path.join(fds_path, "sf_grids")
+        if os.path.exists(sfgrids_path):  # delete any existing directory
+            logging.warning("Delete {}".format(sfgrids_path))
+            shutil.rmtree(sfgrids_path)
+        try:
+            os.makedirs(sfgrids_path)
+        except OSError as exc:
+            logging.critical("Can not make directory {} error={}".format(sfgrids_path, exc))
+            sys.exit("Error: Can not make directory %s" % sfgrids_path)
+        logging.info("Create {}".format(sfgrids_path))
+        # ============================================================================
+        # Readout of crossings and transitions from jps geometry (saved as dictionary)
+        # ============================================================================
+        exits = get_exits(jps_path)
+        # =====================================================================================
+        # Calculation of smoke factor grid, default resolution: delta_smoke_factor_grid = 1 (m)
+        # =====================================================================================
+        delta_smoke_factor_grid = cmdl_args.delta_sfgrid
+        logging.info('Generation of smoke factor grids with mesh resolution: %s [m]' % delta_smoke_factor_grid)
+        for it in range(0, slice_data.times.size):
 
-        convert = data[it]
-        Time = slice_data.times[it]
+            convert = data[it]
+            Time = slice_data.times[it]
 
-        logging.info('--------------------------------------------------')
-        logging.info('Processing files for time: %.fs' % Time)
+            logging.info('--------------------------------------------------')
+            logging.info('Processing files for time: %.fs' % Time)
 
-        for id, _exit in enumerate(exits):
-            Smoke_factor_grid_norm = smoke_factor_conv(convert, _exit, Time)
+            for id, _exit in enumerate(exits):
+                Smoke_factor_grid_norm = smoke_factor_conv(convert, _exit, Time)
+
+                if plots:
+                    logging.info('--------------------------------------------------')
+                    logging.info('Plotting files for time: %.fs and Exit: %s', Time, _exit)
+                    # =======================
+                    # Plot Smoke factor grids
+                    # =======================
+                    plot_smoke_grids(_exit, Time, Smoke_factor_grid_norm, geometry)
 
             if plots:
-                logging.info('--------------------------------------------------')
-                logging.info('Plotting files for time: %.fs and Exit: %s', Time, _exit)
-                # =======================
-                # Plot Smoke factor grids
-                # =======================
-                plot_smoke_grids(_exit, Time, Smoke_factor_grid_norm, geometry)
-
-        if plots:
-            # ===================
-            # plot line of sights
-            # ===================
-            plot_line_sights(Time, dx, dy, dz, point_of_view, agent_exit)
+                # ===================
+                # plot line of sights
+                # ===================
+                plot_line_sights(Time, dx, dy, dz, point_of_view, agent_exit)
 
 
 # Path pointing to the fire simulation directory
